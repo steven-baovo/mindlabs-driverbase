@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+
 import Sidebar from "@/components/Sidebar"
 import { WorkspaceProvider } from "@/contexts/WorkspaceContext"
 import { FocusProvider } from "@/contexts/FocusContext"
@@ -27,11 +27,11 @@ export default function FrontendLayout({
       }
     }
 
-    // 2. Chạy ngầm xác thực session thực tế với supabase
-    const supabase = createClient()
+    // 2. Chạy ngầm xác thực session thực tế với NextAuth
     async function checkSession() {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
+        const res = await fetch('/api/auth/session')
+        const session = await res.json()
         if (session?.user) {
           setUser(session.user)
           localStorage.setItem('mindlabs-user', JSON.stringify(session.user))
@@ -45,21 +45,6 @@ export default function FrontendLayout({
     }
 
     checkSession()
-
-    // 3. Đăng ký thay đổi trạng thái đăng nhập
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setUser(session.user)
-        localStorage.setItem('mindlabs-user', JSON.stringify(session.user))
-      } else {
-        setUser(null)
-        localStorage.removeItem('mindlabs-user')
-      }
-    })
-
-    return () => {
-      subscription.unsubscribe()
-    }
   }, [])
 
   return (

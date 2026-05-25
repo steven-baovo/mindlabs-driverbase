@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useFocus } from '@/contexts/FocusContext'
 import { db } from '@/lib/local-first/db'
 import { triggerSync } from '@/lib/local-first/sync-engine'
-import { createClient } from '@/lib/supabase/client'
+
 import { Settings2, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FloatingPortal } from '@floating-ui/react'
@@ -28,9 +28,14 @@ export default function FocusSettings() {
   const handleSave = async () => {
     setIsSaving(true)
     try {
-      const supabase = createClient()
-      const { data: authData } = await supabase.auth.getSession()
-      const userId = authData?.session?.user?.id || 'anonymous'
+      let userId = 'anonymous'
+      try {
+        const res = await fetch('/api/auth/session')
+        const authData = await res.json()
+        if (authData?.user?.id) userId = authData.user.id
+      } catch (e) {
+        console.error('No session')
+      }
       const now = new Date().toISOString()
       const recordId = userId // Use user_id as the primary key for settings
 

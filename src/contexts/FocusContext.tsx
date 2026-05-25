@@ -1,10 +1,10 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
-import { loadFocusSettings } from '@/app/(frontend)/pomodoro/actions'
+
 import { db } from '@/lib/local-first/db'
 import { triggerSync } from '@/lib/local-first/sync-engine'
-import { createClient } from '@/lib/supabase/client'
+
 
 export type FocusMode = 'pomodoro' | 'short_break' | 'long_break'
 
@@ -74,17 +74,19 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    // 2. Chạy ngầm loadFocusSettings() sau 1 giây (SWR) để tránh chặn UI Thread và gây trễ chuyển tab
     const timer = setTimeout(async () => {
       try {
-        const { data: dbSettings } = await loadFocusSettings()
-        if (dbSettings) {
-          setSettings(dbSettings)
-          setTimeLeft(dbSettings.pomodoro_duration * 60)
-          localStorage.setItem('focus-settings', JSON.stringify(dbSettings))
+        // Fallback or skip remote settings fetch if using GDrive JSON
+        // Remote settings are now synchronized directly by sync-engine.
+        const dbSettings = await db.focus_settings.toArray()
+        if (dbSettings && dbSettings.length > 0) {
+          const settingsObj = dbSettings[0]
+          setSettings(settingsObj)
+          setTimeLeft(settingsObj.pomodoro_duration * 60)
+          localStorage.setItem('focus-settings', JSON.stringify(settingsObj))
         }
       } catch (err) {
-        console.error('Failed to fetch remote focus settings asynchronously:', err)
+        console.error('Failed to fetch local focus settings asynchronously:', err)
       }
     }, 1000)
     
@@ -143,9 +145,14 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
 
     // Log session locally to IndexedDB + Sync Engine
     try {
-      const supabase = createClient()
-      const { data: authData } = await supabase.auth.getSession()
-      const userId = authData?.session?.user?.id || 'anonymous'
+      let userId = 'anonymous'
+      try {
+        const res = await fetch('/api/auth/session')
+        const authData = await res.json()
+        if (authData?.user?.id) userId = authData.user.id
+      } catch (e) {
+        console.error('No session')
+      }
       const sessionId = crypto.randomUUID()
       const now = new Date().toISOString()
 

@@ -6,7 +6,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/lib/local-first/db'
 import Link from 'next/link'
 
-import { createClient } from '@/lib/supabase/client'
+
 
 export function SyncStatusIndicator() {
   const [isOnline, setIsOnline] = useState(true)
@@ -26,21 +26,16 @@ export function SyncStatusIndicator() {
     window.addEventListener('offline', handleOffline)
     window.addEventListener('mindlabs-sync-error', handleSyncError)
 
-    // Check initial auth state and listen for changes
-    const supabase = createClient()
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null)
-    })
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null)
-    })
+    // Check initial auth state
+    fetch('/api/auth/session')
+      .then(res => res.json())
+      .then(session => setUser(session?.user || null))
+      .catch(() => setUser(null))
 
     return () => {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
       window.removeEventListener('mindlabs-sync-error', handleSyncError)
-      subscription.unsubscribe()
     }
   }, [])
 

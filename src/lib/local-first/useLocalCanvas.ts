@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { db } from './db'
 import { triggerSync } from './sync-engine'
-import { loadMindmap } from '@/app/(frontend)/workspace/node-actions'
+
 
 export function useLocalCanvas() {
   /**
@@ -16,28 +16,9 @@ export function useLocalCanvas() {
       return { data: canvas, error: null }
     }
 
-    // 2. Tải từ Server
-    console.log(`[Local Canvas] Canvas ${mapId} chưa có ở local. Tải từ Server...`)
-    try {
-      const { data, error } = await loadMindmap(mapId)
-      if (error) return { data: null, error }
-      if (data) {
-        const newLocalCanvas = {
-          id: data.id,
-          user_id: data.user_id,
-          title: data.title,
-          nodes: data.nodes || [],
-          edges: data.edges || [],
-          created_at: data.created_at,
-          updated_at: data.updated_at,
-          is_synced: 1
-        }
-        await db.mindmaps.put(newLocalCanvas)
-        return { data: newLocalCanvas, error: null }
-      }
-    } catch (err: any) {
-      return { data: null, error: err.message }
-    }
+    // 2. Not found in local DB
+    console.log(`[Local Canvas] Canvas ${mapId} chưa có ở local. Vui lòng đợi đồng bộ từ Server.`)
+    return { data: null, error: 'Canvas not found locally' }
     return { data: null, error: 'Canvas not found' }
   }, [])
 

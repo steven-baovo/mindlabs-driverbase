@@ -14,7 +14,6 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  output: process.env.TAURI_BUILD === "true" ? "export" : undefined,
   compiler: {
     styledComponents: true,
   },
@@ -22,7 +21,6 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: process.env.TAURI_BUILD === "true" ? true : undefined,
     remotePatterns: [
       {
         protocol: 'https',
@@ -44,9 +42,6 @@ const nextConfig: NextConfig = {
     },
   },
   async rewrites() {
-    if (process.env.TAURI_BUILD === "true") {
-      return [];
-    }
     return [
       {
         source: "/blog/:path*",

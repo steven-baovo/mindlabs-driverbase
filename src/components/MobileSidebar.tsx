@@ -6,15 +6,7 @@ import {
   X, 
   Home, 
   Search, 
-  Info, 
-  MessageSquare, 
-  History, 
-  HelpCircle, 
-  BookOpen, 
-  ShieldCheck,
-  Calendar,
   FileText,
-  Sparkles,
   Timer,
   ListTodo
 } from 'lucide-react'
@@ -31,21 +23,12 @@ interface MobileSidebarProps {
 }
 
 const MENU_ITEMS = [
-  { title: 'Home', icon: Home, href: '/' },
-  { title: 'Search', icon: Search, href: '#' },
   { title: 'Nhiệm vụ', icon: ListTodo, href: '/tasks' },
   { title: 'Workspace', icon: FileText, href: '/workspace' },
   { title: 'MindFocus', icon: Timer, href: '/pomodoro' },
 ]
 
-const EXPLORE_ITEMS = [
-  { title: 'About Us', icon: Info, href: '/about' },
-  { title: 'Contact', icon: MessageSquare, href: '/contact' },
-  { title: 'Changelog', icon: History, href: '/changelog' },
-  { title: 'FAQ', icon: HelpCircle, href: '/faq' },
-  { title: 'Help Center', icon: BookOpen, href: '/docs' },
-  { title: 'Legal', icon: ShieldCheck, href: '/legal' },
-]
+
 
 export default function MobileSidebar({ isOpen, onClose, user, profile }: MobileSidebarProps) {
   const pathname = usePathname()
@@ -122,25 +105,7 @@ export default function MobileSidebar({ isOpen, onClose, user, profile }: Mobile
                 })}
               </div>
 
-              {/* Explore Menu */}
-              <div className="flex flex-col gap-1">
-                <span className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-secondary/80 mb-2">Khám phá</span>
-                {EXPLORE_ITEMS.map((item) => {
-                  const Icon = item.icon
-                  const isActive = pathname === item.href
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={onClose}
-                      className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all ${isActive ? 'bg-primary/5 text-primary font-bold' : 'text-secondary hover:bg-gray-50'}`}
-                    >
-                      <Icon className="w-5 h-5 text-secondary" />
-                      <span className="text-sm">{item.title}</span>
-                    </Link>
-                  )
-                })}
-              </div>
+
             </div>
 
             {/* Footer / User Profile */}

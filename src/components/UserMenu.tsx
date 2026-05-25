@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { User as UserIcon, LogOut, Settings } from 'lucide-react'
-import { logout } from '@/app/auth/actions'
+import { signOut } from 'next-auth/react'
 
 interface UserMenuProps {
   user: {
@@ -67,15 +67,14 @@ export default function UserMenu({ user, profile }: UserMenuProps) {
             Tài khoản
           </Link>
 
-          <form action={logout}>
             <button 
-              type="submit" 
+              type="button" 
+              onClick={() => signOut({ callbackUrl: '/login' })}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
               Đăng xuất
             </button>
-          </form>
         </div>
       )}
     </div>

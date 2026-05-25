@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { createClient } from '@/lib/supabase/client'
+
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
@@ -13,14 +13,6 @@ import {
   Plus,
   Sparkles,
   Calendar,
-  MessageSquare,
-  Info,
-  History,
-  ShieldCheck,
-  HelpCircle,
-  BookOpen,
-  LayoutGrid,
-  ExternalLink,
   Timer,
   ListTodo,
   Briefcase
@@ -36,7 +28,6 @@ interface SidebarProps {
 }
 
 const PRIMARY_MENU = [
-  { title: 'Dashboard', icon: Home, href: '/' },
   { title: 'Nhiệm vụ', icon: ListTodo, href: '/tasks' },
   { title: 'Workspace', icon: Briefcase, href: '/workspace' },
 ]
@@ -46,53 +37,20 @@ const TOOLS_MENU = [
 ]
 
 
-// Các trang thông tin được đưa vào Khám phá
-const PANEL_PAGES = [
-  { title: 'About Us', icon: Info, href: '/about' },
-  { title: 'Contact', icon: MessageSquare, href: '/contact' },
-  { title: 'Changelog', icon: History, href: '/changelog' },
-  { title: 'FAQ', icon: HelpCircle, href: '/faq' },
-  { title: 'Help Center', icon: BookOpen, href: '/docs' },
-  { title: 'Legal', icon: ShieldCheck, href: '/legal' },
-]
+
 
 export default function Sidebar({ user, profile: initialProfile }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const focus = useFocus()
 
-  const [profile, setProfile] = useState<any>(initialProfile || null)
-
-  // Client-side SWR profile fetching
-  useEffect(() => {
-    if (!user) return
-
-    const cachedProfile = localStorage.getItem(`user-profile-${user.id}`)
-    if (cachedProfile) {
-      try {
-        setProfile(JSON.parse(cachedProfile))
-      } catch (e) {
-        console.error('Failed to parse cached profile', e)
-      }
+  // NextAuth provides user.name and user.image directly
+  const profile = useMemo(() => {
+    if (!user) return null
+    return {
+      display_name: user.name || 'User',
+      avatar_url: user.image || null
     }
-
-    const supabase = createClient()
-    async function fetchProfile() {
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .maybeSingle()
-        if (data && !error) {
-          setProfile(data)
-          localStorage.setItem(`user-profile-${user.id}`, JSON.stringify(data))
-        }
-      } catch (err) {
-        console.error('Error fetching profile client-side:', err)
-      }
-    }
-    fetchProfile()
   }, [user])
 
   // Initialize collapsed state (default to open to avoid hydration mismatch)
@@ -128,22 +86,7 @@ export default function Sidebar({ user, profile: initialProfile }: SidebarProps)
     localStorage.setItem('sidebar-collapsed', String(val))
   }
 
-  const [isExploreOpen, setIsExploreOpen] = useState(false)
-  const wrapperRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setIsExploreOpen(false)
-      }
-    }
-    if (isExploreOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isExploreOpen])
 
   const renderMenuItem = (item: any, index: number) => {
     const Icon = item.icon
@@ -269,51 +212,6 @@ export default function Sidebar({ user, profile: initialProfile }: SidebarProps)
 
       {/* Bottom Section */}
       <div className="p-2 flex flex-col gap-1.5 relative">
-
-        {/* Khám phá (Đặt ở dưới cùng, trên notification) */}
-        <div
-          ref={wrapperRef}
-          className="relative"
-        >
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setIsExploreOpen(!isExploreOpen)
-            }}
-            className={`flex items-center transition-all rounded-xl py-2 text-secondary hover:text-foreground hover:bg-zinc-200/60 w-full cursor-pointer ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'}`}
-            title="Khám phá"
-          >
-            <LayoutGrid className="w-[18px] h-[18px] shrink-0 text-secondary" />
-            {!isCollapsed && <span className="text-[13px]">Khám phá</span>}
-          </button>
-
-          {/* Flyout Panel 1 cột */}
-          {isExploreOpen && (
-            <div
-              className={`absolute ${isCollapsed ? 'left-[50px]' : 'left-[210px]'} bottom-0 w-[200px] bg-white border border-border-strong rounded-2xl p-4 z-[100] animate-in fade-in slide-in-from-left-2 duration-200`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div>
-                <div className={`${SIDEBAR_STYLES.sectionTitle} mb-2 px-2`}>Trang</div>
-                <div className="flex flex-col gap-0.5">
-                  {PANEL_PAGES.map((item, index) => {
-                    const Icon = item.icon
-                    return (
-                      <Link
-                        key={index}
-                        href={item.href}
-                        className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12px] text-secondary hover:text-foreground hover:bg-gray-50 transition-colors"
-                      >
-                        <Icon className="w-3.5 h-3.5 text-secondary/80" />
-                        <span>{item.title}</span>
-                      </Link>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
 
 
 

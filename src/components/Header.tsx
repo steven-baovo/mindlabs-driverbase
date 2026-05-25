@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Bell, Home, FileText, Sparkles, Cloud, CloudCheck, Timer } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { Search, Bell, ListTodo, FileText, Sparkles, Cloud, CloudCheck, Timer } from 'lucide-react'
+
 import UserMenu from './UserMenu'
 import { useWorkspace } from '@/contexts/WorkspaceContext'
 import { useFocus } from '@/contexts/FocusContext'
@@ -14,7 +14,7 @@ import { SyncStatusIndicator } from './SyncStatusIndicator'
 const DEEP_WORKSPACE = /^\/workspace/
 
 const NAV_ITEMS = [
-  { name: 'Home', href: '/', icon: Home },
+  { name: 'Tasks', href: '/tasks', icon: ListTodo },
   { name: 'Workspace', href: '/workspace', icon: FileText },
 ]
 
@@ -25,18 +25,26 @@ export default function Header() {
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [workspaceHref, setWorkspaceHref] = useState('/workspace')
-  const supabase = createClient()
+
 
   const isDeepWorkspace = DEEP_WORKSPACE.test(pathname)
 
 
   useEffect(() => {
     async function getUser() {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      if (user) {
-        const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-        setProfile(data)
+      try {
+        const res = await fetch('/api/auth/session')
+        const session = await res.json()
+        const currentUser = session?.user || null
+        setUser(currentUser)
+        if (currentUser) {
+          setProfile({
+            display_name: currentUser.name || 'User',
+            avatar_url: currentUser.image || null
+          })
+        }
+      } catch (err) {
+        console.error('Failed to fetch session', err)
       }
     }
     getUser()
@@ -150,7 +158,7 @@ export default function Header() {
           {isDeepWorkspace && (
             <div className="flex items-center gap-1 mr-2 bg-black/5 rounded-full p-0.5">
               {[
-                { href: '/', icon: Home, title: 'Home' }
+                { href: '/workspace', icon: FileText, title: 'Workspace' }
               ].map((link, i) => (
                 <Link 
                   key={i}

@@ -1,14 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Home, FileText, Timer, Menu } from 'lucide-react'
+import { ListTodo, FileText, Timer, Menu } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { useFocus } from '@/contexts/FocusContext'
 
 const NAV_ITEMS = [
-  { icon: Home, label: 'Home', href: '/' },
+  { icon: ListTodo, label: 'Tasks', href: '/tasks' },
   { icon: FileText, label: 'Workspace', href: '/workspace' },
   { icon: Timer, label: 'Focus', href: '/pomodoro' },
 ]
