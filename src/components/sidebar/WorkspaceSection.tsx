@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useWorkspace } from '@/contexts/WorkspaceContext'
 import {
   ChevronRight,
+  ChevronDown,
   Plus,
   Trash2,
   FilePlus,
@@ -12,15 +13,18 @@ import {
   LayoutGrid,
   GitFork,
   Link as LucideLink,
-  Network
+  Network,
+  Library
 } from 'lucide-react'
 import { useLocalWorkspace } from '@/lib/local-first/useLocalWorkspace'
 import { useLocalNotes } from '@/lib/local-first/useLocalNotes'
 import { useLocalCanvas } from '@/lib/local-first/useLocalCanvas'
 import { db } from '@/lib/local-first/db'
+import { SIDEBAR_STYLES } from '@/lib/sidebar-styles'
 
 import { getNodeIconData, buildTree, TreeNode, WorkspaceNode } from '@/lib/node-utils'
 import LinkNodeModal from '@/components/workspace/LinkNodeModal'
+import { DropdownCard, DropdownItem, DropdownSeparator } from '@/components/ui/DropdownCard'
 
 export default function WorkspaceSection() {
   const router = useRouter()
@@ -36,6 +40,25 @@ export default function WorkspaceSection() {
 
   const loading = !liveNodesReady
 
+  // State cho Bảng Tạo mới (Dropdown Menu)
+  const [createMenuOpen, setCreateMenuOpen] = useState(false)
+  const createMenuRef = useRef<HTMLDivElement>(null)
+
+  // Lắng nghe click outside để đóng menu tạo mới
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (createMenuRef.current && !createMenuRef.current.contains(event.target as Node)) {
+        setCreateMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleCollapseAll = () => {
+    setOpenNodes(new Set())
+  }
+
   // State cho Link Node Modal
   const [linkModalOpen, setLinkModalOpen] = useState(false)
   const [linkModalData, setLinkModalData] = useState<{
@@ -45,6 +68,23 @@ export default function WorkspaceSection() {
     title: string
     url: string
   } | null>(null)
+
+  // State và Effect cho việc co/giãn toàn bộ phân mục Library
+  const [isLibraryExpanded, setIsLibraryExpanded] = useState(true)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sidebar-library-expanded')
+      if (saved !== null) {
+        setIsLibraryExpanded(saved === 'true')
+      }
+    }
+  }, [])
+
+  const handleToggleLibrary = (expanded: boolean) => {
+    setIsLibraryExpanded(expanded)
+    localStorage.setItem('sidebar-library-expanded', expanded.toString())
+  }
 
   // State cho việc tạo Node mới
   const [creatingParentId, setCreatingParentId] = useState<string | null>(null)
@@ -313,56 +353,98 @@ export default function WorkspaceSection() {
   return (
     <>
       <div className="flex-1 flex flex-col pt-0 px-0 relative group/sidebar min-h-0">
-        <div className="h-[44px] border-b border-border-main bg-transparent shrink-0 flex items-center justify-between select-none px-1">
-          {/* Nhóm 1: Thêm mới */}
+        {/* Tiêu đề mục Library tích hợp Hover và Nút điều khiển nhanh */}
+        <div className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md select-none shrink-0 relative group/lib-header cursor-pointer transition-colors ${createMenuOpen ? 'bg-hover-bg' : 'hover:bg-hover-bg'}`}>
+          <div className="flex items-center gap-2">
+            <Library className="w-3.5 h-3.5 text-zinc-400/80" strokeWidth={2} />
+            <span className="font-medium text-[13px] text-secondary">Library</span>
+          </div>
+          
           <div className="flex items-center gap-1">
+            {/* Nhóm nút nâng cao chỉ xuất hiện khi Hover */}
+            <div className="flex items-center gap-1 opacity-0 group-hover/lib-header:opacity-100 transition-opacity">
+              {/* Nút xem Graph */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  router.push('/workspace?view=graph')
+                }}
+                className="p-1 rounded hover:bg-zinc-300/50 dark:hover:bg-zinc-700/50 text-zinc-400 hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
+                title="Xem Graph View"
+              >
+                <Network className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Nút tạo mới */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setCreateMenuOpen(!createMenuOpen)
+                }}
+                className="p-1 rounded hover:bg-zinc-300/50 dark:hover:bg-zinc-700/50 text-zinc-400 hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
+                title="Tạo tài liệu mới"
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Nút co/giãn mục Library luôn xuất hiện ở góc ngoài cùng bên phải */}
             <button
-              onClick={() => handleCreateNodeDirect(null, 'note')}
-              className="p-1.5 hover:bg-hover-bg rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
-              title="Tạo Note mới"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleToggleLibrary(!isLibraryExpanded)
+              }}
+              className="p-0.5 rounded hover:bg-zinc-300/50 dark:hover:bg-zinc-700/50 text-zinc-400 hover:text-foreground transition-colors cursor-pointer flex items-center justify-center shrink-0"
+              title={isLibraryExpanded ? "Thu gọn Library" : "Mở rộng Library"}
             >
-              <FilePlus className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleCreateNodeDirect(null, 'map')}
-              className="p-1.5 hover:bg-hover-bg rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
-              title="Tạo Canvas mới"
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleCreateNodeDirect(null, 'link')}
-              className="p-1.5 hover:bg-hover-bg rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
-              title="Tạo Liên kết mới"
-            >
-              <LucideLink className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleCreateNodeDirect(null, 'folder')}
-              className="p-1.5 hover:bg-hover-bg rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
-              title="Tạo Thư mục mới"
-            >
-              <FolderPlus className="w-4 h-4" />
+              <ChevronDown className={`w-3.5 h-3.5 transform transition-transform duration-200 ${isLibraryExpanded ? '' : '-rotate-90'}`} />
             </button>
           </div>
 
-          {/* Nhóm 2: Góc nhìn */}
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => router.push('/workspace?view=graph')}
-              className="p-1.5 hover:bg-hover-bg rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
-              title="Xem Graph View"
+          {/* Bảng Tạo mới (Dropdown Menu) */}
+          {createMenuOpen && (
+            <DropdownCard 
+              dropdownRef={createMenuRef}
+              className="absolute right-1 top-9 w-40"
             >
-              <Network className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => router.push('/workspace')}
-              className="p-1.5 hover:bg-hover-bg rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
-              title="Xem Sơ đồ Cấu trúc"
-            >
-              <GitFork className="w-4 h-4" />
-            </button>
-          </div>
+              <DropdownItem
+                onClick={() => {
+                  setCreateMenuOpen(false)
+                  handleCreateNodeDirect(null, 'note')
+                }}
+                icon={FilePlus}
+              >
+                Tạo Note mới
+              </DropdownItem>
+              <DropdownItem
+                onClick={() => {
+                  setCreateMenuOpen(false)
+                  handleCreateNodeDirect(null, 'map')
+                }}
+                icon={LayoutGrid}
+              >
+                Tạo Canvas mới
+              </DropdownItem>
+              <DropdownItem
+                onClick={() => {
+                  setCreateMenuOpen(false)
+                  handleCreateNodeDirect(null, 'link')
+                }}
+                icon={LucideLink}
+              >
+                Tạo Liên kết mới
+              </DropdownItem>
+              <DropdownItem
+                onClick={() => {
+                  setCreateMenuOpen(false)
+                  handleCreateNodeDirect(null, 'folder')
+                }}
+                icon={FolderPlus}
+              >
+                Tạo Thư mục mới
+              </DropdownItem>
+            </DropdownCard>
+          )}
         </div>
 
         <div 
@@ -380,7 +462,7 @@ export default function WorkspaceSection() {
           }}
           className="flex-1 overflow-y-auto no-scrollbar pt-3 flex flex-col gap-0.5"
         >
-          {loading ? (
+          {!isLibraryExpanded ? null : loading ? (
             <div className="space-y-2 animate-pulse mt-2">
               <div className="flex items-center gap-2 p-1.5">
                 <div className="w-3.5 h-3.5 bg-active-bg/50 rounded"></div>
@@ -413,44 +495,46 @@ export default function WorkspaceSection() {
         const isFolderWithChildren = node?.type === 'folder' && hasChildren
 
         return (
-          <div
-            className="fixed bg-surface border border-border-main rounded-lg py-1 z-[1000] w-48 animate-in fade-in zoom-in-95 duration-100 shadow-overlay"
+          <DropdownCard
+            className="fixed w-48 !z-[1000]"
             style={{ top: contextMenu.mouseY, left: contextMenu.mouseX }}
-            onClick={(e) => e.stopPropagation()}
           >
-            <button
+            <DropdownItem
               onClick={() => {
                 setEditingNodeId(contextMenu.nodeId)
                 setContextMenu(null)
               }}
-              className="w-full text-left px-3 py-1.5 text-xs hover:bg-hover-bg flex items-center gap-2 text-foreground"
+              icon={Plus}
             >
-              <Plus className="w-3.5 h-3.5 text-secondary" /> Đổi tên
-            </button>
+              Đổi tên
+            </DropdownItem>
 
             {node?.type === 'link' && (
-              <button
-                onClick={() => {
-                  setLinkModalData({
-                    mode: 'edit',
-                    nodeId: node.id,
-                    title: node.title,
-                    url: node.url || ''
-                  })
-                  setLinkModalOpen(true)
-                  setContextMenu(null)
-                }}
-                className="w-full text-left px-3 py-1.5 text-xs hover:bg-hover-bg flex items-center gap-2 text-foreground border-t border-border-main"
-              >
-                <LucideLink className="w-3.5 h-3.5 text-secondary" /> Sửa tiêu đề & URL
-              </button>
+              <>
+                <DropdownSeparator />
+                <DropdownItem
+                  onClick={() => {
+                    setLinkModalData({
+                      mode: 'edit',
+                      nodeId: node.id,
+                      title: node.title,
+                      url: node.url || ''
+                    })
+                    setLinkModalOpen(true)
+                    setContextMenu(null)
+                  }}
+                  icon={LucideLink}
+                >
+                  Sửa tiêu đề & URL
+                </DropdownItem>
+              </>
             )}
 
             {isFolderWithChildren ? (
               <>
-                <div className="border-t border-border-main my-1"></div>
+                <DropdownSeparator />
                 <div className="px-3 py-1 text-[10px] text-secondary font-medium">Lựa chọn xóa:</div>
-                <button
+                <DropdownItem
                   onClick={async () => {
                     const children = nodes.filter(n => n.parent_id === node.id)
                     setContextMenu(null)
@@ -460,41 +544,35 @@ export default function WorkspaceSection() {
                     }
                     await deleteNode(node.id)
                   }}
-                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-hover-bg flex flex-col gap-0.5 text-foreground"
+                  icon={Trash2}
                 >
-                  <div className="flex items-center gap-2">
-                    <Trash2 className="w-3.5 h-3.5 text-secondary" strokeWidth={1.5} /> 
-                    <span>Chỉ xóa thư mục</span>
-                  </div>
-                  <span className="text-[10px] text-secondary/60 ml-5">Giữ lại file con đẩy ra ngoài</span>
-                </button>
+                  Chỉ xóa thư mục
+                </DropdownItem>
 
-                <button
+                <DropdownItem
+                  variant="danger"
                   onClick={async () => {
                     setContextMenu(null)
                     await deleteNode(node.id)
                   }}
-                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-red-500/10 text-red-500 flex flex-col gap-0.5"
+                  icon={Trash2}
                 >
-                  <div className="flex items-center gap-2">
-                    <Trash2 className="w-3.5 h-3.5 text-red-500" strokeWidth={1.5} /> 
-                    <span>Xóa toàn bộ</span>
-                  </div>
-                  <span className="text-[10px] text-red-450 ml-5">Xóa sạch thư mục và file con</span>
-                </button>
+                  Xóa toàn bộ
+                </DropdownItem>
               </>
             ) : (
-              <button
+              <DropdownItem
+                variant="danger"
                 onClick={() => {
                   handleDeleteNode(contextMenu.nodeId)
                   setContextMenu(null)
                 }}
-                className="w-full text-left px-3 py-1.5 text-xs hover:bg-red-500/10 text-red-500 flex items-center gap-2"
+                icon={Trash2}
               >
-                <Trash2 className="w-3.5 h-3.5" strokeWidth={1.5} /> Xóa
-              </button>
+                Xóa
+              </DropdownItem>
             )}
-          </div>
+          </DropdownCard>
         )
       })()}
 

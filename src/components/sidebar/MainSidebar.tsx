@@ -14,11 +14,8 @@ export default function MainSidebar() {
         <SidebarHeader />
 
         {/* Cột scroll chứa Tasks và Workspace */}
-        <div className="flex flex-col flex-1 overflow-y-auto no-scrollbar">
+        <div className="flex flex-col flex-1 overflow-y-auto no-scrollbar gap-2">
           <TasksSection />
-          
-          {/* Divider */}
-          <div className="my-4 border-t border-border-main shrink-0" />
           
           <WorkspaceSection />
         </div>

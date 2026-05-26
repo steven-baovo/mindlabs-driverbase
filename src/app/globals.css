@@ -26,10 +26,10 @@
   /* Zinc 400 focus/interactive borders */
   --border-gray-bg: #d4d4d8;
   /* Zinc 300 for borders on gray backgrounds */
-  --hover-bg: #f4f4f5;
-  /* Zinc 100 hover */
-  --active-bg: #e4e4e7;
-  /* Zinc 200 active */
+  --hover-bg: rgba(0, 0, 0, 0.05);
+  /* Lớp phủ xám mờ tinh tế nổi bật trên cả nền #f2f2f2 */
+  --active-bg: rgba(0, 0, 0, 0.08);
+  /* Lớp phủ active xám đậm hơn */
 
   /* Ncmaz Premium Style Extensions (Override to sharp linear-style) */
   --radius-ncmaz: 8px;
@@ -144,8 +144,8 @@
   --border-main: #1f1f23;
   /* Dark border */
   --border-strong: #3f3f46;
-  --hover-bg: #1f1f23;
-  --active-bg: #27272a;
+  --hover-bg: rgba(255, 255, 255, 0.06);
+  --active-bg: rgba(255, 255, 255, 0.1);
   --glass-bg: rgba(9, 9, 11, 0.85);
   --glass-border: rgba(255, 255, 255, 0.08);
 }

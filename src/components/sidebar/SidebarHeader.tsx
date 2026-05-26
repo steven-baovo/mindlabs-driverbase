@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { User as UserIcon, LogOut, Settings, Sun, Moon, Monitor, X, ChevronDown } from 'lucide-react'
 import { signOut } from 'next-auth/react'
+import { DropdownCard, DropdownHeader, DropdownItem } from '@/components/ui/DropdownCard'
 
 type Theme = 'light' | 'dark' | 'system'
 
@@ -130,39 +131,33 @@ export default function SidebarHeader() {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute left-1.5 top-full mt-1.5 w-60 bg-surface rounded-xl border border-border-main py-1.5 z-[60] shadow-overlay animate-in fade-in slide-in-from-top-1 duration-200">
-          <div className="px-3 py-1.5 border-b border-border-main mb-1">
-            <p className="text-xs text-foreground font-bold truncate">
-              {displayName}
-            </p>
-            <p className="text-[10px] text-foreground/50 truncate">
-              {user?.email || 'local@leanity.app'}
-            </p>
-          </div>
+        <DropdownCard className="absolute left-1.5 top-full mt-1.5 w-60">
+          <DropdownHeader 
+            title={displayName} 
+            subtitle={user?.email || 'local@leanity.app'} 
+          />
           
-          <Link 
-            href="/account" 
-            className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-foreground/80 hover:bg-hover-bg transition-colors cursor-pointer"
+          <DropdownItem 
+            href="/account"
+            icon={UserIcon}
             onClick={() => setIsOpen(false)}
           >
-            <UserIcon className="w-3.5 h-3.5 text-foreground/50" />
             Tài khoản
-          </Link>
+          </DropdownItem>
 
-          <button 
-            type="button"
+          <DropdownItem 
+            icon={Settings}
             onClick={() => {
               setIsOpen(false)
               setIsSettingsOpen(true)
             }}
-            className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-foreground/80 hover:bg-hover-bg transition-colors text-left cursor-pointer"
           >
-            <Settings className="w-3.5 h-3.5 text-foreground/50" />
             Cài đặt
-          </button>
+          </DropdownItem>
 
-          <button 
-            type="button" 
+          <DropdownItem 
+            variant="danger"
+            icon={LogOut}
             onClick={async () => {
               setIsOpen(false)
               try {
@@ -175,12 +170,10 @@ export default function SidebarHeader() {
               }
               signOut({ callbackUrl: '/login' })
             }}
-            className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors text-left cursor-pointer"
           >
-            <LogOut className="w-3.5 h-3.5" />
             Đăng xuất
-          </button>
-        </div>
+          </DropdownItem>
+        </DropdownCard>
       )}
 
       {/* Settings Modal */}

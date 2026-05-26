@@ -109,7 +109,7 @@ export default function TasksSection() {
 
   return (
     <>
-      <div className="flex flex-col gap-3 flex-none shrink-0">
+      <div className="flex flex-col gap-2 flex-none shrink-0">
         {/* Main Menu */}
         <div className="space-y-0.5">
           <Link
