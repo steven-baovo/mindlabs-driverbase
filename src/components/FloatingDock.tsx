@@ -70,7 +70,7 @@ export default function FloatingDock({ user }: FloatingDockProps) {
   if (isCustomLayout) {
     return (
       <div 
-        className="fixed bottom-[5px] left-[5px] z-[9999] pointer-events-auto h-[52px] bg-white border border-border-main/50 rounded-default flex items-center px-4 justify-between"
+        className="fixed bottom-[5px] left-[5px] z-[9999] pointer-events-auto h-[44px] bg-white border border-border-main/50 rounded-default flex items-center px-4 justify-between"
         style={{ width: 'var(--sidebar-width, 300px)' }}
       >
         {/* Mục tài khoản / Menu người dùng (ở bên trái) */}
