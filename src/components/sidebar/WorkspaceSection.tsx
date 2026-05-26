@@ -724,7 +724,7 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
         }}
         className={`flex items-center gap-2 p-1.5 rounded-lg cursor-grab active:cursor-grabbing transition-all group select-none
           ${isActive 
-            ? 'bg-primary/5 text-primary font-bold border-l-2 border-primary rounded-l-none' 
+            ? 'bg-primary/5 text-primary font-bold' 
             : 'text-secondary hover:text-foreground hover:bg-hover-bg'}
           ${isDragOver ? 'bg-blue-50/70 border border-blue-500' : ''}
           ${level === 0 ? 'text-[13px]' : 'text-[12px]'}

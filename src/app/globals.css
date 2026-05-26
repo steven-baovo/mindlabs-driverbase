@@ -7,8 +7,8 @@
   /* Professional Minimalist Foundation - Linear Matte Zinc & Indigo Accent */
   --background: #ffffff;
   /* Pure white canvas for clean light mode */
-  --foreground: #09090b;
-  /* Zinc 950 for deep matte text contrast */
+  --foreground: #18181b;
+  /* Zinc 900 for soft, premium, eye-friendly matte text contrast */
   --surface: #ffffff;
   /* White cards and panels */
 
@@ -199,41 +199,50 @@ body {
   }
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
+/* ==========================================================================
+   Hệ Thống Thanh Cuộn Quy Chuẩn Toàn Cầu (Global Sleek Scrollbar System)
+   ========================================================================== */
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 10px;
-  transition: background 0.2s;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.custom-scrollbar {
+/* Cho Firefox */
+* {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
 }
 
-/* Hỗ trợ Dark mode qua class .dark */
-.dark {
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-  }
+.dark * {
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
 
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.4);
-  }
+/* Cho Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
 
-  .custom-scrollbar {
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-  }
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 9999px;
+  border: 1.5px solid transparent; /* Tạo viền trong suốt tạo hiệu ứng bay lơ lửng */
+  background-clip: padding-box;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+  background-clip: padding-box;
+}
+
+/* Hỗ trợ Dark mode cho Webkit */
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  background-clip: padding-box;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+  background-clip: padding-box;
 }

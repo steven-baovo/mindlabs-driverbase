@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { User as UserIcon, LogOut, Settings, Sun, Moon, Monitor, X, ChevronDown } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import { DropdownCard, DropdownHeader, DropdownItem } from '@/components/ui/DropdownCard'
+import SettingsModal from './SettingsModal'
 
 type Theme = 'light' | 'dark' | 'system'
 
@@ -15,6 +16,7 @@ export default function SidebarHeader() {
   const [isOpen, setIsOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [theme, setTheme] = useState<Theme>('system')
+  const [fontSize, setFontSize] = useState<string>('13px')
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Fetch cached user on mount and check session
@@ -43,10 +45,15 @@ export default function SidebarHeader() {
     checkSession()
   }, [])
 
-  // Load theme on mount
+  // Load theme and font size on mount
   useEffect(() => {
     const savedTheme = (localStorage.getItem('theme') as Theme) || 'system'
     setTheme(savedTheme)
+
+    const savedFontSize = localStorage.getItem('font-size-system') || '13px'
+    setFontSize(savedFontSize)
+    document.documentElement.style.setProperty('--font-size-system', savedFontSize)
+    document.documentElement.style.setProperty('--font-size-standard', savedFontSize)
   }, [])
 
   // Close dropdown on click outside
@@ -75,6 +82,13 @@ export default function SidebarHeader() {
         document.documentElement.classList.remove('dark')
       }
     }
+  }
+
+  const handleFontSizeChange = (newSize: string) => {
+    setFontSize(newSize)
+    localStorage.setItem('font-size-system', newSize)
+    document.documentElement.style.setProperty('--font-size-system', newSize)
+    document.documentElement.style.setProperty('--font-size-standard', newSize)
   }
 
   // Get stable colors for avatar
@@ -177,77 +191,15 @@ export default function SidebarHeader() {
       )}
 
       {/* Settings Modal */}
-      {isSettingsOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-[100] flex items-center justify-center animate-in fade-in duration-200">
-          <div className="absolute inset-0" onClick={() => setIsSettingsOpen(false)} />
-          
-          <div className="relative bg-surface border border-border-main rounded-2xl p-5 w-80 max-w-[90vw] shadow-overlay z-10 animate-in fade-in zoom-in-95 duration-200">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-5 pb-2.5 border-b border-border-main">
-              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                <Settings className="w-4 h-4 text-primary" />
-                Cài đặt hệ thống
-              </h3>
-              <button 
-                onClick={() => setIsSettingsOpen(false)}
-                className="p-1 hover:bg-hover-bg rounded-md text-foreground/50 hover:text-foreground transition-colors cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-            
-            {/* Content */}
-            <div className="space-y-4">
-              <div>
-                <label className="text-[10px] font-bold text-foreground/50 uppercase tracking-wider block mb-2">
-                  Giao diện ứng dụng
-                </label>
-                
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleThemeChange('light')}
-                    className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border text-[11px] font-semibold transition-all cursor-pointer ${
-                      theme === 'light'
-                        ? 'border-primary bg-primary/5 text-primary'
-                        : 'border-border-main hover:bg-hover-bg text-foreground/75'
-                    }`}
-                  >
-                    <Sun className="w-4 h-4" />
-                    <span>Sáng</span>
-                  </button>
-                  
-                  <button
-                    type="button"
-                    onClick={() => handleThemeChange('dark')}
-                    className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border text-[11px] font-semibold transition-all cursor-pointer ${
-                      theme === 'dark'
-                        ? 'border-primary bg-primary/5 text-primary'
-                        : 'border-border-main hover:bg-hover-bg text-foreground/75'
-                    }`}
-                  >
-                    <Moon className="w-4 h-4" />
-                    <span>Tối</span>
-                  </button>
-                  
-                  <button
-                    type="button"
-                    onClick={() => handleThemeChange('system')}
-                    className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border text-[11px] font-semibold transition-all cursor-pointer ${
-                      theme === 'system'
-                        ? 'border-primary bg-primary/5 text-primary'
-                        : 'border-border-main hover:bg-hover-bg text-foreground/75'
-                    }`}
-                  >
-                    <Monitor className="w-4 h-4" />
-                    <span>Hệ thống</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        theme={theme}
+        onThemeChange={handleThemeChange}
+        fontSize={fontSize}
+        onFontSizeChange={handleFontSizeChange}
+        user={user}
+      />
     </div>
   )
 }

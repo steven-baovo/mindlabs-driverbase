@@ -53,7 +53,7 @@ export default function FrontendLayout({
       <TasksProvider>
         <WorkspaceProvider>
           {user && <SyncInitializer />}
-          <div className="flex flex-col lg:flex-row h-screen bg-[#f2f2f2] dark:bg-background overflow-hidden p-[4px] gap-[4px]">
+          <div className="flex flex-col lg:flex-row h-screen bg-[#f2f2f2] dark:bg-background overflow-hidden p-[5px] gap-[5px]">
             {/* Mobile Navigation */}
             <MobileNavigationWrapper user={user} />
 
