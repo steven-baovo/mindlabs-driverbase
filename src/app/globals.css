@@ -18,7 +18,7 @@
   /* Zinc 600 subtext/icons for higher readability */
 
   /* Đường kẻ & Trạng thái Hài hòa */
-  --border-main: #e5e5e5;
+  --border-main: #f2f2f2;
   /* Zinc 200 clean borders */
   --border-strong: #a1a1aa;
   /* Zinc 400 focus/interactive borders */
@@ -42,9 +42,6 @@
   /* Biến Bo góc mặc định cho các Đảo nổi */
   --radius-default: 8px;
   
-  /* Biến Viền mặc định trùng màu nền */
-  --border-default: #f2f2f2;
-  
   /* Biến Bóng đổ chung (Unified Common Shadow) */
   --shadow-linear: 0px 4px 16px rgba(0, 0, 0, 0.04), 0px 1px 2px rgba(0, 0, 0, 0.02);
 }
@@ -60,7 +57,6 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-border-main: var(--border-main);
-  --color-border-default: var(--border-default);
   --color-border-strong: var(--border-strong);
   --color-border-gray-bg: var(--border-gray-bg);
   --color-hover-bg: var(--hover-bg);
@@ -142,10 +138,9 @@
     --primary-foreground: #ffffff;
     --secondary: #a1a1aa;
     /* Light Zinc gray */
-    --border-main: #27272a;
+    --border-main: #08080a;
     /* Dark border */
     --border-strong: #3f3f46;
-    --border-default: #08080a;
     --hover-bg: #1f1f23;
     --active-bg: #27272a;
     --glass-bg: rgba(9, 9, 11, 0.85);

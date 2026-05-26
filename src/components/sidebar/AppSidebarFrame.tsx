@@ -70,12 +70,12 @@ export default function AppSidebarFrame({ children, defaultWidth = 300 }: AppSid
         <div className="fixed inset-0 cursor-col-resize z-[9999]" />
       )}
       <div
-        className="relative h-[calc(100%-48px)] flex-shrink-0 mb-[48px]"
+        className="relative h-[calc(100vh-56px)] flex-shrink-0 mb-[48px]"
         style={{ width: `${width}px` }}
       >
         <aside
           ref={sidebarRef}
-          className="w-full h-full flex flex-col relative bg-white rounded-default border border-border-default overflow-hidden"
+          className="w-full h-full flex flex-col relative bg-white rounded-default border border-border-main overflow-hidden"
         >
           {children}
         </aside>
