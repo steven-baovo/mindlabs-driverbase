@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import ProjectSidebar from '@/components/workspace/ProjectSidebar'
 import NoteEditorClient from '@/components/mindnote/NoteEditorClient'
 import MindmapOverview from '@/components/workspace/MindmapOverview'
 import ConnectNodeModal from '@/components/workspace/ConnectNodeModal'
@@ -166,54 +165,15 @@ function WorkspaceContent() {
   }
 
   return (
-    <div className="flex h-full w-full bg-transparent p-[4px] gap-[4px]">
-      {/* Cột 2: Project Sidebar */}
-      <ProjectSidebar
-        nodes={nodes}
-        setNodes={undefined}
-        loading={loading || !liveNodesReady}
-        onRefetch={fetchProjectNodes}
-        onSelectNote={handleSelectNote}
-        onShowOverview={() => {
-          setActiveNoteId(null)
-          setActiveCanvasId(null)
-          setActiveLinkId(null)
-          setShowGraphView(false)
-          router.replace(`/workspace`)
-        }}
-        onShowGraphView={() => {
-          setActiveNoteId(null)
-          setActiveCanvasId(null)
-          setActiveLinkId(null)
-          setShowGraphView(true)
-          router.replace(`/workspace`)
-        }}
-        onSelectCanvas={handleSelectCanvas}
-        onSelectLink={handleSelectLink}
-        openNodes={openNodes}
-        onToggleNode={(id) => {
-          setOpenNodes(prev => {
-            const next = new Set(prev)
-            if (next.has(id)) next.delete(id)
-            else next.add(id)
-            return next
-          })
-        }}
-        activeNoteId={activeNoteId}
-        activeCanvasId={activeCanvasId}
-        activeLinkId={activeLinkId}
-      />
-
-      {/* Cột 3: Vùng làm việc chính */}
-      <main className="flex-1 bg-surface flex flex-col relative overflow-hidden rounded-default border border-border-main">
-        {activeNoteId ? (
-          <div className="w-full h-full relative overflow-auto no-scrollbar">
-            <NoteEditorClient
-              key={activeNoteId}
-              noteId={activeNoteId}
-              onOpenConnectModal={() => setIsConnectModalOpen(true)}
-            />
-          </div>
+    <>
+      {activeNoteId ? (
+        <div className="w-full h-full relative overflow-auto no-scrollbar">
+          <NoteEditorClient
+            key={activeNoteId}
+            noteId={activeNoteId}
+            onOpenConnectModal={() => setIsConnectModalOpen(true)}
+          />
+        </div>
         ) : activeCanvasId ? (
           <div className="w-full h-full relative">
             <ReactFlowProvider>
@@ -248,9 +208,8 @@ function WorkspaceContent() {
             onSelectLink={handleSelectLink}
           />
         )}
-      </main>
 
-      {/* Modal Kết nối Node */}
+      {/* Connect Modal */}
       <ConnectNodeModal
         isOpen={isConnectModalOpen}
         onClose={() => setIsConnectModalOpen(false)}
@@ -293,7 +252,7 @@ function WorkspaceContent() {
         currentNodeId={nodes.find(n => n.note_id === activeNoteId || n.map_id === activeCanvasId)?.id || ''}
         alreadyConnectedIds={nodes.find(n => n.note_id === activeNoteId || n.map_id === activeCanvasId)?.connected_node_ids || []}
       />
-    </div>
+    </>
   )
 }
 

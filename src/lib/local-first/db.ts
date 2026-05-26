@@ -14,6 +14,7 @@ export interface LocalMindNote {
   created_at: string
   updated_at: string
   is_synced: number
+  is_deleted: number // 0: false, 1: true — dùng cho soft-delete
 }
 
 export interface LocalMindmap {
@@ -25,6 +26,7 @@ export interface LocalMindmap {
   created_at: string
   updated_at: string
   is_synced: number
+  is_deleted: number // 0: false, 1: true — dùng cho soft-delete
 }
 
 export interface LocalFocusTask {
@@ -123,11 +125,8 @@ export interface LocalOutboxItem {
   action: 'create' | 'update' | 'delete'
   table_name: 'workspace_nodes' | 'mind_notes' | 'mindmaps' | 'focus_tasks' | 'projects' | 'cycles' | 'issues' | 'focus_sessions' | 'focus_settings'
   record_id: string
-  payload: any
   created_at: string
   status?: 'pending' | 'failed'
-  retry_count?: number
-  error_msg?: string
 }
 
 class MindlabsOfflineDatabase extends Dexie {
@@ -144,7 +143,7 @@ class MindlabsOfflineDatabase extends Dexie {
 
   constructor() {
     super('MindlabsOfflineDatabase')
-    
+
     this.version(3).stores({
       workspace_nodes: 'id, parent_id, order, type, note_id, map_id, is_synced, is_deleted',
       mind_notes: 'id, is_synced',
@@ -168,6 +167,20 @@ class MindlabsOfflineDatabase extends Dexie {
       workspace_nodes: 'id, parent_id, order, type, note_id, map_id, is_synced, is_deleted',
       mind_notes: 'id, is_synced',
       mindmaps: 'id, is_synced',
+      focus_tasks: 'id, is_completed, is_synced',
+      projects: 'id, user_id, status, is_synced, is_deleted',
+      cycles: 'id, user_id, is_active, is_synced, is_deleted',
+      issues: 'id, user_id, project_id, cycle_id, status, priority, is_synced, is_deleted',
+      focus_sessions: 'id, user_id, task_id, session_type, is_synced',
+      focus_settings: 'id, user_id, is_synced',
+      outbox: '++id, table_name, record_id, created_at, [record_id+table_name]'
+    })
+
+    // v6: Thêm is_deleted index cho mind_notes và mindmaps để hỗ trợ soft-delete
+    this.version(6).stores({
+      workspace_nodes: 'id, parent_id, order, type, note_id, map_id, is_synced, is_deleted',
+      mind_notes: 'id, is_synced, is_deleted',
+      mindmaps: 'id, is_synced, is_deleted',
       focus_tasks: 'id, is_completed, is_synced',
       projects: 'id, user_id, status, is_synced, is_deleted',
       cycles: 'id, user_id, is_active, is_synced, is_deleted',

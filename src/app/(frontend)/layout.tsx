@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 
-import FloatingDock from "@/components/FloatingDock"
 import { WorkspaceProvider } from "@/contexts/WorkspaceContext"
 import { FocusProvider } from "@/contexts/FocusContext"
+import { TasksProvider } from "@/lib/local-first/TasksProvider"
 import MobileNavigationWrapper from "@/components/MobileNavigationWrapper"
 import ContentWrapper from "@/components/ContentWrapper"
 import SyncInitializer from "@/components/SyncInitializer"
+import MainSidebar from "@/components/sidebar/MainSidebar"
 
 export default function FrontendLayout({
   children,
@@ -49,21 +50,25 @@ export default function FrontendLayout({
 
   return (
     <FocusProvider>
-      <WorkspaceProvider>
-        {user && <SyncInitializer />}
-        <div className="flex flex-col lg:flex-row h-screen bg-[#f2f2f2] dark:bg-background overflow-hidden">
-          {/* Mobile Navigation */}
-          <MobileNavigationWrapper user={user} />
+      <TasksProvider>
+        <WorkspaceProvider>
+          {user && <SyncInitializer />}
+          <div className="flex flex-col lg:flex-row h-screen bg-[#f2f2f2] dark:bg-background overflow-hidden p-[4px] gap-[4px]">
+            {/* Mobile Navigation */}
+            <MobileNavigationWrapper user={user} />
 
-          {/* MacOS Floating Action Dock (Desktop) */}
-          <div className="hidden lg:block">
-            <FloatingDock user={user} />
+            {/* Desktop Sidebar */}
+            <div className="hidden lg:block h-full">
+              <Suspense fallback={<div className="w-[240px] h-full bg-[#f8fafc] animate-pulse" />}>
+                <MainSidebar />
+              </Suspense>
+            </div>
+
+            {/* Main Content Island */}
+            <ContentWrapper>{children}</ContentWrapper>
           </div>
-
-          {/* Main Content Island */}
-          <ContentWrapper>{children}</ContentWrapper>
-        </div>
-      </WorkspaceProvider>
+        </WorkspaceProvider>
+      </TasksProvider>
     </FocusProvider>
   )
 }

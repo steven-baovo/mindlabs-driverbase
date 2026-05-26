@@ -27,8 +27,8 @@ export function useLocalProjects() {
         action: 'create',
         table_name: 'projects',
         record_id: id,
-        payload: newProject,
-        created_at: now
+        created_at: now,
+        status: 'pending',
       })
     })
     triggerSync()
@@ -40,16 +40,15 @@ export function useLocalProjects() {
     await db.transaction('rw', [db.projects, db.outbox], async () => {
       const existing = await db.projects.get(id)
       if (!existing) return
-      
-      const payload = { ...updates, updated_at: now, is_synced: 0 }
-      await db.projects.update(id, payload)
-      
+
+      await db.projects.update(id, { ...updates, updated_at: now, is_synced: 0 })
+
       await db.outbox.add({
         action: 'update',
         table_name: 'projects',
         record_id: id,
-        payload: payload,
-        created_at: now
+        created_at: now,
+        status: 'pending',
       })
     })
     triggerSync()
@@ -63,8 +62,8 @@ export function useLocalProjects() {
         action: 'delete',
         table_name: 'projects',
         record_id: id,
-        payload: null,
-        created_at: now
+        created_at: now,
+        status: 'pending',
       })
     })
     triggerSync()
@@ -80,7 +79,7 @@ export function useLocalCycles() {
   const addCycle = async (payload: Omit<LocalCycle, 'id' | 'user_id' | 'number' | 'created_at' | 'updated_at' | 'is_synced' | 'is_deleted'>) => {
     const id = uuidv4()
     const now = new Date().toISOString()
-    
+
     await db.transaction('rw', [db.cycles, db.outbox], async () => {
       const allCycles = await db.cycles.toArray()
       const maxNumber = allCycles.reduce((max, c) => Math.max(max, c.number || 0), 0)
@@ -102,8 +101,8 @@ export function useLocalCycles() {
         action: 'create',
         table_name: 'cycles',
         record_id: id,
-        payload: newCycle,
-        created_at: now
+        created_at: now,
+        status: 'pending',
       })
     })
     triggerSync()
@@ -115,30 +114,29 @@ export function useLocalCycles() {
     await db.transaction('rw', [db.cycles, db.outbox], async () => {
       const existing = await db.cycles.get(id)
       if (!existing) return
-      
+
       if (updates.is_active === true) {
         const otherCycles = await db.cycles.filter(c => c.id !== id && c.is_active === true).toArray();
         for (const oc of otherCycles) {
-           await db.cycles.update(oc.id, { is_active: false, updated_at: now, is_synced: 0 });
-           await db.outbox.add({
-             action: 'update',
-             table_name: 'cycles',
-             record_id: oc.id,
-             payload: { is_active: false, updated_at: now, is_synced: 0 },
-             created_at: now
-           });
+          await db.cycles.update(oc.id, { is_active: false, updated_at: now, is_synced: 0 });
+          await db.outbox.add({
+            action: 'update',
+            table_name: 'cycles',
+            record_id: oc.id,
+            created_at: now,
+            status: 'pending',
+          });
         }
       }
 
-      const payload = { ...updates, updated_at: now, is_synced: 0 }
-      await db.cycles.update(id, payload)
-      
+      await db.cycles.update(id, { ...updates, updated_at: now, is_synced: 0 })
+
       await db.outbox.add({
         action: 'update',
         table_name: 'cycles',
         record_id: id,
-        payload: payload,
-        created_at: now
+        created_at: now,
+        status: 'pending',
       })
     })
     triggerSync()
@@ -152,8 +150,8 @@ export function useLocalCycles() {
         action: 'delete',
         table_name: 'cycles',
         record_id: id,
-        payload: null,
-        created_at: now
+        created_at: now,
+        status: 'pending',
       })
     })
     triggerSync()
@@ -169,7 +167,7 @@ export function useLocalIssues() {
   const addIssue = async (payload: Omit<LocalIssue, 'id' | 'user_id' | 'number' | 'created_at' | 'updated_at' | 'is_synced' | 'is_deleted'>) => {
     const id = uuidv4()
     const now = new Date().toISOString()
-    
+
     await db.transaction('rw', [db.issues, db.outbox], async () => {
       const allIssues = await db.issues.toArray()
       const maxNumber = allIssues.reduce((max, i) => Math.max(max, i.number || 0), 0)
@@ -191,8 +189,8 @@ export function useLocalIssues() {
         action: 'create',
         table_name: 'issues',
         record_id: id,
-        payload: newIssue,
-        created_at: now
+        created_at: now,
+        status: 'pending',
       })
     })
     triggerSync()
@@ -204,16 +202,15 @@ export function useLocalIssues() {
     await db.transaction('rw', [db.issues, db.outbox], async () => {
       const existing = await db.issues.get(id)
       if (!existing) return
-      
-      const payload = { ...updates, updated_at: now, is_synced: 0 }
-      await db.issues.update(id, payload)
-      
+
+      await db.issues.update(id, { ...updates, updated_at: now, is_synced: 0 })
+
       await db.outbox.add({
         action: 'update',
         table_name: 'issues',
         record_id: id,
-        payload: payload,
-        created_at: now
+        created_at: now,
+        status: 'pending',
       })
     })
     triggerSync()
@@ -227,8 +224,8 @@ export function useLocalIssues() {
         action: 'delete',
         table_name: 'issues',
         record_id: id,
-        payload: null,
-        created_at: now
+        created_at: now,
+        status: 'pending',
       })
     })
     triggerSync()

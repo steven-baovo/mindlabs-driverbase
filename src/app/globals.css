@@ -39,6 +39,7 @@
 
   /* Biến CSS chuẩn hệ thống theo yêu cầu của User */
   --font-size-standard: 13px;
+  --font-size-system: 13px; /* Cỡ chữ hệ thống chính, có thể điều chỉnh tại đây */
   --color-standard-text: var(--foreground);
   
   /* Biến Bo góc mặc định cho các Đảo nổi */

@@ -6,16 +6,16 @@ import { triggerSync } from './sync-engine';
 function getStartOfWeekDate(date: Date, startDay: number): Date {
   const result = new Date(date);
   result.setHours(0, 0, 0, 0);
-  
+
   // startDay: 1 (Thứ Hai) -> 7 (Chủ Nhật)
   // JS Date.getDay(): 0 (Chủ Nhật) -> 6 (Thứ Bảy)
   const currentDay = result.getDay() === 0 ? 7 : result.getDay();
-  
+
   let diff = currentDay - startDay;
   if (diff < 0) {
     diff += 7;
   }
-  
+
   result.setDate(result.getDate() - diff);
   return result;
 }
@@ -45,8 +45,8 @@ export async function runAutoCycleEngine() {
           action: 'update',
           table_name: 'cycles',
           record_id: c.id,
-          payload: { name: newName, updated_at: nowStr, is_synced: 0 },
-          created_at: nowStr
+          created_at: nowStr,
+          status: 'pending',
         });
       }
     }
@@ -54,9 +54,10 @@ export async function runAutoCycleEngine() {
     // 2. Trường hợp CHƯA CÓ chu kỳ nào: khởi tạo gối đầu 3 chu kỳ đầu tiên
     if (cycles.length === 0) {
       const isOnline = typeof window !== 'undefined' ? navigator.onLine : true;
+      // mindlabs_initial_pull_done được set bởi sync-engine sau lần pull đầu tiên thành công
       const initialPullDone = typeof window !== 'undefined' ? localStorage.getItem('mindlabs_initial_pull_done') === 'true' : false;
       if (isOnline && !initialPullDone) {
-        // Nếu online và chưa pull lần đầu, đợi sync kéo cycles từ Supabase về trước để tránh sinh trùng
+        // Nếu online và chưa pull lần đầu, đợi sync kéo cycles từ server về trước để tránh sinh trùng
         return;
       }
 
@@ -87,8 +88,8 @@ export async function runAutoCycleEngine() {
           action: 'create',
           table_name: 'cycles',
           record_id: id,
-          payload: newCycle,
-          created_at: nowStr
+          created_at: nowStr,
+          status: 'pending',
         });
 
         // Chu kỳ tiếp theo bắt đầu ngay sau chu kỳ cũ kết thúc
@@ -102,7 +103,7 @@ export async function runAutoCycleEngine() {
 
     // 3. Đã có chu kỳ, đối chiếu để tự động chuyển giao và gối đầu
     let activeCycle = cycles.find(c => c.is_active === true);
-    
+
     // Nếu không tìm thấy active cycle nhưng có cycle, kích hoạt cycle lớn nhất hoặc cycle thích hợp
     if (!activeCycle && cycles.length > 0) {
       activeCycle = cycles[cycles.length - 1];
@@ -111,22 +112,22 @@ export async function runAutoCycleEngine() {
         action: 'update',
         table_name: 'cycles',
         record_id: activeCycle.id,
-        payload: { is_active: true, updated_at: nowStr, is_synced: 0 },
-        created_at: nowStr
+        created_at: nowStr,
+        status: 'pending',
       });
     }
 
     if (activeCycle) {
       const activeEndDate = new Date(activeCycle.end_date || '');
-      
+
       // Nếu chu kỳ active hiện tại ĐÃ HẾT HẠN (hôm nay vượt quá end_date)
       if (today > activeEndDate) {
         const oldActiveId = activeCycle.id;
         const nextNumber = activeCycle.number + 1;
-        
+
         // Tìm hoặc tạo chu kỳ tiếp theo
         let nextCycle = cycles.find(c => c.number === nextNumber);
-        
+
         if (!nextCycle) {
           // Tạo chu kỳ kế tiếp gối đầu
           const id = uuidv4();
@@ -157,8 +158,8 @@ export async function runAutoCycleEngine() {
             action: 'create',
             table_name: 'cycles',
             record_id: id,
-            payload: nextCycle,
-            created_at: nowStr
+            created_at: nowStr,
+            status: 'pending',
           });
         }
 
@@ -168,8 +169,8 @@ export async function runAutoCycleEngine() {
           action: 'update',
           table_name: 'cycles',
           record_id: oldActiveId,
-          payload: { is_active: false, updated_at: nowStr, is_synced: 0 },
-          created_at: nowStr
+          created_at: nowStr,
+          status: 'pending',
         });
 
         // Kích hoạt chu kỳ mới
@@ -178,8 +179,8 @@ export async function runAutoCycleEngine() {
           action: 'update',
           table_name: 'cycles',
           record_id: nextCycle.id,
-          payload: { is_active: true, updated_at: nowStr, is_synced: 0 },
-          created_at: nowStr
+          created_at: nowStr,
+          status: 'pending',
         });
 
         // Thực hiện tự động chuyển giao task chưa hoàn thành
@@ -195,12 +196,12 @@ export async function runAutoCycleEngine() {
               action: 'update',
               table_name: 'issues',
               record_id: issue.id,
-              payload: { cycle_id: nextCycle.id, updated_at: nowStr, is_synced: 0 },
-              created_at: nowStr
+              created_at: nowStr,
+              status: 'pending',
             });
           }
         }
-        
+
         triggerSync();
         // Gọi lại đệ quy để đảm bảo sinh đủ các chu kỳ tương lai gối đầu tiếp theo
         setTimeout(() => runAutoCycleEngine(), 100);
@@ -243,8 +244,8 @@ export async function runAutoCycleEngine() {
             action: 'create',
             table_name: 'cycles',
             record_id: id,
-            payload: newCycle,
-            created_at: nowStr
+            created_at: nowStr,
+            status: 'pending',
           });
 
           cycleStart = new Date(cycleEnd);
