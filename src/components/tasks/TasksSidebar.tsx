@@ -303,25 +303,7 @@ export default function TasksSidebar() {
         )}
       </div>
 
-      <div className="border-t border-border-gray-bg pt-4 flex items-center justify-between text-zinc-400 text-[10px] font-medium">
-        <div className="flex items-center gap-1.5">
-          <Keyboard className="w-3.5 h-3.5" />
-          <span>Phím tắt: Bật</span>
-        </div>
-        <button 
-          onClick={() => {
-            setDurationWeeks(parseInt(localStorage.getItem('cycle_duration_weeks') || '1', 10));
-            setStartDay(parseInt(localStorage.getItem('cycle_start_day') || '1', 10));
-            setAutoTransfer(localStorage.getItem('auto_transfer_unfinished') !== 'false');
-            setCyclesEnabled(localStorage.getItem('cycles_enabled') !== 'false');
-            setIsSettingsOpen(true);
-          }}
-          className="flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer"
-        >
-          <Settings className="w-3.5 h-3.5 text-zinc-400" />
-          <span>Cấu hình</span>
-        </button>
-      </div>
+
 
 
 
