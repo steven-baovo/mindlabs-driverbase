@@ -20,6 +20,7 @@ export default function TasksSection() {
 
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(true);
   const [isCyclesExpanded, setIsCyclesExpanded] = useState(true);
+  const [isClient, setIsClient] = useState(false);
 
   // Cycle Settings States
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -31,6 +32,7 @@ export default function TasksSection() {
 
   // Kích hoạt chạy engine chu kỳ khi sidebar được tải
   useEffect(() => {
+    setIsClient(true);
     if (typeof window !== 'undefined') {
       const enabled = localStorage.getItem('cycles_enabled') !== 'false';
       setCyclesEnabled(enabled);
@@ -107,6 +109,14 @@ export default function TasksSection() {
     return c.endDate < nowStr;
   }).sort((a, b) => b.startDate.localeCompare(a.startDate));
 
+  const isMyTasksActive = isClient && pathname === '/tasks' && 
+    !searchParams?.get('project') && 
+    !searchParams?.get('cycle') && 
+    !searchParams?.get('issue') && 
+    searchParams?.get('view') !== 'projects';
+
+  const isProjectsHeaderActive = isClient && searchParams?.get('view') === 'projects';
+
   return (
     <>
       <div className="flex flex-col gap-2 flex-none shrink-0">
@@ -114,7 +124,7 @@ export default function TasksSection() {
         <div className="space-y-0.5">
           <Link
             href="/tasks"
-            className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${(!searchParams?.get('project') && !searchParams?.get('cycle') && !searchParams?.get('issue') && pathname === '/tasks') ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
+            className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${isMyTasksActive ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
           >
             <div className="flex items-center gap-2">
               <CheckSquare className="w-3.5 h-3.5 text-zinc-400/80" />
@@ -129,7 +139,7 @@ export default function TasksSection() {
           <div className="relative group/header">
             <Link
               href="/tasks?view=projects"
-              className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${searchParams?.get('view') === 'projects' ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
+              className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${isProjectsHeaderActive ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
             >
               <div className="flex items-center gap-2">
                 <Box className="w-3.5 h-3.5 text-zinc-400/80" />
@@ -153,7 +163,7 @@ export default function TasksSection() {
               {projects.map(project => {
                 const count = (dbIssues || []).filter(i => i.project_id === project.id).length;
                 const progress = projectProgress[project.id] || 0;
-                const isActive = searchParams?.get('project') === project.id;
+                const isActive = isClient && searchParams?.get('project') === project.id;
                 
                 return (
                   <Link
