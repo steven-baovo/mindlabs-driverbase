@@ -205,7 +205,7 @@ function WorkspaceContent() {
       />
 
       {/* Cột 3: Vùng làm việc chính */}
-      <main className="flex-1 bg-white flex flex-col relative overflow-hidden rounded-default">
+      <main className="flex-1 bg-white flex flex-col relative overflow-hidden rounded-default border border-border-default">
         {activeNoteId ? (
           <div className="w-full h-full relative overflow-auto no-scrollbar">
             <NoteEditorClient

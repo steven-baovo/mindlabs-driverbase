@@ -18,7 +18,7 @@ export default function TasksLayout({
         <Suspense fallback={<aside className="w-[300px] shrink-0 flex flex-col p-4 bg-[#f2f2f2] animate-pulse" />}>
           <TasksSidebar />
         </Suspense>
-        <main className="flex-1 bg-white flex flex-col relative overflow-hidden rounded-default">
+        <main className="flex-1 bg-white flex flex-col relative overflow-hidden rounded-default border border-border-default">
           {children}
         </main>
       </div>
