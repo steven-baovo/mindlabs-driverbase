@@ -166,7 +166,7 @@ function WorkspaceContent() {
   }
 
   return (
-    <div className="flex h-full w-full bg-transparent p-[5px] gap-[5px]">
+    <div className="flex h-full w-full bg-transparent p-[4px] gap-[4px]">
       {/* Cột 2: Project Sidebar */}
       <ProjectSidebar
         nodes={nodes}

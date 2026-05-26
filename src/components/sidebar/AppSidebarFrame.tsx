@@ -70,7 +70,7 @@ export default function AppSidebarFrame({ children, defaultWidth = 300 }: AppSid
         <div className="fixed inset-0 cursor-col-resize z-[9999]" />
       )}
       <div
-        className="relative h-[calc(100%-49px)] flex-shrink-0 mb-[49px]"
+        className="relative h-[calc(100%-48px)] flex-shrink-0 mb-[48px]"
         style={{ width: `${width}px` }}
       >
         <aside
