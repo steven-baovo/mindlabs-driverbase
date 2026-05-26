@@ -14,11 +14,11 @@ export default function TasksLayout({
 }) {
   return (
     <TasksProvider>
-      <div className="flex h-full w-full gap-[5px] overflow-hidden bg-transparent">
+      <div className="flex h-full w-full overflow-hidden bg-transparent">
         <Suspense fallback={<aside className="w-64 shrink-0 flex flex-col p-4 bg-[#f2f2f2] animate-pulse" />}>
           <TasksSidebar />
         </Suspense>
-        <main className="flex-1 bg-white rounded-2xl flex flex-col relative overflow-hidden border border-border-main">
+        <main className="flex-1 bg-white flex flex-col relative overflow-hidden border-l border-border-main">
           {children}
         </main>
       </div>

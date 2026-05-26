@@ -20,7 +20,7 @@ import { useLocalWorkspace } from '@/lib/local-first/useLocalWorkspace'
 import { useLocalNotes } from '@/lib/local-first/useLocalNotes'
 import { useLocalCanvas } from '@/lib/local-first/useLocalCanvas'
 import { db } from '@/lib/local-first/db'
-import InteractiveMinimap from '@/components/workspace/InteractiveMinimap'
+
 import { getNodeIconData, buildTree, TreeNode, WorkspaceNode } from '@/lib/node-utils'
 import LinkNodeModal from './LinkNodeModal'
 
@@ -766,15 +766,7 @@ RenderNode.displayName = 'RenderNode'
             )}
           </div>
 
-          {/* Mini-map */}
-          <div className="mb-2 px-1">
-            <InteractiveMinimap
-              nodes={nodes}
-              onSelectNote={onSelectNote}
-              onSelectCanvas={onSelectCanvas}
-              onSelectLink={onSelectLink}
-            />
-          </div>
+
         </aside>
 
         {/* Resize Handle */}

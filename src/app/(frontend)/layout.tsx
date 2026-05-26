@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
-import Sidebar from "@/components/Sidebar"
+import FloatingDock from "@/components/FloatingDock"
 import { WorkspaceProvider } from "@/contexts/WorkspaceContext"
 import { FocusProvider } from "@/contexts/FocusContext"
 import MobileNavigationWrapper from "@/components/MobileNavigationWrapper"
@@ -55,9 +55,9 @@ export default function FrontendLayout({
           {/* Mobile Navigation */}
           <MobileNavigationWrapper user={user} />
 
-          {/* Sidebar Island (Desktop) */}
-          <div className="hidden lg:flex flex-col h-full shrink-0">
-            <Sidebar user={user} />
+          {/* MacOS Floating Action Dock (Desktop) */}
+          <div className="hidden lg:block">
+            <FloatingDock user={user} />
           </div>
 
           {/* Main Content Island */}
