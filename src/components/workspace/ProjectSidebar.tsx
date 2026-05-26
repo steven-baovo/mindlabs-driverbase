@@ -23,6 +23,7 @@ import { db } from '@/lib/local-first/db'
 
 import { getNodeIconData, buildTree, TreeNode, WorkspaceNode } from '@/lib/node-utils'
 import LinkNodeModal from './LinkNodeModal'
+import AppSidebarFrame from '@/components/sidebar/AppSidebarFrame'
 
 interface ProjectSidebarProps {
   nodes: WorkspaceNode[]
@@ -82,97 +83,6 @@ export default function ProjectSidebar({
   // States cho Kéo & Thả (Drag and Drop)
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null)
   const [dragOverNodeId, setDragOverNodeId] = useState<string | null>(null)
-
-  const handleNodeDrop = async (draggedId: string, targetParentId: string | null) => {
-    if (!draggedId) return
-    
-    // Kiểm tra hợp lệ (không cho thả vào chính nó)
-    if (draggedId === targetParentId) return
-
-    if (targetParentId) {
-      const targetNode = nodes.find(n => n.id === targetParentId)
-      if (!targetNode || targetNode.type !== 'folder') return
-      
-      const draggedNode = nodes.find(n => n.id === draggedId)
-      if (draggedNode && draggedNode.type === 'folder') {
-        // Hàm đệ quy kiểm tra xem targetParentId có phải là con cháu của draggedId không
-        const isDescendant = (parentId: string, childId: string): boolean => {
-          let curr = nodes.find(n => n.id === childId)
-          while (curr && curr.parent_id) {
-            if (curr.parent_id === parentId) return true
-            const nextParentId = curr.parent_id
-            curr = nodes.find(n => n.id === nextParentId)
-          }
-          return false
-        }
-        if (isDescendant(draggedId, targetParentId)) {
-          alert('Không thể kéo thư mục cha vào thư mục con của chính nó!')
-          return
-        }
-      }
-    }
-    
-    try {
-      const newOrder = Math.max(...nodes.filter(n => n.parent_id === targetParentId).map(n => n.order || 0), -1) + 1
-      await updateNode(draggedId, { parent_id: targetParentId, order: newOrder })
-      if (targetParentId && !openNodes.has(targetParentId)) {
-        onToggleNode(targetParentId) // Tự động mở rộng thư mục cha sau khi thả
-      }
-      onRefetch?.(true)
-    } catch (err: any) {
-      alert(`Lỗi khi di chuyển file: ${err.message}`)
-    }
-  }
-
-  // State cho việc kéo dãn chiều rộng Sidebar
-  const [width, setWidth] = useState(300)
-  const [isResizing, setIsResizing] = useState(false)
-  const [isWidthLoaded, setIsWidthLoaded] = useState(false)
-  const sidebarRef = useRef<HTMLElement>(null)
-
-  // Đọc chiều rộng từ localStorage khi mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('project-sidebar-width')
-      if (saved) {
-        setWidth(parseInt(saved, 10))
-      }
-      setIsWidthLoaded(true)
-    }
-  }, [])
-
-  // Lưu chiều rộng vào localStorage khi thay đổi (chỉ sau khi đã load xong)
-  useEffect(() => {
-    if (isWidthLoaded) {
-      localStorage.setItem('project-sidebar-width', width.toString())
-    }
-  }, [width, isWidthLoaded])
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing || !sidebarRef.current) return
-      const rect = sidebarRef.current.getBoundingClientRect()
-      let newWidth = e.clientX - rect.left
-      // Giới hạn chiều rộng từ 200px đến 600px
-      if (newWidth < 200) newWidth = 200
-      if (newWidth > 600) newWidth = 600
-      setWidth(newWidth)
-    }
-
-    const handleMouseUp = () => {
-      setIsResizing(false)
-    }
-
-    if (isResizing) {
-      window.addEventListener('mousemove', handleMouseMove)
-      window.addEventListener('mouseup', handleMouseUp)
-    }
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-    }
-  }, [isResizing])
 
   // Dữ liệu sẽ tự động đồng bộ qua Dexie useLiveQuery nên không cần thủ công lắng nghe sự kiện file-renamed ở đây.
 
@@ -629,19 +539,51 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
 })
 RenderNode.displayName = 'RenderNode'
 
+  const handleNodeDrop = async (draggedId: string, targetParentId: string | null) => {
+    if (!draggedId) return
+    
+    // Kiểm tra hợp lệ (không cho thả vào chính nó)
+    if (draggedId === targetParentId) return
+
+    if (targetParentId) {
+      const targetNode = nodes.find(n => n.id === targetParentId)
+      if (!targetNode || targetNode.type !== 'folder') return
+      
+      const draggedNode = nodes.find(n => n.id === draggedId)
+      if (draggedNode && draggedNode.type === 'folder') {
+        // Hàm đệ quy kiểm tra xem targetParentId có phải là con cháu của draggedId không
+        const isDescendant = (parentId: string, childId: string): boolean => {
+          let curr = nodes.find(n => n.id === childId)
+          while (curr && curr.parent_id) {
+            if (curr.parent_id === parentId) return true
+            const nextParentId = curr.parent_id
+            curr = nodes.find(n => n.id === nextParentId)
+          }
+          return false
+        }
+        if (isDescendant(draggedId, targetParentId)) {
+          alert('Không thể kéo thư mục cha vào thư mục con của chính nó!')
+          return
+        }
+      }
+    }
+    
+    try {
+      const newOrder = Math.max(...nodes.filter(n => n.parent_id === targetParentId).map(n => n.order || 0), -1) + 1
+      await updateNode(draggedId, { parent_id: targetParentId, order: newOrder })
+      if (targetParentId && !openNodes.has(targetParentId)) {
+        onToggleNode(targetParentId) // Tự động mở rộng thư mục cha sau khi thả
+      }
+      onRefetch?.(true)
+    } catch (err: any) {
+      alert(`Lỗi khi di chuyển file: ${err.message}`)
+    }
+  }
+
   return (
     <>
-      {isResizing && (
-        <div className="fixed inset-0 cursor-col-resize z-[9999]" />
-      )}
-      <div
-        className="relative h-full flex-shrink-0"
-        style={{ width: `${width}px` }}
-      >
-        <aside
-          ref={sidebarRef}
-          className="w-full h-full flex flex-col pt-0 px-0 pb-4 relative group/sidebar bg-[#f2f2f2]"
-        >
+      <AppSidebarFrame defaultWidth={300}>
+        <div className="w-full h-full flex flex-col pt-0 px-0 pb-4 relative group/sidebar">
 
           <div className="px-4 h-[44px] border-b border-border-main bg-transparent shrink-0 flex items-center justify-between select-none">
             {/* Nhóm 1: Thêm mới */}
@@ -767,16 +709,8 @@ RenderNode.displayName = 'RenderNode'
           </div>
 
 
-        </aside>
-
-        {/* Resize Handle */}
-        <div
-          className="absolute top-0 -right-[13px] w-[22px] h-full cursor-col-resize z-50"
-          onMouseDown={(e) => {
-            e.preventDefault()
-            setIsResizing(true)
-          }}
-        />
+        </div>
+      </AppSidebarFrame>
         {contextMenu && (() => {
           const node = nodes.find(n => n.id === contextMenu.nodeId)
           const hasChildren = nodes.some(n => n.parent_id === contextMenu.nodeId)
@@ -876,8 +810,6 @@ RenderNode.displayName = 'RenderNode'
             </div>
           )
         })()}
-      </div>
-
       <LinkNodeModal
         isOpen={linkModalOpen}
         onClose={() => {

@@ -8,6 +8,7 @@ import { useLocalProjects, useLocalCycles, useLocalIssues } from '@/lib/local-fi
 import { MockProject, MockCycle } from './types';
 import { runAutoCycleEngine } from '@/lib/local-first/cycle-engine';
 import { SIDEBAR_STYLES } from '@/lib/sidebar-styles';
+import AppSidebarFrame from '@/components/sidebar/AppSidebarFrame';
 
 export default function TasksSidebar() {
   const router = useRouter();
@@ -113,7 +114,8 @@ export default function TasksSidebar() {
   }).sort((a, b) => b.startDate.localeCompare(a.startDate));
 
   return (
-    <aside className="w-64 shrink-0 flex flex-col p-4 select-none bg-[#f2f2f2]">
+    <AppSidebarFrame defaultWidth={300}>
+      <div className="w-full h-full flex flex-col p-4 select-none">
       <div className="flex items-center mb-6 px-1">
         <Link href="/tasks" className="font-bold text-sm tracking-tight text-foreground hover:opacity-80">Task Center</Link>
       </div>
@@ -412,6 +414,7 @@ export default function TasksSidebar() {
           </div>
         </div>
       )}
-    </aside>
+      </div>
+    </AppSidebarFrame>
   );
 }

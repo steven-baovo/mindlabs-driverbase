@@ -166,7 +166,7 @@ function WorkspaceContent() {
   }
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex h-full w-full bg-transparent p-[5px] gap-[5px]">
       {/* Cột 2: Project Sidebar */}
       <ProjectSidebar
         nodes={nodes}
@@ -205,7 +205,7 @@ function WorkspaceContent() {
       />
 
       {/* Cột 3: Vùng làm việc chính */}
-      <main className="flex-1 bg-white flex flex-col relative overflow-hidden border-l border-border-main">
+      <main className="flex-1 bg-white flex flex-col relative overflow-hidden rounded-default">
         {activeNoteId ? (
           <div className="w-full h-full relative overflow-auto no-scrollbar">
             <NoteEditorClient
