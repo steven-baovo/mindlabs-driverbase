@@ -3,7 +3,7 @@ import TasksSidebar from '@/components/tasks/TasksSidebar';
 import { TasksProvider } from '@/lib/local-first/TasksProvider';
 
 export const metadata = {
-  title: 'Mindlabs Tasks',
+  title: 'Leanity Tasks',
   description: 'Manage your projects and tasks',
 };
 

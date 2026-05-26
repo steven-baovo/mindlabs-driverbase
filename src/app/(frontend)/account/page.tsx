@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import Image from 'next/image'
 
 export const metadata = {
-  title: 'Cài đặt tài khoản | Mindlabs',
+  title: 'Cài đặt tài khoản | Leanity',
 }
 
 export default async function AccountPage() {
