@@ -63,32 +63,40 @@ async function recoverOrphanedItems(): Promise<number> {
 export async function triggerSync() {
   if (isSyncing) return
   if (typeof window !== 'undefined' && !navigator.onLine) {
+    console.log('[Sync Engine] Offline - Tạm dừng đồng bộ.');
     return
   }
 
+  console.log('[Sync Engine] Bắt đầu quá trình đồng bộ hóa...');
   const accessToken = await getAccessToken()
   if (!accessToken) {
+    console.warn('[Sync Engine] Không tìm thấy mã thông báo (Access Token). Xin vui lòng ĐĂNG XUẤT và ĐĂNG NHẬP LẠI tài khoản Google của bạn để kích hoạt đồng bộ hóa với Google Drive.');
     return
   }
 
   isSyncing = true
 
   try {
+    console.log('[Sync Engine] Đang kết nối với Google Drive...');
     const fileId = await findOrCreateSyncFile(accessToken)
-    if (!fileId) throw new Error("Could not create or find GDrive sync file")
+    if (!fileId) throw new Error("Không thể tạo hoặc tìm thấy tệp tin đồng bộ trên Google Drive.")
+    console.log(`[Sync Engine] Kết nối Google Drive thành công. File ID: ${fileId}`);
 
     // 1. Recover orphaned
     await recoverOrphanedItems()
 
     // 2. Download remote JSON snapshot
+    console.log('[Sync Engine] Đang tải dữ liệu từ Google Drive...');
     let remoteData = await downloadSyncData(accessToken, fileId) || {}
 
     // 3. Pull: Merge remote to local (Last-Write-Wins based on updated_at)
+    console.log('[Sync Engine] Đang gộp dữ liệu từ mây xuống thiết bị cục bộ...');
     await pullRemoteChanges(remoteData)
 
     // 4. Push: Read outbox and apply to remoteData
     const outboxItems = await db.outbox.orderBy('id').filter(i => i.status !== 'failed').toArray()
     if (outboxItems.length > 0) {
+      console.log(`[Sync Engine] Phát hiện ${outboxItems.length} thay đổi cục bộ chưa đồng bộ. Đang tiến hành tải lên...`);
       let modifiedRemote = false;
 
       for (const item of outboxItems) {
@@ -112,6 +120,7 @@ export async function triggerSync() {
 
       if (modifiedRemote) {
         // Upload the new merged JSON
+        console.log('[Sync Engine] Đang tải Snapshot hợp nhất mới lên Google Drive...');
         const success = await uploadSyncData(accessToken, fileId, remoteData);
         if (success) {
           // Mark all local as synced and delete outbox
@@ -122,16 +131,22 @@ export async function triggerSync() {
             }
           }
           await db.outbox.bulkDelete(outboxIds);
+          console.log('[Sync Engine] Đã tải lên và đánh dấu đồng bộ các tệp tin cục bộ thành công.');
+        } else {
+          console.error('[Sync Engine] Lỗi khi tải Snapshot mới lên Google Drive.');
         }
       }
+    } else {
+      console.log('[Sync Engine] Không có thay đổi cục bộ nào mới cần tải lên.');
     }
 
     if (typeof window !== 'undefined') {
       localStorage.setItem('mindlabs_initial_pull_done', 'true')
       window.dispatchEvent(new CustomEvent('mindlabs-sync-complete'))
     }
+    console.log('[Sync Engine] Đồng bộ hóa hoàn tất thành công!');
   } catch (err) {
-    console.error('[Sync Engine] Sync failed:', err)
+    console.error('[Sync Engine] Đồng bộ hóa thất bại:', err)
   } finally {
     isSyncing = false
   }

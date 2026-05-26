@@ -72,10 +72,10 @@ export default function FloatingDock({ user }: FloatingDockProps) {
       onMouseLeave={handleMouseLeave}
     >
       <div 
-        className={`flex items-center h-12 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800/80 rounded-full shadow-2xl transition-all duration-300 ease-out overflow-hidden ${
+        className={`flex items-center h-12 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800/80 rounded-full shadow-2xl transition-all duration-300 ease-out ${
           isHovered 
-            ? 'w-[280px] px-4 gap-3' 
-            : 'w-12 px-0 justify-center gap-0'
+            ? 'w-[280px] px-4 gap-3 overflow-visible' 
+            : 'w-12 px-0 justify-center gap-0 overflow-hidden'
         }`}
       >
         {/* Launcher Logo - hiển thị khi thu gọn */}
