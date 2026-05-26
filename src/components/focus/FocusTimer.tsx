@@ -75,7 +75,7 @@ export default function FocusTimer() {
       onTouchStart={resetHideTimeout}
       className={`flex flex-col items-center justify-center transition-all duration-700 ${isFullscreen
           ? 'fixed inset-0 bg-black z-[9999] h-screen w-screen cursor-none'
-          : 'p-6 sm:p-12 bg-white rounded-[48px] border border-slate-200 relative overflow-hidden'
+          : 'p-6 sm:p-12 bg-surface rounded-3xl border border-border-main relative overflow-hidden'
         } ${isFullscreen && !showFullscreenUI ? 'cursor-none' : ''}`}
     >
       {/* Fullscreen Close Button */}
@@ -149,7 +149,7 @@ export default function FocusTimer() {
           className={`flex items-center justify-center transition-all duration-500 active:scale-95 border border-white/20 group/play ${isFullscreen
               ? 'h-16 px-10 rounded-full bg-white/10 text-white hover:bg-white/20'
               : isActive
-                ? 'h-24 px-12 rounded-full bg-white text-primary hover:bg-gray-50'
+                ? 'h-24 px-12 rounded-full bg-surface text-primary border border-border-main hover:bg-hover-bg'
                 : 'h-24 px-12 rounded-full bg-primary text-white hover:opacity-90'
             }`}
         >
@@ -172,7 +172,7 @@ export default function FocusTimer() {
               onClick={skipTimer}
               className={`flex items-center justify-center rounded-full transition-all active:scale-95 ${isFullscreen
                   ? 'w-16 h-16 bg-white/5 text-white/40 hover:text-white'
-                  : 'w-14 h-14 bg-black/5 text-foreground/40 hover:text-foreground hover:bg-black/10'
+                  : 'w-14 h-14 bg-hover-bg text-foreground/40 hover:text-foreground hover:bg-active-bg'
                 }`}
               title="Bỏ qua"
             >
@@ -184,7 +184,7 @@ export default function FocusTimer() {
         {!isFullscreen && (
           <button
             onClick={toggleFullscreen}
-            className="w-14 h-14 flex items-center justify-center rounded-full bg-black/5 text-foreground/40 hover:text-foreground hover:bg-black/10 transition-all active:scale-95"
+            className="w-14 h-14 flex items-center justify-center rounded-full bg-hover-bg text-foreground/40 hover:text-foreground hover:bg-active-bg transition-all active:scale-95"
             title="Toàn màn hình"
           >
             <Maximize2 className="w-5 h-5" />
@@ -198,7 +198,7 @@ export default function FocusTimer() {
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className={`w-1.5 h-1.5 rounded-full ${i < (pomodorosCompleted % 4) ? 'bg-primary scale-125' : 'bg-black/20'}`}
+              className={`w-1.5 h-1.5 rounded-full ${i < (pomodorosCompleted % 4) ? 'bg-primary scale-125' : 'bg-foreground/20'}`}
             />
           ))}
         </div>

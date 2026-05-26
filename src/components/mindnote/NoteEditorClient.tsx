@@ -174,15 +174,15 @@ const NoteEditorClient = ({ noteId, onOpenConnectModal }: NoteEditorClientProps)
   // Loading state — chỉ hiện spinner nhỏ khi lần đầu load noteId mới
   if (isLoadingNote) {
     return (
-      <div className="h-full bg-white flex items-center justify-center">
-        <div className="w-5 h-5 border-2 border-gray-200 border-t-gray-400 rounded-full animate-spin" />
+      <div className="h-full bg-background flex items-center justify-center">
+        <div className="w-5 h-5 border-2 border-border-main border-t-foreground rounded-full animate-spin" />
       </div>
     )
   }
 
   if (!initialData) {
     return (
-      <div className="h-full bg-white flex flex-col items-center justify-center gap-2 text-gray-400">
+      <div className="h-full bg-background flex flex-col items-center justify-center gap-2 text-secondary">
         <FileText className="w-8 h-8 opacity-30" />
         <p className="text-sm">Không tìm thấy ghi chú này</p>
       </div>
@@ -190,7 +190,7 @@ const NoteEditorClient = ({ noteId, onOpenConnectModal }: NoteEditorClientProps)
   }
 
   return (
-    <div className="h-full bg-white relative flex flex-col">
+    <div className="h-full bg-background relative flex flex-col">
       {/* Breadcrumb Header Strip */}
       <header className="w-full flex items-center justify-between px-4 h-[44px] border-b border-border-main bg-background shrink-0 select-none z-10">
         <div className="flex items-center gap-1.5 text-standard tracking-tight text-secondary leading-none">
@@ -252,7 +252,7 @@ const NoteEditorClient = ({ noteId, onOpenConnectModal }: NoteEditorClientProps)
       <div className="absolute bottom-6 right-6 z-50">
         <button
           onClick={() => setIsLinksPanelOpen(!isLinksPanelOpen)}
-          className={`p-2.5 rounded-xl transition-colors bg-white/90 backdrop-blur-md border border-gray-200 flex items-center gap-2 group ${isLinksPanelOpen ? 'text-blue-600' : 'text-gray-700 hover:bg-gray-50'}`}
+          className={`p-2.5 rounded-xl transition-colors bg-surface/90 backdrop-blur-md border border-border-main flex items-center gap-2 group ${isLinksPanelOpen ? 'text-primary' : 'text-foreground hover:bg-hover-bg'}`}
           title="Liên kết Graph View"
         >
           <Link2 className="w-5 h-5" />
@@ -260,27 +260,27 @@ const NoteEditorClient = ({ noteId, onOpenConnectModal }: NoteEditorClientProps)
         </button>
 
         {isLinksPanelOpen && (
-          <div ref={linksPanelRef} className="absolute bottom-full right-0 mb-2 bg-white/95 backdrop-blur-md rounded-xl border border-gray-300 p-4 w-72 max-h-80 flex flex-col z-50 animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-200">
+          <div ref={linksPanelRef} className="absolute bottom-full right-0 mb-2 bg-surface/95 backdrop-blur-md rounded-xl border border-border-main p-4 w-72 max-h-80 flex flex-col z-50 animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-200 shadow-overlay">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-bold text-gray-800">Liên kết Graph View</h4>
-              <span className="text-xs text-gray-400">{linkedNodeIds.length} đã nối</span>
+              <h4 className="text-sm font-bold text-foreground">Liên kết Graph View</h4>
+              <span className="text-xs text-secondary">{linkedNodeIds.length} đã nối</span>
             </div>
 
-            <div className="space-y-1.5 max-h-32 overflow-y-auto mb-3 border-b border-gray-100 pb-3">
+            <div className="space-y-1.5 max-h-32 overflow-y-auto mb-3 border-b border-border-main pb-3">
               {linkedNodeIds.length === 0 ? (
-                <p className="text-xs text-gray-400 italic text-center py-2">Chưa có liên kết nào.</p>
+                <p className="text-xs text-secondary italic text-center py-2">Chưa có liên kết nào.</p>
               ) : (
                 linkedNodeIds.map(id => {
                   const file = allAvailableFiles.find(f => f.id === id)
                   return (
-                    <div key={id} className="flex items-center justify-between text-xs p-2 bg-gray-50/50 hover:bg-gray-50 rounded-lg transition-colors border border-gray-100">
-                      <span className="truncate flex-1 mr-2 flex items-center gap-1.5 font-medium text-gray-700">
-                        {file?.type === 'note' ? <FileText className="w-3.5 h-3.5 text-gray-400" /> : <Network className="w-3.5 h-3.5 text-gray-400" />}
+                    <div key={id} className="flex items-center justify-between text-xs p-2 bg-active-bg/20 hover:bg-hover-bg rounded-lg transition-colors border border-border-main/50">
+                      <span className="truncate flex-1 mr-2 flex items-center gap-1.5 font-medium text-foreground">
+                        {file?.type === 'note' ? <FileText className="w-3.5 h-3.5 text-secondary" /> : <Network className="w-3.5 h-3.5 text-secondary" />}
                         {file?.title || id}
                       </span>
                       <button
                         onClick={() => handleRemoveLink(id)}
-                        className="text-gray-400 hover:text-red-500 p-1 rounded-md hover:bg-white transition-colors"
+                        className="text-secondary/50 hover:text-red-500 p-1 rounded-md hover:bg-hover-bg transition-colors"
                         title="Xóa liên kết"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -292,10 +292,10 @@ const NoteEditorClient = ({ noteId, onOpenConnectModal }: NoteEditorClientProps)
             </div>
 
             <div>
-              <h5 className="text-xs font-semibold text-gray-500 mb-2">Thêm liên kết mới:</h5>
+              <h5 className="text-xs font-semibold text-secondary mb-2">Thêm liên kết mới:</h5>
               <div className="space-y-1 max-h-40 overflow-y-auto">
                 {allAvailableFiles.filter(f => f.id !== currentNode?.id && !linkedNodeIds.includes(f.id)).length === 0 ? (
-                  <p className="text-xs text-gray-400 italic text-center py-2">Không có file nào khả dụng</p>
+                  <p className="text-xs text-secondary italic text-center py-2">Không có file nào khả dụng</p>
                 ) : (
                   allAvailableFiles
                     .filter(f => f.id !== currentNode?.id && !linkedNodeIds.includes(f.id))
@@ -303,13 +303,13 @@ const NoteEditorClient = ({ noteId, onOpenConnectModal }: NoteEditorClientProps)
                       <button
                         key={f.id}
                         onClick={() => handleAddLink(f.id)}
-                        className="w-full text-left px-2 py-1.5 text-xs rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-between group border border-transparent hover:border-gray-100"
+                        className="w-full text-left px-2 py-1.5 text-xs rounded-lg hover:bg-hover-bg transition-colors flex items-center justify-between group border border-transparent hover:border-border-main"
                       >
-                        <span className="truncate flex-1 flex items-center gap-1.5 text-gray-600 group-hover:text-gray-800">
-                          {f.type === 'note' ? <FileText className="w-3.5 h-3.5 text-gray-400" /> : <Network className="w-3.5 h-3.5 text-gray-400" />}
+                        <span className="truncate flex-1 flex items-center gap-1.5 text-secondary group-hover:text-foreground">
+                          {f.type === 'note' ? <FileText className="w-3.5 h-3.5 text-secondary" /> : <Network className="w-3.5 h-3.5 text-secondary" />}
                           {f.title}
                         </span>
-                        <Plus className="w-3.5 h-3.5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Plus className="w-3.5 h-3.5 text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
                       </button>
                     ))
                 )}
@@ -321,9 +321,9 @@ const NoteEditorClient = ({ noteId, onOpenConnectModal }: NoteEditorClientProps)
 
       {/* Bộ đếm số từ */}
       <div className="absolute bottom-[5px] left-[5px] z-50">
-        <div className="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs font-light text-gray-500 flex gap-3">
+        <div className="bg-surface/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs font-light text-secondary flex gap-3 border border-border-main/50 shadow-subtle">
           <span>{wordCount.words} từ</span>
-          <span className="text-gray-300">|</span>
+          <span className="text-border-main">|</span>
           <span>{wordCount.chars} ký tự</span>
         </div>
       </div>

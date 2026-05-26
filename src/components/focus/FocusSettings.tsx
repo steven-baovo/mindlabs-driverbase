@@ -76,7 +76,7 @@ export default function FocusSettings() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-black/[0.02] hover:bg-black/[0.05] rounded-full transition-all text-black/40 hover:text-foreground border border-black/5"
+        className="flex items-center gap-2 px-4 py-2 bg-hover-bg hover:bg-active-bg rounded-full transition-all text-secondary hover:text-foreground border border-border-main"
       >
         <Settings2 className="w-4 h-4" />
         <span className="text-[10px] font-black tracking-[0.2em] uppercase">CÀI ĐẶT</span>
@@ -98,19 +98,19 @@ export default function FocusSettings() {
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="relative w-full max-w-md bg-white rounded-[32px] sm:rounded-[40px] overflow-hidden flex flex-col border border-black/5"
+                className="relative w-full max-w-md bg-surface rounded-2xl overflow-hidden flex flex-col border border-border-main shadow-overlay"
               >
-                <div className="flex items-center justify-between p-6 sm:p-8 border-b border-black/[0.03]">
+                <div className="flex items-center justify-between p-6 sm:p-8 border-b border-border-main">
                   <h2 className="text-lg sm:text-xl font-black tracking-tighter text-foreground uppercase">CÀI ĐẶT</h2>
-                  <button onClick={handleClose} className="p-2 hover:bg-black/5 rounded-full transition-colors">
-                    <X className="w-5 h-5 text-black/20" />
+                  <button onClick={handleClose} className="p-2 hover:bg-hover-bg rounded-full transition-colors">
+                    <X className="w-5 h-5 text-secondary/50 hover:text-secondary" />
                   </button>
                 </div>
 
                 <div className="p-6 sm:p-8 flex flex-col gap-6 sm:gap-8 overflow-y-auto max-h-[70vh] no-scrollbar">
                   {/* Durations */}
                   <div className="space-y-4">
-                    <h3 className="text-[9px] sm:text-[10px] font-black text-black/30 uppercase tracking-[0.2em] sm:tracking-[0.3em]">Thời lượng (phút)</h3>
+                    <h3 className="text-[9px] sm:text-[10px] font-black text-secondary uppercase tracking-[0.2em] sm:tracking-[0.3em]">Thời lượng (phút)</h3>
                     <div className="grid grid-cols-3 gap-3 sm:gap-4">
                       {[
                         { label: 'Tập trung', key: 'pomodoro_duration' },
@@ -118,10 +118,10 @@ export default function FocusSettings() {
                         { label: 'Nghỉ dài', key: 'long_break_duration' }
                       ].map((item) => (
                         <div key={item.key} className="flex flex-col gap-1.5 sm:gap-2">
-                          <label className="text-[9px] sm:text-[10px] font-bold text-black/40 uppercase">{item.label}</label>
+                          <label className="text-[9px] sm:text-[10px] font-bold text-secondary uppercase">{item.label}</label>
                           <input
                             type="number" min="1"
-                            className="w-full bg-black/[0.02] border border-black/5 rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 text-center font-black text-xs sm:text-sm outline-none focus:border-primary/20 transition-all"
+                            className="w-full bg-hover-bg/30 border border-border-main rounded-md px-3 sm:px-4 py-2.5 sm:py-3 text-center font-black text-xs sm:text-sm outline-none focus:border-primary focus:bg-surface transition-all"
                             value={localSettings[item.key as keyof typeof localSettings] as number}
                             onChange={e => setLocalSettings({ ...localSettings, [item.key]: Number(e.target.value) })}
                           />
@@ -130,7 +130,7 @@ export default function FocusSettings() {
                     </div>
                   </div>
 
-                  <div className="h-px bg-black/[0.03] w-full" />
+                  <div className="h-px bg-border-main w-full" />
 
                   {/* Toggles */}
                   <div className="space-y-5 sm:space-y-6">
@@ -142,7 +142,7 @@ export default function FocusSettings() {
                         <span className="text-sm font-bold text-foreground">{item.label}</span>
                         <button
                           onClick={() => setLocalSettings({ ...localSettings, [item.key]: !localSettings[item.key as keyof typeof localSettings] })}
-                          className={`w-10 sm:w-12 h-5 sm:h-6 rounded-full relative transition-all duration-300 ${localSettings[item.key as keyof typeof localSettings] ? 'bg-primary' : 'bg-black/10'}`}
+                          className={`w-10 sm:w-12 h-5 sm:h-6 rounded-full relative transition-all duration-300 ${localSettings[item.key as keyof typeof localSettings] ? 'bg-primary' : 'bg-active-bg'}`}
                         >
                           <motion.div
                             animate={{ x: localSettings[item.key as keyof typeof localSettings] ? (window.innerWidth < 640 ? 22 : 26) : 4 }}
@@ -153,21 +153,21 @@ export default function FocusSettings() {
                     ))}
                   </div>
 
-                  <div className="h-px bg-black/[0.03] w-full" />
+                  <div className="h-px bg-border-main w-full" />
 
                   {/* Interval */}
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-bold text-foreground">Chu kỳ nghỉ dài</span>
                     <input
                       type="number" min="1"
-                      className="w-16 sm:w-20 bg-black/[0.02] border border-black/5 rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 text-center font-black text-xs sm:text-sm outline-none"
+                      className="w-16 sm:w-20 bg-hover-bg/30 border border-border-main rounded-md px-3 sm:px-4 py-2.5 sm:py-3 text-center font-black text-xs sm:text-sm outline-none focus:border-primary focus:bg-surface transition-all"
                       value={localSettings.long_break_interval}
                       onChange={e => setLocalSettings({ ...localSettings, long_break_interval: Number(e.target.value) })}
                     />
                   </div>
                 </div>
 
-                <div className="p-6 sm:p-8 border-t border-black/[0.03] flex justify-end">
+                <div className="p-6 sm:p-8 border-t border-border-main flex justify-end">
                   <button
                     onClick={handleSave}
                     disabled={isSaving}

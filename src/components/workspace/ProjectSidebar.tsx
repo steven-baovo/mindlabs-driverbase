@@ -410,7 +410,7 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
         className={`flex items-center gap-2 p-1.5 rounded-lg cursor-grab active:cursor-grabbing transition-all group select-none
           ${isActive 
             ? 'bg-primary/5 text-primary font-bold border-l-2 border-primary rounded-l-none' 
-            : 'text-secondary hover:text-foreground hover:bg-zinc-200/60'}
+            : 'text-secondary hover:text-foreground hover:bg-hover-bg'}
           ${isDragOver ? 'bg-blue-50/70 border border-blue-500' : ''}
           ${level === 0 ? 'text-[13px]' : 'text-[12px]'}
         `}
@@ -450,7 +450,7 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
           <input
             type="text"
             defaultValue={node.title}
-            className="flex-1 bg-white border border-blue-500 rounded px-1 text-xs outline-none"
+            className="flex-1 bg-surface border border-blue-500 rounded px-1 text-xs outline-none text-foreground"
             autoFocus
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => {
@@ -502,7 +502,7 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
                   toggleNode(node.id)
                 }
               }}
-              className="p-1 hover:bg-gray-200 rounded"
+              className="p-1 hover:bg-hover-bg rounded"
               title="Thêm node con"
             >
               <Plus className="w-3 h-3 text-secondary" />
@@ -513,7 +513,7 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
               e.stopPropagation()
               handleDeleteNode(node.id)
             }}
-            className="p-1 hover:bg-red-100 rounded"
+            className="p-1 hover:bg-red-500/10 dark:hover:bg-red-500/20 rounded"
             title="Xóa"
           >
             <Trash2 className="w-3 h-3 text-red-500" />
@@ -523,11 +523,11 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
 
       {creatingParentId === node.id && (
         <div className="ml-6 mb-2 px-1 flex items-center justify-start gap-1 border-b border-border-main/50 pb-2 text-[10px]">
-          <button onClick={() => handleCreateNodeDirect(node.id, 'note')} className="p-1 hover:bg-zinc-200 rounded text-secondary hover:text-foreground transition-colors">Note</button>
-          <button onClick={() => handleCreateNodeDirect(node.id, 'map')} className="p-1 hover:bg-zinc-200 rounded text-secondary hover:text-foreground transition-colors">Canvas</button>
-          <button onClick={() => handleCreateNodeDirect(node.id, 'link')} className="p-1 hover:bg-zinc-200 rounded text-secondary hover:text-foreground transition-colors">Link</button>
-          <button onClick={() => handleCreateNodeDirect(node.id, 'folder')} className="p-1 hover:bg-zinc-200 rounded text-secondary hover:text-foreground transition-colors">Folder</button>
-          <button onClick={() => setCreatingParentId(null)} className="p-1 bg-gray-200 hover:bg-gray-300 rounded ml-auto text-secondary">Hủy</button>
+          <button onClick={() => handleCreateNodeDirect(node.id, 'note')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Note</button>
+          <button onClick={() => handleCreateNodeDirect(node.id, 'map')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Canvas</button>
+          <button onClick={() => handleCreateNodeDirect(node.id, 'link')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Link</button>
+          <button onClick={() => handleCreateNodeDirect(node.id, 'folder')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Folder</button>
+          <button onClick={() => setCreatingParentId(null)} className="p-1 bg-active-bg hover:bg-hover-bg rounded ml-auto text-secondary">Hủy</button>
         </div>
       )}
 
@@ -590,28 +590,28 @@ RenderNode.displayName = 'RenderNode'
             <div className="flex items-center gap-1">
               <button
                 onClick={() => handleCreateNodeDirect(null, 'note')}
-                className="p-1.5 hover:bg-zinc-200 rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
+                className="p-1.5 hover:bg-hover-bg rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
                 title="Tạo Note mới"
               >
                 <FilePlus className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleCreateNodeDirect(null, 'map')}
-                className="p-1.5 hover:bg-zinc-200 rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
+                className="p-1.5 hover:bg-hover-bg rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
                 title="Tạo Canvas mới"
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleCreateNodeDirect(null, 'link')}
-                className="p-1.5 hover:bg-zinc-200 rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
+                className="p-1.5 hover:bg-hover-bg rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
                 title="Tạo Liên kết mới"
               >
                 <LucideLink className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleCreateNodeDirect(null, 'folder')}
-                className="p-1.5 hover:bg-zinc-200 rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
+                className="p-1.5 hover:bg-hover-bg rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
                 title="Tạo Thư mục mới"
               >
                 <FolderPlus className="w-4 h-4" />
@@ -622,14 +622,14 @@ RenderNode.displayName = 'RenderNode'
             <div className="flex items-center gap-1">
               <button
                 onClick={() => onShowGraphView?.()}
-                className="p-1.5 hover:bg-zinc-200 rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
+                className="p-1.5 hover:bg-hover-bg rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
                 title="Xem Graph View"
               >
                 <Network className="w-4 h-4" />
               </button>
               <button
                 onClick={() => onShowOverview?.()}
-                className="p-1.5 hover:bg-zinc-200 rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
+                className="p-1.5 hover:bg-hover-bg rounded-lg text-secondary hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
                 title="Xem Sơ đồ Cấu trúc"
               >
                 <GitFork className="w-4 h-4" />
@@ -655,20 +655,20 @@ RenderNode.displayName = 'RenderNode'
             {loading ? (
               <div className="space-y-2 animate-pulse mt-2">
                 <div className="flex items-center gap-2 p-1.5">
-                  <div className="w-3.5 h-3.5 bg-gray-200 rounded"></div>
-                  <div className="w-3/4 h-3 bg-gray-200 rounded"></div>
+                  <div className="w-3.5 h-3.5 bg-active-bg/50 rounded"></div>
+                  <div className="w-3/4 h-3 bg-active-bg/50 rounded"></div>
                 </div>
                 <div className="flex items-center gap-2 p-1.5">
-                  <div className="w-3.5 h-3.5 bg-gray-200 rounded"></div>
-                  <div className="w-1/2 h-3 bg-gray-200 rounded"></div>
+                  <div className="w-3.5 h-3.5 bg-active-bg/50 rounded"></div>
+                  <div className="w-1/2 h-3 bg-active-bg/50 rounded"></div>
                 </div>
                 <div className="flex items-center gap-2 p-1.5">
-                  <div className="w-3.5 h-3.5 bg-gray-200 rounded"></div>
-                  <div className="w-2/3 h-3 bg-gray-200 rounded"></div>
+                  <div className="w-3.5 h-3.5 bg-active-bg/50 rounded"></div>
+                  <div className="w-2/3 h-3 bg-active-bg/50 rounded"></div>
                 </div>
                 <div className="flex items-center gap-2 p-1.5">
-                  <div className="w-3.5 h-3.5 bg-gray-200 rounded"></div>
-                  <div className="w-2/5 h-3 bg-gray-200 rounded"></div>
+                  <div className="w-3.5 h-3.5 bg-active-bg/50 rounded"></div>
+                  <div className="w-2/5 h-3 bg-active-bg/50 rounded"></div>
                 </div>
               </div>
             ) : projectTree.length === 0 ? (
@@ -721,7 +721,7 @@ RenderNode.displayName = 'RenderNode'
 
           return (
             <div
-              className="fixed bg-white border border-border-strong rounded-lg py-1 z-[1000] w-48 animate-in fade-in zoom-in-95 duration-100"
+              className="fixed bg-surface border border-border-main rounded-lg py-1 z-[1000] w-48 animate-in fade-in zoom-in-95 duration-100 shadow-overlay"
               style={{ top: contextMenu.mouseY, left: contextMenu.mouseX }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -731,9 +731,9 @@ RenderNode.displayName = 'RenderNode'
                   setEditingNodeId(contextMenu.nodeId)
                   setContextMenu(null)
                 }}
-                className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 flex items-center gap-2 text-gray-700"
+                className="w-full text-left px-3 py-1.5 text-xs hover:bg-hover-bg flex items-center gap-2 text-foreground"
               >
-                <Plus className="w-3.5 h-3.5 text-gray-400" /> Đổi tên
+                <Plus className="w-3.5 h-3.5 text-secondary" /> Đổi tên
               </button>
 
               {node?.type === 'link' && (
@@ -748,16 +748,16 @@ RenderNode.displayName = 'RenderNode'
                     setLinkModalOpen(true)
                     setContextMenu(null)
                   }}
-                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 flex items-center gap-2 text-gray-700 border-t border-gray-100"
+                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-hover-bg flex items-center gap-2 text-foreground border-t border-border-main"
                 >
-                  <LucideLink className="w-3.5 h-3.5 text-gray-400" /> Sửa tiêu đề & URL
+                  <LucideLink className="w-3.5 h-3.5 text-secondary" /> Sửa tiêu đề & URL
                 </button>
               )}
 
               {isFolderWithChildren ? (
                 <>
-                  <div className="border-t border-gray-100 my-1"></div>
-                  <div className="px-3 py-1 text-[10px] text-gray-400 font-medium">Lựa chọn xóa:</div>
+                  <div className="border-t border-border-main my-1"></div>
+                  <div className="px-3 py-1 text-[10px] text-secondary font-medium">Lựa chọn xóa:</div>
                   <button
                     onClick={async () => {
                       console.log('Click Chỉ xóa thư mục')
@@ -770,13 +770,13 @@ RenderNode.displayName = 'RenderNode'
                       await deleteNode(node.id)
                       onRefetch?.(true)
                     }}
-                    className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 flex flex-col gap-0.5 text-gray-700"
+                    className="w-full text-left px-3 py-1.5 text-xs hover:bg-hover-bg flex flex-col gap-0.5 text-foreground"
                   >
                     <div className="flex items-center gap-2">
-                      <Trash2 className="w-3.5 h-3.5 text-gray-400" strokeWidth={1.5} /> 
+                      <Trash2 className="w-3.5 h-3.5 text-secondary" strokeWidth={1.5} /> 
                       <span>Chỉ xóa thư mục</span>
                     </div>
-                    <span className="text-[10px] text-gray-400 ml-5">Giữ lại file con đẩy ra ngoài</span>
+                    <span className="text-[10px] text-secondary/60 ml-5">Giữ lại file con đẩy ra ngoài</span>
                   </button>
 
                   <button
@@ -786,13 +786,13 @@ RenderNode.displayName = 'RenderNode'
                       await deleteNode(node.id)
                       onRefetch?.(true)
                     }}
-                    className="w-full text-left px-3 py-1.5 text-xs hover:bg-red-50 flex flex-col gap-0.5 text-red-500"
+                    className="w-full text-left px-3 py-1.5 text-xs hover:bg-red-500/10 text-red-500 flex flex-col gap-0.5"
                   >
                     <div className="flex items-center gap-2">
                       <Trash2 className="w-3.5 h-3.5 text-red-500" strokeWidth={1.5} /> 
                       <span>Xóa toàn bộ</span>
                     </div>
-                    <span className="text-[10px] text-red-400 ml-5">Xóa sạch thư mục và file con</span>
+                    <span className="text-[10px] text-red-450 ml-5">Xóa sạch thư mục và file con</span>
                   </button>
                 </>
               ) : (
@@ -802,7 +802,7 @@ RenderNode.displayName = 'RenderNode'
                     handleDeleteNode(contextMenu.nodeId)
                     setContextMenu(null)
                   }}
-                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-red-50 flex items-center gap-2 text-red-500"
+                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-red-500/10 text-red-500 flex items-center gap-2"
                 >
                   <Trash2 className="w-3.5 h-3.5" strokeWidth={1.5} /> Xóa
                 </button>
@@ -823,10 +823,10 @@ RenderNode.displayName = 'RenderNode'
       />
 
       {deleteModalOpen && nodeToDelete && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-[400px]">
-            <h3 className="text-lg font-medium mb-2">Xóa thư mục</h3>
-            <p className="text-sm text-gray-600 mb-6">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50">
+          <div className="bg-surface rounded-lg shadow-overlay border border-border-main p-6 w-[400px]">
+            <h3 className="text-lg font-medium mb-2 text-foreground">Xóa thư mục</h3>
+            <p className="text-sm text-secondary mb-6 leading-relaxed">
               Thư mục <strong>{nodeToDelete.title}</strong> đang chứa các file/thư mục con. Bạn có chắc chắn muốn xóa thư mục này và toàn bộ nội dung bên trong không?
             </p>
             <div className="flex justify-end gap-3">
@@ -835,7 +835,7 @@ RenderNode.displayName = 'RenderNode'
                   setDeleteModalOpen(false)
                   setNodeToDelete(null)
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded"
+                className="px-4 py-2 text-sm font-medium text-secondary bg-active-bg hover:bg-hover-bg rounded border border-border-main transition-colors cursor-pointer"
               >
                 Hủy
               </button>
@@ -849,7 +849,7 @@ RenderNode.displayName = 'RenderNode'
                   setDeleteModalOpen(false)
                   setNodeToDelete(null)
                 }}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded"
+                className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded transition-colors cursor-pointer"
               >
                 Xóa tất cả
               </button>

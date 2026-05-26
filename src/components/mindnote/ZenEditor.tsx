@@ -121,7 +121,7 @@ const ZenEditor = ({ initialContent, onChange, onCountChange, placeholder = 'Báº
       {/* Custom Context Menu */}
       {menuPos && (
         <div 
-          className="fixed z-[100] flex items-center gap-1 bg-white/95 backdrop-blur-md border border-border-strong p-1.5 rounded-xl animate-in fade-in zoom-in duration-200"
+          className="fixed z-[100] flex items-center gap-1 bg-surface/95 backdrop-blur-md border border-border-main p-1.5 rounded-xl shadow-overlay animate-in fade-in zoom-in duration-200"
           style={{ 
             top: menuPos.y - 50, // Slightly above the cursor
             left: Math.min(menuPos.x, typeof window !== 'undefined' ? window.innerWidth - 450 : menuPos.x) 

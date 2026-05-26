@@ -28,7 +28,7 @@ function Popover({ open, onClose, children }: { open: boolean; onClose: () => vo
   return (
     <div
       ref={ref}
-      className="absolute right-0 top-[calc(100%+4px)] z-50 min-w-[196px] bg-white border border-border-main rounded-lg overflow-hidden shadow-overlay"
+      className="absolute right-0 top-[calc(100%+4px)] z-50 min-w-[196px] bg-surface border border-border-main rounded-lg overflow-hidden shadow-overlay"
     >
       {children}
     </div>
@@ -70,7 +70,7 @@ function MenuOption({ icon, label, active, onClick, onDelete }: {
 // Mỗi block là card độc lập, KHÔNG bị ôm bởi sidebar wrapper
 function SidebarBlock({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-border-main bg-white relative">
+    <div className="rounded-xl border border-border-main bg-surface relative">
       {/* Header bên trong card — màu accent giống Linear */}
       <button className="w-full flex items-center gap-1.5 px-4 pt-3.5 pb-3 cursor-default select-none">
         <span className="text-[13px] font-medium text-primary">{title}</span>
@@ -184,19 +184,19 @@ function CalendarPicker({ value, onChange, onClose }: {
   const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
   return (
-    <div className="flex flex-col w-[196px] bg-white text-zinc-800 p-2.5">
+    <div className="flex flex-col w-[196px] bg-surface text-foreground p-2.5">
       {/* Quick Select Buttons */}
       <div className="flex flex-col gap-1 pb-2 mb-2 border-b border-border-main">
         <div className="grid grid-cols-2 gap-1">
           <button
             onClick={() => setQuickDate(0)}
-            className="flex items-center justify-center px-1 py-1 text-[10px] font-medium text-zinc-600 hover:bg-hover-bg border border-border-main rounded-md transition-colors text-center cursor-pointer"
+            className="flex items-center justify-center px-1 py-1 text-[10px] font-medium text-secondary hover:bg-hover-bg border border-border-main rounded-md transition-colors text-center cursor-pointer"
           >
             Hôm nay
           </button>
           <button
             onClick={() => setQuickDate(1)}
-            className="flex items-center justify-center px-1 py-1 text-[10px] font-medium text-zinc-600 hover:bg-hover-bg border border-border-main rounded-md transition-colors text-center cursor-pointer"
+            className="flex items-center justify-center px-1 py-1 text-[10px] font-medium text-secondary hover:bg-hover-bg border border-border-main rounded-md transition-colors text-center cursor-pointer"
           >
             Ngày mai
           </button>
@@ -204,13 +204,13 @@ function CalendarPicker({ value, onChange, onClose }: {
         <div className="grid grid-cols-2 gap-1">
           <button
             onClick={setNextWeek}
-            className="flex items-center justify-center px-1 py-1 text-[10px] font-medium text-zinc-600 hover:bg-hover-bg border border-border-main rounded-md transition-colors text-center cursor-pointer"
+            className="flex items-center justify-center px-1 py-1 text-[10px] font-medium text-secondary hover:bg-hover-bg border border-border-main rounded-md transition-colors text-center cursor-pointer"
           >
             Tuần sau
           </button>
           <button
             onClick={() => { onChange(null); onClose(); }}
-            className="flex items-center justify-center px-1 py-1 text-[10px] font-semibold text-red-500 hover:bg-red-50 border border-red-50 rounded-md transition-colors text-center cursor-pointer"
+            className="flex items-center justify-center px-1 py-1 text-[10px] font-semibold text-red-500 hover:bg-red-500/10 border border-red-500/20 rounded-md transition-colors text-center cursor-pointer"
           >
             Bỏ chọn
           </button>
@@ -219,19 +219,19 @@ function CalendarPicker({ value, onChange, onClose }: {
 
       {/* Month Navigation */}
       <div className="flex items-center justify-between mb-1.5 px-0.5">
-        <span className="text-[10.5px] font-bold text-zinc-700">
+        <span className="text-[10.5px] font-bold text-foreground">
           Tháng {month + 1}, {year}
         </span>
         <div className="flex items-center gap-0.5">
           <button
             onClick={handlePrevMonth}
-            className="p-1 rounded-md text-zinc-400 hover:bg-hover-bg hover:text-zinc-700 transition-colors cursor-pointer"
+            className="p-1 rounded-md text-secondary hover:bg-hover-bg hover:text-foreground transition-colors cursor-pointer"
           >
             <ChevronLeft className="w-3 h-3" />
           </button>
           <button
             onClick={handleNextMonth}
-            className="p-1 rounded-md text-zinc-400 hover:bg-hover-bg hover:text-zinc-700 transition-colors cursor-pointer"
+            className="p-1 rounded-md text-secondary hover:bg-hover-bg hover:text-foreground transition-colors cursor-pointer"
           >
             <ChevronRight className="w-3 h-3" />
           </button>
@@ -241,7 +241,7 @@ function CalendarPicker({ value, onChange, onClose }: {
       {/* Weekday labels */}
       <div className="grid grid-cols-7 gap-0.5 text-center mb-1">
         {weekDays.map(wd => (
-          <span key={wd} className="text-[9px] font-semibold text-zinc-400 py-0.5">
+          <span key={wd} className="text-[9px] font-semibold text-secondary/60 py-0.5">
             {wd}
           </span>
         ))}
@@ -258,14 +258,14 @@ function CalendarPicker({ value, onChange, onClose }: {
               onClick={() => handleDayClick(cell)}
               className={`
                 aspect-square text-[9.5px] font-medium rounded-md transition-colors flex items-center justify-center relative cursor-pointer
-                ${cell.isCurrentMonth ? 'text-zinc-700 hover:bg-hover-bg' : 'text-zinc-300 hover:bg-zinc-50/50'}
-                ${selected ? '!bg-zinc-950 !text-white hover:!bg-zinc-900' : ''}
-                ${today && !selected ? 'border border-zinc-200 font-bold text-zinc-900' : ''}
+                ${cell.isCurrentMonth ? 'text-foreground hover:bg-hover-bg' : 'text-secondary/35 hover:bg-hover-bg/30'}
+                ${selected ? '!bg-zinc-950 dark:!bg-zinc-100 !text-white dark:!text-zinc-900 hover:!bg-zinc-900 dark:hover:!bg-zinc-200' : ''}
+                ${today && !selected ? 'border border-border-strong font-bold text-foreground' : ''}
               `}
             >
               {cell.day}
               {today && !selected && (
-                <span className="absolute bottom-0.5 w-1 h-1 rounded-full bg-zinc-950 scale-75" />
+                <span className="absolute bottom-0.5 w-1 h-1 rounded-full bg-zinc-950 dark:bg-zinc-100 scale-75" />
               )}
             </button>
           );
@@ -640,7 +640,7 @@ export default function IssueDetails({ issueId }: { issueId: string }) {
             {issue.labels.length > 0 ? (
               <div className="px-4 py-2 flex flex-wrap gap-1.5">
                 {issue.labels.map(label => (
-                  <span key={label} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-zinc-100 text-zinc-700 border border-zinc-200 capitalize">
+                  <span key={label} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-active-bg text-secondary border border-border-main capitalize">
                     {label}
                     <button
                       onClick={() => handleUpdate('labels', issue.labels.filter(l => l !== label))}

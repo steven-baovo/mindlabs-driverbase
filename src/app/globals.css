@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   /* Professional Minimalist Foundation - Linear Matte Zinc & Indigo Accent */
   --background: #ffffff;
@@ -125,27 +127,25 @@
   --color-neutral-950: #09090b;
 }
 
-@media (prefers-color-scheme: dark-disabled-temporary) {
-  :root {
-    --background: #08080a;
-    /* Matte dark linear canvas */
-    --foreground: #f4f4f5;
-    /* Crisp light text */
-    --surface: #121214;
-    /* Darker slate container */
-    --primary: #5e6ad2;
-    /* Brand indigo as primary in dark mode */
-    --primary-foreground: #ffffff;
-    --secondary: #a1a1aa;
-    /* Light Zinc gray */
-    --border-main: #08080a;
-    /* Dark border */
-    --border-strong: #3f3f46;
-    --hover-bg: #1f1f23;
-    --active-bg: #27272a;
-    --glass-bg: rgba(9, 9, 11, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.08);
-  }
+.dark {
+  --background: #08080a;
+  /* Matte dark linear canvas */
+  --foreground: #f4f4f5;
+  /* Crisp light text */
+  --surface: #121214;
+  /* Darker slate container */
+  --primary: #5e6ad2;
+  /* Brand indigo as primary in dark mode */
+  --primary-foreground: #ffffff;
+  --secondary: #a1a1aa;
+  /* Light Zinc gray */
+  --border-main: #1f1f23;
+  /* Dark border */
+  --border-strong: #3f3f46;
+  --hover-bg: #1f1f23;
+  --active-bg: #27272a;
+  --glass-bg: rgba(9, 9, 11, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.08);
 }
 
 body {
@@ -221,8 +221,8 @@ body {
   scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
 }
 
-/* Hỗ trợ Dark mode (Tạm thời đóng băng) */
-@media (prefers-color-scheme: dark-disabled-temporary) {
+/* Hỗ trợ Dark mode qua class .dark */
+.dark {
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
   }

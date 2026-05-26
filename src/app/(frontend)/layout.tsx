@@ -51,7 +51,7 @@ export default function FrontendLayout({
     <FocusProvider>
       <WorkspaceProvider>
         {user && <SyncInitializer />}
-        <div className="flex flex-col lg:flex-row h-screen bg-[#f2f2f2] overflow-hidden">
+        <div className="flex flex-col lg:flex-row h-screen bg-[#f2f2f2] dark:bg-background overflow-hidden">
           {/* Mobile Navigation */}
           <MobileNavigationWrapper user={user} />
 

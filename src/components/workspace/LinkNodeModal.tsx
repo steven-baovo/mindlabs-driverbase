@@ -64,7 +64,7 @@ export default function LinkNodeModal({
       onClick={onClose}
     >
       <div 
-        className="bg-white w-full max-w-md rounded-2xl border border-gray-300 flex flex-col overflow-hidden transform scale-95 animate-in zoom-in-95 duration-200"
+        className="bg-surface w-full max-w-md rounded-2xl border border-border-main flex flex-col overflow-hidden transform scale-95 animate-in zoom-in-95 duration-200 shadow-overlay"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -113,7 +113,7 @@ export default function LinkNodeModal({
                 setTitle(e.target.value)
                 setError(null)
               }}
-              className="w-full px-3.5 py-2.5 bg-gray-50/50 border border-border-main/50 rounded-xl text-sm outline-none focus:border-primary focus:bg-white transition-all text-secondary"
+              className="w-full px-3.5 py-2.5 bg-active-bg/30 border border-border-main rounded-xl text-sm outline-none focus:border-primary focus:bg-surface transition-all text-foreground"
               autoFocus
             />
           </div>
@@ -129,7 +129,7 @@ export default function LinkNodeModal({
                 setUrl(e.target.value)
                 setError(null)
               }}
-              className="w-full px-3.5 py-2.5 bg-gray-50/50 border border-border-main/50 rounded-xl text-sm outline-none focus:border-primary focus:bg-white transition-all text-secondary"
+              className="w-full px-3.5 py-2.5 bg-active-bg/30 border border-border-main rounded-xl text-sm outline-none focus:border-primary focus:bg-surface transition-all text-foreground"
             />
             <p className="text-[10px] text-secondary/40">
               Nhập địa chỉ của website. Hệ thống sẽ tự động cấu hình giao thức bảo mật.

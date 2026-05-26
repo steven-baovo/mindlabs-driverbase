@@ -205,7 +205,7 @@ function WorkspaceContent() {
       />
 
       {/* Cột 3: Vùng làm việc chính */}
-      <main className="flex-1 bg-white flex flex-col relative overflow-hidden rounded-default border border-border-main">
+      <main className="flex-1 bg-surface flex flex-col relative overflow-hidden rounded-default border border-border-main">
         {activeNoteId ? (
           <div className="w-full h-full relative overflow-auto no-scrollbar">
             <NoteEditorClient
@@ -360,26 +360,26 @@ function LinkEmbedPreview({ nodeId, nodes }: { nodeId: string, nodes: WorkspaceN
   }, [formattedUrl])
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#fafafa]">
+    <div className="flex-1 flex flex-col h-full bg-background">
       <div className="flex-1 relative flex flex-col h-full min-h-0">
         {!formattedUrl ? (
-          <div className="flex-1 m-4 p-6 bg-white border border-border-main/50 rounded-2xl flex flex-col items-center justify-center text-center">
+          <div className="flex-1 m-4 p-6 bg-surface border border-border-main rounded-2xl flex flex-col items-center justify-center text-center">
             <LucideLink className="w-10 h-10 text-secondary/30 mb-2 animate-bounce" />
             <h3 className="text-sm font-bold text-foreground mb-1">Chưa có liên kết URL</h3>
             <p className="text-xs text-secondary/50 max-w-sm mb-4">Nhấp chuột phải vào tên liên kết này ở thanh bên, chọn "Sửa tiêu đề & URL Link" để thêm địa chỉ web của bạn.</p>
           </div>
         ) : isChecking ? (
-          <div className="flex-1 m-4 p-6 bg-white border border-border-main/50 rounded-2xl flex flex-col items-center justify-center text-center">
+          <div className="flex-1 m-4 p-6 bg-surface border border-border-main rounded-2xl flex flex-col items-center justify-center text-center">
             <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" />
             <h3 className="text-sm font-bold text-foreground mb-1">Đang kiểm tra bảo mật trang web...</h3>
             <p className="text-xs text-secondary/40 max-w-xs">Xác minh khả năng hiển thị trực tiếp để mang lại trải nghiệm tối ưu.</p>
           </div>
         ) : (isEmbeddable || forceEmbed) ? (
-          <div className="flex-1 bg-white overflow-hidden flex flex-col relative h-full w-full">
+          <div className="flex-1 bg-surface overflow-hidden flex flex-col relative h-full w-full">
             <div className="absolute top-3 right-3 z-50 flex items-center gap-1.5">
               <button
                 onClick={handleRefresh}
-                className="p-2 bg-white/80 backdrop-blur-md hover:bg-white text-secondary/70 hover:text-foreground border border-border-main/50 rounded-xl transition-all duration-150 cursor-pointer"
+                className="p-2 bg-surface/80 backdrop-blur-md hover:bg-surface text-secondary/70 hover:text-foreground border border-border-main rounded-xl transition-all duration-150 cursor-pointer"
                 title="Tải lại trang"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -388,7 +388,7 @@ function LinkEmbedPreview({ nodeId, nodes }: { nodeId: string, nodes: WorkspaceN
               </button>
               <button
                 onClick={handleOpenNewTab}
-                className="flex items-center gap-0 hover:gap-1.5 px-2 py-2 hover:px-3 bg-white/80 backdrop-blur-md hover:bg-white text-secondary/70 hover:text-primary border border-border-main/50 rounded-xl transition-all duration-300 ease-in-out cursor-pointer group"
+                className="flex items-center gap-0 hover:gap-1.5 px-2 py-2 hover:px-3 bg-surface/80 backdrop-blur-md hover:bg-surface text-secondary/70 hover:text-primary border border-border-main rounded-xl transition-all duration-300 ease-in-out cursor-pointer group"
                 title="Mở trong tab mới"
               >
                 <ExternalLink className="w-3.5 h-3.5 text-secondary/70 group-hover:text-primary transition-colors" />
@@ -401,21 +401,21 @@ function LinkEmbedPreview({ nodeId, nodes }: { nodeId: string, nodes: WorkspaceN
             <iframe
               key={iframeKey}
               src={formattedUrl}
-              className="flex-1 w-full h-full border-none bg-white"
+              className="flex-1 w-full h-full border-none bg-surface"
               sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
               title={node.title}
             />
           </div>
         ) : (
-          <div className="flex-1 m-4 bg-white border border-border-main/50 rounded-2xl flex flex-col items-center justify-center text-center p-8 bg-gradient-to-b from-white to-gray-50/50">
-            <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 mb-5 border border-amber-100/50 animate-pulse">
+          <div className="flex-1 m-4 bg-surface border border-border-main rounded-2xl flex flex-col items-center justify-center text-center p-8 bg-gradient-to-b from-surface to-active-bg/30">
+            <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-500 mb-5 border border-amber-500/20 animate-pulse">
               <ShieldAlert className="w-8 h-8 text-amber-500" strokeWidth={1.8} />
             </div>
             
-            <h3 className="text-base font-extrabold text-secondary mb-2">Không thể xem trực tiếp trang web</h3>
+            <h3 className="text-base font-extrabold text-foreground mb-2">Không thể xem trực tiếp trang web</h3>
             
             <p className="text-xs text-secondary/60 max-w-md leading-relaxed mb-6">
-              Để bảo vệ quyền riêng tư và thông tin của bạn, trang web <strong className="text-secondary font-bold">{hostName}</strong> từ chối hiển thị nội dung của họ bên trong các ứng dụng khác (qua chính sách bảo mật X-Frame-Options/CSP).
+              Để bảo vệ quyền riêng tư và thông tin của bạn, trang web <strong className="text-foreground font-bold">{hostName}</strong> từ chối hiển thị nội dung của họ bên trong các ứng dụng khác (qua chính sách bảo mật X-Frame-Options/CSP).
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
@@ -429,7 +429,7 @@ function LinkEmbedPreview({ nodeId, nodes }: { nodeId: string, nodes: WorkspaceN
               
               <button
                 onClick={() => setForceEmbed(true)}
-                className="w-full sm:w-auto px-4 py-3 text-xs font-semibold text-secondary hover:bg-gray-100 rounded-xl transition-all duration-150 border border-border-main/50 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-3 text-xs font-semibold text-foreground hover:bg-hover-bg rounded-xl transition-all duration-150 border border-border-main cursor-pointer"
               >
                 Vẫn cố thử nhúng
               </button>

@@ -45,7 +45,7 @@ export default function ConnectNodeModal({
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
       <div 
-        className="bg-white w-full max-w-md rounded-2xl border border-gray-300 flex flex-col max-h-[80vh] overflow-hidden"
+        className="bg-surface w-full max-w-md rounded-2xl border border-border-main flex flex-col max-h-[80vh] overflow-hidden shadow-overlay"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -56,7 +56,7 @@ export default function ConnectNodeModal({
           </div>
           <button 
             onClick={onClose}
-            className="p-1.5 hover:bg-gray-100 rounded-full text-secondary/50 hover:text-secondary transition-colors"
+            className="p-1.5 hover:bg-hover-bg rounded-full text-secondary/50 hover:text-secondary transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -71,7 +71,7 @@ export default function ConnectNodeModal({
               placeholder="Tìm kiếm node theo tên..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-border-main/50 rounded-xl text-sm outline-none focus:border-primary transition-colors text-secondary"
+              className="w-full pl-9 pr-4 py-2 bg-active-bg/30 border border-border-main rounded-xl text-sm outline-none focus:border-primary transition-colors text-foreground"
               autoFocus
             />
           </div>
@@ -95,9 +95,9 @@ export default function ConnectNodeModal({
                       setSearchQuery('')
                       onClose()
                     }}
-                    className="flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-xl cursor-pointer transition-colors group"
+                    className="flex items-center gap-3 p-2.5 hover:bg-hover-bg rounded-xl cursor-pointer transition-colors group"
                   >
-                    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-secondary">
+                    <div className="w-8 h-8 bg-active-bg/50 rounded-lg flex items-center justify-center text-secondary">
                       <Icon className={`w-4 h-4 ${color}`} strokeWidth={1.5} />
                     </div>
                     <div className="flex-1 min-w-0">

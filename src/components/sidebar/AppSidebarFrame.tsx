@@ -75,7 +75,7 @@ export default function AppSidebarFrame({ children, defaultWidth = 300 }: AppSid
       >
         <aside
           ref={sidebarRef}
-          className="w-full h-full flex flex-col relative bg-white rounded-default border border-border-main overflow-hidden"
+          className="w-full h-full flex flex-col relative bg-surface rounded-default border border-border-main overflow-hidden"
         >
           {children}
         </aside>

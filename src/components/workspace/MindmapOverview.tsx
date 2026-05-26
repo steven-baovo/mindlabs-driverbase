@@ -22,7 +22,7 @@ const CustomNode = ({ data }: any) => {
   
   return (
     <div 
-      className="flex items-center gap-2 p-1.5 bg-white border border-border-main/50 rounded-lg text-secondary text-[12px] hover:text-foreground transition-colors cursor-pointer relative group"
+      className="flex items-center gap-2 p-1.5 bg-surface border border-border-main rounded-lg text-secondary text-[12px] hover:text-foreground transition-colors cursor-pointer relative group"
       onMouseLeave={() => setShowMenu(false)}
     >
       <Handle type="target" position={Position.Left} className="opacity-0" />
@@ -41,31 +41,31 @@ const CustomNode = ({ data }: any) => {
 
       {/* Menu xổ ra */}
       {showMenu && (
-        <div className="absolute top-0 left-full bg-white border border-border-strong rounded-lg p-1 flex gap-1 z-50">
+        <div className="absolute top-0 left-full bg-surface border border-border-main rounded-lg p-1 flex gap-1 z-50 shadow-overlay animate-in fade-in zoom-in-95 duration-100">
           <button 
             onClick={(e) => { e.stopPropagation(); data.onAddChild('note'); setShowMenu(false); }}
-            className="p-1 hover:bg-gray-100 rounded text-gray-600 hover:text-primary"
+            className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-primary transition-colors"
             title="Note"
           >
             <FileText className="w-3.5 h-3.5" />
           </button>
           <button 
             onClick={(e) => { e.stopPropagation(); data.onAddChild('map'); setShowMenu(false); }}
-            className="p-1 hover:bg-gray-100 rounded text-gray-600 hover:text-primary"
+            className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-primary transition-colors"
             title="Canvas"
           >
             <LayoutGrid className="w-3.5 h-3.5" />
           </button>
           <button 
             onClick={(e) => { e.stopPropagation(); data.onAddChild('link'); setShowMenu(false); }}
-            className="p-1 hover:bg-gray-100 rounded text-gray-600 hover:text-primary"
+            className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-primary transition-colors"
             title="Link"
           >
             <Share2 className="w-3.5 h-3.5" />
           </button>
           <button 
             onClick={(e) => { e.stopPropagation(); data.onAddChild('folder'); setShowMenu(false); }}
-            className="p-1 hover:bg-gray-100 rounded text-gray-600 hover:text-primary"
+            className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-primary transition-colors"
             title="Folder"
           >
             <Folder className="w-3.5 h-3.5" />
@@ -166,7 +166,7 @@ export default function MindmapOverview({ nodes, onRefetch, onNodeCreated, onSel
           source: parentId,
           target: node.id,
           type: 'default',
-          style: { stroke: '#e5e7eb', strokeWidth: 1 },
+          style: { stroke: 'var(--border-strong)', strokeWidth: 1 },
         })
       }
 
@@ -193,7 +193,7 @@ export default function MindmapOverview({ nodes, onRefetch, onNodeCreated, onSel
   }
 
   return (
-    <div className="w-full h-full bg-white relative">
+    <div className="w-full h-full bg-background relative">
       <ReactFlow
         nodes={rfNodes}
         edges={rfEdges}
