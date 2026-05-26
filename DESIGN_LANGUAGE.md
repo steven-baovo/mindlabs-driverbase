@@ -6,19 +6,15 @@ Tài liệu này quy định các tiêu chuẩn đồng bộ về thẩm mỹ, t
 
 ## 📐 1. Quy Chuẩn Góc Bo (Border Radius System)
 
-Để tạo ra cảm giác sắc sảo, tối giản tinh tế và hiện đại như Linear, Mindlabs sử dụng hệ thống góc bo nhỏ và gọn (Tight & Crisp), quy định bằng cả đơn vị pixel và rem:
+Để tối ưu hóa sự tối giản và tính nhất quán tuyệt đối, Mindlabs sử dụng hệ thống góc bo tinh giản chỉ gồm **2 cấp độ bo góc** duy nhất:
 
 | Cấp độ | Giá trị Pixel | Giá trị `rem` | Tailwind Class | Trường hợp áp dụng cụ thể |
 | :--- | :--- | :--- | :--- | :--- |
-| **Lớn nhất (Max)** | `12px` | **`0.75rem`** | `rounded-xl` | Các thẻ Bento lớn, Main Cards, Modal nổi toàn màn hình, các panel chính. |
-| **Trung bình (Large)** | `8px` | **`0.5rem`** | `rounded-lg` | Khung ngoài Sidebar, khung bao quanh Canvas Node lớn, Document editor. |
-| **Tiêu chuẩn (Medium)** | `6px` | **`0.375rem`** | `rounded-md` | **Trọng tâm**: Ô nhập liệu (Inputs), Nút bấm chính/phụ (Buttons), Toolbars nổi. |
-| **Nhỏ (Small)** | `4px` | **`0.25rem`** | `rounded-sm` | Nút chức năng con trong Toolbar, Avatar nhỏ, Tags/Badges trạng thái, Tabs phụ. |
-| **Siêu nhỏ (X-Small)**| `2px` | **`0.125rem`**| `rounded-xs` | Các nhãn chỉ dẫn phụ, viền của Tooltips nhỏ. |
-| **Tròn (Pill)** | `9999px`| **`9999px`** | `rounded-full` | Nút nổi tròn (FAB), thanh gạt Toggle, nhãn đếm số (Counter Badges). |
+| **Mặc định (Default)** | `8px` | **`0.5rem`** | `rounded` / `rounded-default` / `rounded-md` / `rounded-lg` / `rounded-xl` | **Quy chuẩn chung**: Các thẻ Bento lớn, Main Cards, Modal, Sidebar, Note Editor, Ô nhập liệu (Inputs), Nút bấm tiêu chuẩn. |
+| **Tròn (Pill)** | `9999px` | **`9999px`** | `rounded-full` | Nút nổi tròn nhỏ, thanh gạt Switch, nhãn đếm số (Counter Badges), avatar tròn. |
 
 > [!TIP]
-> **Đồng bộ hóa tự động**: Nhờ tính năng override biến CSS trong khối `@theme` của [globals.css](file:///d:/mindlabs/src/app/globals.css), toàn bộ giao diện sẽ tự động thừa hưởng hệ thống góc bo mới mà không cần sửa đổi thủ công từng component riêng lẻ.
+> **Đồng bộ hóa tự động**: Toàn bộ các class bo góc của Tailwind v4 (từ `xs` đến `3xl`) đều đã được ghi đè (override) về giá trị `8px` trong tệp [globals.css](file:///d:/mindlabs-driverbase/src/app/globals.css). Do đó, nhà phát triển có thể viết bất kỳ class `rounded` nào ngoài `rounded-full` và hệ thống sẽ tự động hiển thị ở mức bo góc chuẩn `8px`.
 
 ## 🌈 2. Hệ Thống Màu Sắc & Tương Phản (Color & Contrast System)
 

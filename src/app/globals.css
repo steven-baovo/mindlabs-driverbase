@@ -33,7 +33,7 @@
 
   /* Ncmaz Premium Style Extensions (Override to sharp linear-style) */
   --radius-ncmaz: 8px;
-  --radius-ncmaz-sm: 6px;
+  --radius-ncmaz-sm: 8px;
   --glass-bg: rgba(255, 255, 255, 0.85);
   --glass-border: rgba(9, 9, 11, 0.08);
 
@@ -64,21 +64,22 @@
   --color-hover-bg: var(--hover-bg);
   --color-active-bg: var(--active-bg);
   --radius-pill: 9999px;
-  --radius-card: 12px;
+  --radius-full: 9999px;
+  --radius-card: 8px;
   --radius-main: 8px;
-  --radius-default: var(--radius-default);
-  --radius-ncmaz: var(--radius-ncmaz);
-  --radius-ncmaz-sm: var(--radius-ncmaz-sm);
+  --radius-default: 8px;
+  --radius-ncmaz: 8px;
+  --radius-ncmaz-sm: 8px;
   --font-sans: var(--font-inter);
 
   /* Precise border radius overrides for Tailwind v4 */
-  --radius-3xl: 12px;
-  --radius-2xl: 12px;
-  --radius-xl: 12px;
+  --radius-3xl: 8px;
+  --radius-2xl: 8px;
+  --radius-xl: 8px;
   --radius-lg: 8px;
-  --radius-md: 6px;
-  --radius-sm: 4px;
-  --radius-xs: 2px;
+  --radius-md: 8px;
+  --radius-sm: 8px;
+  --radius-xs: 8px;
 
   /* Custom subtle shadow tokens - Unified Linear Style */
   --shadow-subtle: var(--shadow-linear);
