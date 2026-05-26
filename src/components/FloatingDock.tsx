@@ -101,7 +101,7 @@ export default function FloatingDock({ user }: FloatingDockProps) {
               <Link
                 key={idx}
                 href={item.href}
-                className={`group relative flex flex-col items-center justify-center w-8 h-8 transition-colors ${
+                className={`group relative flex items-center justify-center w-8 h-8 transition-colors ${
                   item.active 
                     ? 'text-primary dark:text-indigo-400' 
                     : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
@@ -164,7 +164,7 @@ export default function FloatingDock({ user }: FloatingDockProps) {
                   <Link
                     key={idx}
                     href={item.href}
-                    className="group relative flex flex-col items-center justify-center w-8 h-8 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                    className="group relative flex items-center justify-center w-8 h-8 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
                   >
                     {/* Tooltip nổi phía trên icon */}
                     <span className="absolute bottom-14 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-zinc-950/90 text-white dark:bg-white/95 dark:text-zinc-900 text-[9px] font-bold rounded border border-zinc-800 dark:border-zinc-200 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 whitespace-nowrap translate-y-1 group-hover:translate-y-0 z-50">
@@ -175,7 +175,7 @@ export default function FloatingDock({ user }: FloatingDockProps) {
                     <Icon className="w-[18px] h-[18px] transition-transform duration-200 group-hover:scale-125" strokeWidth={1.5} />
 
                     {/* Dấu chấm active định vị giống MacOS Active App indicator */}
-                    <span className={`w-[3px] h-[3px] rounded-full transition-all duration-300 mt-1 ${
+                    <span className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-[3px] h-[3px] rounded-full transition-all duration-300 ${
                       item.active 
                         ? 'bg-primary dark:bg-indigo-400 shadow-[0_0_8px_rgba(94,106,210,0.8)] scale-100' 
                         : 'bg-transparent scale-0'
