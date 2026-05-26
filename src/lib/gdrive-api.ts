@@ -11,7 +11,8 @@ export async function findOrCreateSyncFile(accessToken: string): Promise<string 
     const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&spaces=appDataFolder&fields=files(id,name)`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-      }
+      },
+      cache: 'no-store'
     });
 
     if (!searchRes.ok) {
@@ -57,7 +58,8 @@ export async function downloadSyncData(accessToken: string, fileId: string): Pro
     const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-      }
+      },
+      cache: 'no-store'
     });
 
     if (res.status === 404) return null; // Không có data
@@ -83,7 +85,8 @@ export async function uploadSyncData(accessToken: string, fileId: string, data: 
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      cache: 'no-store'
     });
 
     if (!res.ok) {

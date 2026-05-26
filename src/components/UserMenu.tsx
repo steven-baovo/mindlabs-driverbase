@@ -69,7 +69,18 @@ export default function UserMenu({ user, profile }: UserMenuProps) {
 
             <button 
               type="button" 
-              onClick={() => signOut({ callbackUrl: '/login' })}
+              onClick={async () => {
+                setIsOpen(false);
+                try {
+                  const { db } = await import('@/lib/local-first/db');
+                  await db.delete(); // Xoá sạch IndexedDB
+                  localStorage.removeItem('mindlabs_initial_pull_done');
+                  localStorage.removeItem('mindlabs-user');
+                } catch (err) {
+                  console.error('Failed to clear local db on signout', err);
+                }
+                signOut({ callbackUrl: '/login' });
+              }}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
