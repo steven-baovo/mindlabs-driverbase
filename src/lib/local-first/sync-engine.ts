@@ -9,8 +9,6 @@ let syncTimeout: ReturnType<typeof setTimeout> | null = null
 let activeContinuousSyncTimeout: ReturnType<typeof setTimeout> | null = null
 let lastActivityTime = Date.now()
 let lastSuccessfulSyncTime = Date.now()
-let periodicIntervalId: ReturnType<typeof setInterval> | null = null
-let isIdleState = false
 let lastActivityThrottleTime = 0
 
 
@@ -299,51 +297,19 @@ export function scheduleSync() {
   }
 }
 
-export function setupLazyPeriodicPull() {
-  if (typeof window === 'undefined') return
-
-  // Dọn dẹp timer cũ nếu có
-  if (periodicIntervalId) {
-    clearInterval(periodicIntervalId)
-    periodicIntervalId = null
-  }
-
-  // Chỉ kích hoạt kéo định kỳ 5 phút nếu tab đang mở và người dùng không Idle
-  if (document.visibilityState === 'visible' && !isIdleState) {
-    console.log('[Sync Engine] Kích hoạt hẹn giờ kéo định kỳ 5 phút (Lazy Periodic Pull)...')
-    periodicIntervalId = setInterval(triggerSync, 300000) // 5 phút (300,000 ms)
-  } else {
-    console.log('[Sync Engine] Tab đang ẩn hoặc người dùng nhàn rỗi. Tạm ngưng hẹn giờ kéo định kỳ.')
-  }
-}
-
-export function checkIdleAndAdjustSync() {
-  if (typeof window === 'undefined') return
-
-  const idleDuration = Date.now() - lastActivityTime
-  // Ngưỡng Idle 10 phút (600,000 ms)
-  if (idleDuration >= 10 * 60 * 1000) {
-    if (!isIdleState) {
-      isIdleState = true
-      console.log('[Sync Engine] Treo máy mở màn hình quá 10 phút. Tạm dừng đồng bộ định kỳ hoàn toàn...')
-      setupLazyPeriodicPull()
-    }
-  }
-}
-
 function handleUserActivity() {
-  lastActivityTime = Date.now()
+  const now = Date.now()
+  const idleDuration = now - lastActivityTime
+  lastActivityTime = now
 
-  // Wake-up Pull: Nếu đang Idle mà hoạt động trở lại, kích hoạt sync lập tức
-  if (isIdleState) {
-    isIdleState = false
-    console.log('[Sync Engine] Hoạt động trở lại! Kích hoạt Wake-up Pull và khôi phục chu kỳ 5 phút...')
+  // Nếu không tương tác quá 10 phút (Idle) và vừa chạm chuột lại (Wake-up Pull)
+  if (idleDuration >= 10 * 60 * 1000) {
+    console.log('[Sync Engine] Tương tác trở lại sau hơn 10 phút nhàn rỗi. Kích hoạt Wake-up Pull...')
     triggerSync()
-    setupLazyPeriodicPull()
   }
 }
 
-// Throttle tương tác người dùng 5 giây
+// Throttle tương tác người dùng 5 giây để tránh quá tải CPU
 export function handleUserActivityThrottled() {
   const now = Date.now()
   if (now - lastActivityThrottleTime > 5000) {
@@ -375,13 +341,8 @@ export function handleVisibilityChange() {
       console.log(`[Sync Engine] Vừa đồng bộ thành công cách đây ${Math.round(timeSinceLastSync / 1000)}s. Bỏ qua kéo dữ liệu trùng lặp.`)
     }
     
-    // Khôi phục trạng thái active và thiết lập lại timer 5 phút
-    isIdleState = false
+    // Khôi phục trạng thái active
     lastActivityTime = now
-    setupLazyPeriodicPull()
-  } else {
-    // Tab bị ẩn -> Ngưng timer ngay
-    setupLazyPeriodicPull()
   }
 }
 
@@ -391,16 +352,11 @@ export function startSyncEngine() {
   // 1. Initial sync khi mount
   triggerSync()
 
-  // 2. Khởi tạo trạng thái và thiết lập Lazy Periodic Pull
+  // 2. Khởi tạo trạng thái hoạt động
   lastActivityTime = Date.now()
   lastSuccessfulSyncTime = Date.now()
-  isIdleState = false
-  setupLazyPeriodicPull()
 
-  // Hẹn giờ kiểm tra Idle mỗi 1 phút
-  const idleCheckInterval = setInterval(checkIdleAndAdjustSync, 60000)
-
-  // 3. Đăng ký các sự kiện tương tác để theo dõi hoạt động (Active/Idle)
+  // 3. Đăng ký các sự kiện tương tác để theo dõi hoạt động (Wake-up Pull)
   const activityEvents = ['mousemove', 'keydown', 'mousedown', 'scroll', 'touchstart']
   activityEvents.forEach(event => {
     window.addEventListener(event, handleUserActivityThrottled, { passive: true })
@@ -435,12 +391,6 @@ export function startSyncEngine() {
   window.addEventListener('mindlabs-trigger-sync', onTrigger)
 
   return () => {
-    clearInterval(idleCheckInterval)
-    if (periodicIntervalId) {
-      clearInterval(periodicIntervalId)
-      periodicIntervalId = null
-    }
-
     activityEvents.forEach(event => {
       window.removeEventListener(event, handleUserActivityThrottled)
     })
