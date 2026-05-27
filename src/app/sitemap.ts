@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // Thay thế bằng tên miền chính thức của bạn khi deploy (ví dụ: https://leanity.vn)
-  const baseUrl = 'https://leanity.com'
+  const baseUrl = 'https://www.leanity.io.vn'
   const lastModified = new Date()
 
   // Các trang công khai (public routes) được hiển thị ra ngoài để Google lập chỉ mục
