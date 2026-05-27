@@ -1,12 +1,28 @@
 import Link from 'next/link'
 import { Metadata } from 'next'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/utils/supabase/server'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Leanity - Giải Pháp Quản Lý Năng Suất, Tasks & Pomodoro',
   description: 'Trải nghiệm không gian làm việc số Leanity với quản lý công việc (Tasks), soạn thảo tài liệu, ghi chú và đồng hồ Pomodoro giúp tối đa hóa sự tập trung.',
 }
 
-export default function Home() {
+export default async function Home() {
+  // Tự động chuyển hướng thông minh trên Server nếu đã đăng nhập
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      redirect('/workspace')
+    }
+  } catch (e) {
+    // Bỏ qua lỗi và render Landing Page nếu chưa có session hoặc lỗi cấu hình
+    console.error('Auth check error on landing page:', e)
+  }
+
   // Cấu trúc Dữ liệu Schema FAQPage dành cho Generative Engine Optimization (Google AI Overviews)
   const faqSchema = {
     "@context": "https://schema.org",
@@ -33,7 +49,7 @@ export default function Home() {
         "name": "Làm thế nào để bắt đầu sử dụng Leanity?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Chỉ cần nhấp vào nút 'Vào Workspace' để truy cập ngay lập tức vào không gian làm việc cá nhân của bạn, quản lý Kanban, Todo và lưu trữ tài liệu một cách khoa học."
+          "text": "Chỉ cần đăng ký và truy cập ngay lập tức vào không gian làm việc cá nhân (Workspace) của bạn để quản lý công việc và lưu trữ tài liệu một cách khoa học."
         }
       }
     ]
@@ -68,20 +84,20 @@ export default function Home() {
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left">
           <article className="bg-surface/50 backdrop-blur-xl p-8 rounded-2xl shadow-subtle border border-border-main hover:border-primary/30 transition-all duration-300 flex flex-col space-y-4 group">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">🎯</div>
-            <h2 className="text-2xl font-bold">Quản Lý Tasks & Kanban</h2>
-            <p className="text-secondary leading-relaxed">Tổ chức công việc khoa học theo dạng danh sách Todo hoặc bảng Kanban trực quan, đảm bảo không bỏ sót bất kỳ nhiệm vụ nào.</p>
+            <h2 className="text-2xl font-bold">Quản Lý Tasks & Workspace</h2>
+            <p className="text-secondary leading-relaxed">Tổ chức công việc khoa học theo dạng danh sách Todo hoặc bảng Kanban trực quan trong không gian làm việc tập trung.</p>
           </article>
           
           <article className="bg-surface/50 backdrop-blur-xl p-8 rounded-2xl shadow-subtle border border-border-main hover:border-primary/30 transition-all duration-300 flex flex-col space-y-4 group">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">📝</div>
             <h2 className="text-2xl font-bold">Soạn Thảo & Lưu Trữ</h2>
-            <p className="text-secondary leading-relaxed">Công cụ soạn thảo tài liệu mạnh mẽ giúp bạn ghi chép, lưu trữ và tra cứu thông tin lâu dài một cách dễ dàng và bảo mật.</p>
+            <p className="text-secondary leading-relaxed">Ghi chép và lưu trữ tài liệu lâu dài với trình soạn thảo mạnh mẽ, bảo mật thông tin tối đa.</p>
           </article>
 
           <article className="bg-surface/50 backdrop-blur-xl p-8 rounded-2xl shadow-subtle border border-border-main hover:border-primary/30 transition-all duration-300 flex flex-col space-y-4 group">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">⏱️</div>
             <h2 className="text-2xl font-bold">Đồng Hồ Pomodoro</h2>
-            <p className="text-secondary leading-relaxed">Tích hợp sẵn bộ đếm thời gian Pomodoro giúp tối đa hóa sự tập trung và tự động trích xuất báo cáo năng suất hàng ngày.</p>
+            <p className="text-secondary leading-relaxed">Phương pháp đếm ngược Pomodoro chuẩn khoa học giúp tập trung cao độ và xuất báo cáo tự động mỗi ngày.</p>
           </article>
         </section>
 

@@ -12,8 +12,6 @@ export default function robots(): MetadataRoute.Robots {
         '/api/', 
         '/workspace/', // Chặn bot truy cập vào không gian làm việc cá nhân của người dùng
         '/tasks/',
-        '/kanban/',
-        '/todo/',
       ],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
