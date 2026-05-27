@@ -67,7 +67,7 @@ export default function IssueList({
   const [isQuickEntryOpen, setIsQuickEntryOpen] = useState(false);
   const [issueTitle, setIssueTitle] = useState('');
   const [issueDescription, setIssueDescription] = useState('');
-  const [issueStatus, setIssueStatus] = useState<IssueStatus>('todo');
+  const [issueStatus, setIssueStatus] = useState<IssueStatus>('backlog');
   const [issuePriority, setIssuePriority] = useState<IssuePriority>('none');
   const [issueProjectId, setIssueProjectId] = useState<string | null>(projectId);
   const [issueCycleId, setIssueCycleId] = useState<string | null>(cycleId);
@@ -92,7 +92,7 @@ export default function IssueList({
   const openQuickEntry = () => {
     setIssueTitle('');
     setIssueDescription('');
-    setIssueStatus('todo');
+    setIssueStatus('backlog');
     setIssuePriority('none');
     setIssueProjectId(projectId);
     setIssueCycleId(cycleId || (cycles.find(c => c.is_active)?.id || null));

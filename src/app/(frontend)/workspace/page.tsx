@@ -13,7 +13,7 @@ import { db } from '@/lib/local-first/db'
 import dynamic from 'next/dynamic'
 import { ReactFlowProvider } from '@xyflow/react'
 import MindmapBoard from '@/components/mindmap/MindmapBoard'
-import { Link as LucideLink, ShieldAlert, ExternalLink, Loader2 } from 'lucide-react'
+import { Link as LucideLink, ShieldAlert, ExternalLink, Loader2, GitFork, Share2 } from 'lucide-react'
 
 const GraphView = dynamic(() => import('@/components/workspace/GraphView'), {
   ssr: false,
@@ -26,6 +26,7 @@ function WorkspaceContent() {
   const noteParam = searchParams?.get('note')
   const canvasParam = searchParams?.get('canvas')
   const linkParam = searchParams?.get('link')
+  const viewParam = searchParams?.get('view')
 
   const { nodes, updateNode, liveNodesReady } = useLocalWorkspace()
   const [loading, setLoading] = useState(false)
@@ -61,11 +62,28 @@ function WorkspaceContent() {
     }
   }
 
-  // State cho việc mở Note, Canvas, Link, Graph View
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null)
   const [activeCanvasId, setActiveCanvasId] = useState<string | null>(null)
   const [activeLinkId, setActiveLinkId] = useState<string | null>(null)
   const [showGraphView, setShowGraphView] = useState(false)
+  const [graphMode, setGraphMode] = useState<'tree' | 'network'>('tree')
+
+  // Load graphMode from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('workspace-graph-mode') as 'tree' | 'network'
+      if (saved === 'tree' || saved === 'network') {
+        setGraphMode(saved)
+      }
+    }
+  }, [])
+
+  const handleSetGraphMode = (mode: 'tree' | 'network') => {
+    setGraphMode(mode)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('workspace-graph-mode', mode)
+    }
+  }
 
   // State cho việc mở Modal kết nối
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false)
@@ -91,12 +109,18 @@ function WorkspaceContent() {
       setActiveCanvasId(null)
       setActiveLinkId(linkParam)
       setShowGraphView(false)
+    } else if (viewParam === 'graph') {
+      setActiveNoteId(null)
+      setActiveCanvasId(null)
+      setActiveLinkId(null)
+      setShowGraphView(true)
     } else {
       setActiveNoteId(null)
       setActiveCanvasId(null)
       setActiveLinkId(null)
+      setShowGraphView(false)
     }
-  }, [noteParam, canvasParam, linkParam])
+  }, [noteParam, canvasParam, linkParam, viewParam])
 
   // Tự động mở các thư mục cha của file đang active trên sidebar cây thư mục
   useEffect(() => {
@@ -190,7 +214,58 @@ function WorkspaceContent() {
             />
           </div>
         ) : showGraphView ? (
-          <GraphView nodes={nodes} />
+          <div className="flex-1 flex flex-col h-full bg-background overflow-hidden">
+            {/* Control Switcher Bar */}
+            <div className="flex items-center justify-between px-6 py-3 border-b border-border-main shrink-0 bg-surface/30 backdrop-blur-md">
+              <h2 className="text-sm font-semibold text-foreground">Tổng quan Library</h2>
+              <div className="flex items-center gap-1 p-0.5 bg-hover-bg rounded-lg border border-border-main/50">
+                <button
+                  onClick={() => handleSetGraphMode('tree')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                    graphMode === 'tree'
+                      ? 'bg-surface text-foreground shadow-subtle border border-border-main/50'
+                      : 'text-secondary hover:text-foreground'
+                  }`}
+                >
+                  <GitFork className="w-3.5 h-3.5" />
+                  <span>Sơ đồ cây thư mục</span>
+                </button>
+                <button
+                  onClick={() => handleSetGraphMode('network')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                    graphMode === 'network'
+                      ? 'bg-surface text-foreground shadow-subtle border border-border-main/50'
+                      : 'text-secondary hover:text-foreground'
+                  }`}
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>Mạng liên kết (Graph)</span>
+                </button>
+              </div>
+            </div>
+            
+            {/* View Render */}
+            <div className="flex-1 min-h-0 relative">
+              {graphMode === 'tree' ? (
+                <MindmapOverview
+                  nodes={globalTreeNodes}
+                  onRefetch={fetchProjectNodes}
+                  onNodeCreated={(parentId) => {
+                    setOpenNodes(prev => {
+                      const next = new Set(prev)
+                      next.add(parentId)
+                      return next
+                    })
+                  }}
+                  onSelectNote={handleSelectNote}
+                  onSelectCanvas={handleSelectCanvas}
+                  onSelectLink={handleSelectLink}
+                />
+              ) : (
+                <GraphView nodes={nodes} />
+              )}
+            </div>
+          </div>
         ) : (
           /* Render Mindmap View */
           <MindmapOverview

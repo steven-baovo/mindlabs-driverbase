@@ -452,7 +452,7 @@ export default function IssueDetails({ issueId }: { issueId: string }) {
   const handleAddSubIssue = async () => {
     if (!newSubTitle.trim()) { setAddingSubIssue(false); return; }
     await addIssue({
-      title: newSubTitle.trim(), description: '', status: 'todo', priority: 'none',
+      title: newSubTitle.trim(), description: '', status: 'backlog', priority: 'none',
       project_id: issue.projectId, cycle_id: null, parent_id: issueId, due_date: null, labels: []
     });
     setNewSubTitle(''); setAddingSubIssue(false);

@@ -383,7 +383,10 @@ export default function WorkspaceSection() {
     <>
       <div className="flex-1 flex flex-col pt-0 px-0 relative group/sidebar min-h-0">
         {/* Tiêu đề mục Library tích hợp Hover và Nút điều khiển nhanh */}
-        <div className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md select-none shrink-0 relative group/lib-header cursor-pointer transition-colors ${createMenuOpen ? 'bg-hover-bg' : 'hover:bg-hover-bg'}`}>
+        <div 
+          onClick={() => router.push('/workspace?view=graph')}
+          className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md select-none shrink-0 relative group/lib-header cursor-pointer transition-colors ${createMenuOpen ? 'bg-hover-bg' : 'hover:bg-hover-bg'}`}
+        >
           <div className="flex items-center gap-2">
             <Library className="w-3.5 h-3.5 text-zinc-400/80" strokeWidth={2} />
             <span className="font-medium text-[13px] text-secondary">Library</span>
@@ -392,18 +395,6 @@ export default function WorkspaceSection() {
           <div className="flex items-center gap-1">
             {/* Nhóm nút nâng cao chỉ xuất hiện khi Hover */}
             <div className="flex items-center gap-1 opacity-0 group-hover/lib-header:opacity-100 transition-opacity">
-              {/* Nút xem Graph */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  router.push('/workspace?view=graph')
-                }}
-                className="p-1 rounded hover:bg-zinc-300/50 dark:hover:bg-zinc-700/50 text-zinc-400 hover:text-foreground transition-colors cursor-pointer flex items-center justify-center"
-                title="Xem Graph View"
-              >
-                <Network className="w-3.5 h-3.5" />
-              </button>
-
               {/* Nút tạo mới */}
               <button
                 onClick={(e) => {
