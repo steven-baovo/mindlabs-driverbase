@@ -10,6 +10,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '',
     '/pomodoro',
     '/productivity',
+    '/docs',
+    '/blog',
   ]
 
   return routes.map((route) => ({
