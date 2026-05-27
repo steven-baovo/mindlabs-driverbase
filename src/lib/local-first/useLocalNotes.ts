@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { db } from './db'
-import { triggerSync } from './sync-engine'
+import { scheduleSync } from './sync-engine'
 
 export function useLocalNotes() {
   /**
@@ -49,7 +49,7 @@ export function useLocalNotes() {
     })
 
     // Kích hoạt đồng bộ hóa mạng chạy ngầm ngay sau khi cập nhật thành công ở local
-    triggerSync()
+    scheduleSync()
 
     return { error: null }
   }, [])

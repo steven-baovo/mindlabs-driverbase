@@ -292,6 +292,10 @@ export default function WorkspaceSection() {
     if (!draggedId) return
 
     if (targetId === null) {
+      const draggedNode = nodes.find(n => n.id === draggedId)
+      if (!draggedNode) return
+      if (draggedNode.parent_id === null) return // Already at root, do nothing
+
       try {
         const rootNodes = nodes.filter(n => n.parent_id === null && n.id !== draggedId)
         const newOrder = Math.max(...rootNodes.map(n => n.order || 0), -1) + 1
@@ -313,11 +317,12 @@ export default function WorkspaceSection() {
 
     if (position === 'inside') {
       if (targetNode.type !== 'folder') return
+      if (draggedNode.parent_id === targetNode.id) return // Already inside target folder, do nothing
       newParentId = targetNode.id
       const children = nodes.filter(n => n.parent_id === targetNode.id && n.id !== draggedId)
       newOrder = Math.max(...children.map(n => n.order || 0), -1) + 1
     } else {
-      newParentId = targetNode.parent_id
+      newParentId = targetNode.parent_id ?? null
       const siblings = nodes
         .filter(n => n.parent_id === newParentId && n.id !== draggedId)
         .sort((a, b) => (a.order || 0) - (b.order || 0))
@@ -328,6 +333,19 @@ export default function WorkspaceSection() {
       let insertIndex = targetIndex
       if (position === 'after') {
         insertIndex = targetIndex + 1
+      }
+
+      // Kiểm tra nếu không thay đổi parent và vị trí thả vẫn giữa đúng 2 sibling cũ → bỏ qua, không ghi DB
+      if (newParentId === draggedNode.parent_id) {
+        const allSiblings = nodes
+          .filter(n => n.parent_id === newParentId)
+          .sort((a, b) => (a.order || 0) - (b.order || 0))
+        const draggedIndex = allSiblings.findIndex(s => s.id === draggedId)
+        const currentPrevId = allSiblings[draggedIndex - 1]?.id ?? null
+        const currentNextId = allSiblings[draggedIndex + 1]?.id ?? null
+        const newPrevId = siblings[insertIndex - 1]?.id ?? null
+        const newNextId = siblings[insertIndex]?.id ?? null
+        if (currentPrevId === newPrevId && currentNextId === newNextId) return
       }
 
       // Fractional ordering: chỉ cần 1 write duy nhất cho dragged node
@@ -721,8 +739,8 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
           e.dataTransfer.setData('text/plain', node.id)
           // Tính tất cả node con 1 lần khi bắt đầu kéo
           const getDescendantIds = (id: string): string[] => {
-            const children = nodes.filter(n => n.parent_id === id)
-            return [id, ...children.flatMap(c => getDescendantIds(c.id))]
+            const children = nodes.filter((n: any) => n.parent_id === id)
+            return [id, ...children.flatMap((c: any) => getDescendantIds(c.id))]
           }
           invalidTargetIdsRef.current = new Set(getDescendantIds(node.id))
         }}
@@ -770,10 +788,12 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
           setDropPosition(null)
         }}
         onDrop={async (e) => {
-          if (!draggedNodeId || draggedNodeId === node.id) return
+          if (!draggedNodeId) return
 
           e.preventDefault()
           e.stopPropagation()
+
+          if (draggedNodeId === node.id) return
 
           const position = dropPosition
           setDragOverNodeId(null)

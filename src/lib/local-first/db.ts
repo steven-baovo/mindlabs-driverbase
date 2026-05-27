@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie'
-import { NodeType, WorkspaceNode } from '@/app/(frontend)/workspace/node-actions'
+import { WorkspaceNode } from '@/lib/node-utils'
+export type { WorkspaceNode }
 
 export interface LocalWorkspaceNode extends WorkspaceNode {
   is_synced: number; // 0: false, 1: true

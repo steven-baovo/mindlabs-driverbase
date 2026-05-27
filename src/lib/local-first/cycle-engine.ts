@@ -1,6 +1,6 @@
 import { db, LocalCycle } from './db';
 import { v4 as uuidv4 } from 'uuid';
-import { triggerSync } from './sync-engine';
+import { scheduleSync } from './sync-engine'
 
 // Helper tính toán ngày bắt đầu chu kỳ gần nhất
 function getStartOfWeekDate(date: Date, startDay: number): Date {
@@ -97,7 +97,7 @@ export async function runAutoCycleEngine() {
         cycleStart.setDate(cycleStart.getDate() + 1);
         cycleStart.setHours(0, 0, 0, 0);
       }
-      triggerSync();
+      scheduleSync();
       return;
     }
 
@@ -202,7 +202,7 @@ export async function runAutoCycleEngine() {
           }
         }
 
-        triggerSync();
+        scheduleSync();
         // Gọi lại đệ quy để đảm bảo sinh đủ các chu kỳ tương lai gối đầu tiếp theo
         setTimeout(() => runAutoCycleEngine(), 100);
         return;
@@ -252,7 +252,7 @@ export async function runAutoCycleEngine() {
           cycleStart.setDate(cycleStart.getDate() + 1);
           cycleStart.setHours(0, 0, 0, 0);
         }
-        triggerSync();
+        scheduleSync();
       }
     }
   });

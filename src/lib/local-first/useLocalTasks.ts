@@ -2,7 +2,7 @@ import { useContext } from 'react'
 import { db, LocalProject, LocalCycle, LocalIssue } from './db'
 import { TasksContext } from './TasksProvider'
 import { v4 as uuidv4 } from 'uuid'
-import { triggerSync } from './sync-engine'
+import { scheduleSync } from './sync-engine'
 
 // --- PROJECTS ---
 export function useLocalProjects() {
@@ -31,7 +31,7 @@ export function useLocalProjects() {
         status: 'pending',
       })
     })
-    triggerSync()
+    scheduleSync()
     return id
   }
 
@@ -51,7 +51,7 @@ export function useLocalProjects() {
         status: 'pending',
       })
     })
-    triggerSync()
+    scheduleSync()
   }
 
   const deleteProject = async (id: string) => {
@@ -66,7 +66,7 @@ export function useLocalProjects() {
         status: 'pending',
       })
     })
-    triggerSync()
+    scheduleSync()
   }
 
   return { projects, addProject, updateProject, deleteProject }
@@ -105,7 +105,7 @@ export function useLocalCycles() {
         status: 'pending',
       })
     })
-    triggerSync()
+    scheduleSync()
     return id
   }
 
@@ -139,7 +139,7 @@ export function useLocalCycles() {
         status: 'pending',
       })
     })
-    triggerSync()
+    scheduleSync()
   }
 
   const deleteCycle = async (id: string) => {
@@ -154,7 +154,7 @@ export function useLocalCycles() {
         status: 'pending',
       })
     })
-    triggerSync()
+    scheduleSync()
   }
 
   return { cycles, addCycle, updateCycle, deleteCycle }
@@ -193,7 +193,7 @@ export function useLocalIssues() {
         status: 'pending',
       })
     })
-    triggerSync()
+    scheduleSync()
     return id
   }
 
@@ -213,7 +213,7 @@ export function useLocalIssues() {
         status: 'pending',
       })
     })
-    triggerSync()
+    scheduleSync()
   }
 
   const deleteIssue = async (id: string) => {
@@ -228,7 +228,7 @@ export function useLocalIssues() {
         status: 'pending',
       })
     })
-    triggerSync()
+    scheduleSync()
   }
 
   return { issues, addIssue, updateIssue, deleteIssue }

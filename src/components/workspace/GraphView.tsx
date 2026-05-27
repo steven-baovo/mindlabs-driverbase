@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from 'react'
 import ForceGraph2D from 'react-force-graph-2d'
-import { WorkspaceNode } from '@/app/(frontend)/workspace/node-actions'
+import { WorkspaceNode } from '@/lib/node-utils'
 
 interface GraphViewProps {
   nodes: WorkspaceNode[]

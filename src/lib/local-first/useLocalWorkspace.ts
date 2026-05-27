@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, LocalWorkspaceNode } from './db'
-import { triggerSync } from './sync-engine'
-import { WorkspaceNode } from '@/app/(frontend)/workspace/node-actions'
+import { scheduleSync } from './sync-engine'
+import { WorkspaceNode } from '@/lib/node-utils'
 
 export function useLocalWorkspace() {
   // Query trực tiếp từ database thực tế bằng useLiveQuery
@@ -109,7 +109,7 @@ export function useLocalWorkspace() {
     })
 
     // Kích hoạt đồng bộ hóa mạng chạy ngầm ngay sau khi tạo thành công ở local
-    triggerSync()
+    scheduleSync()
 
     return { data: newNode, error: null }
   }, [])
@@ -138,7 +138,7 @@ export function useLocalWorkspace() {
     })
 
     // Kích hoạt đồng bộ hóa mạng chạy ngầm ngay sau khi cập nhật thành công ở local
-    triggerSync()
+    scheduleSync()
 
     return { error: null }
   }, [])
@@ -214,7 +214,7 @@ export function useLocalWorkspace() {
     })
 
     // Kích hoạt đồng bộ hóa mạng chạy ngầm ngay sau khi xóa thành công ở local
-    triggerSync()
+    scheduleSync()
 
     return { error: null }
   }, [])
