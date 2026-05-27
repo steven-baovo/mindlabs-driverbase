@@ -14,9 +14,6 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  compiler: {
-    styledComponents: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
