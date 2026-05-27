@@ -96,6 +96,7 @@ export default function WorkspaceSection() {
   // States cho Kéo & Thả (Drag and Drop)
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null)
   const [dragOverNodeId, setDragOverNodeId] = useState<string | null>(null)
+  const [dropPosition, setDropPosition] = useState<'before' | 'inside' | 'after' | null>(null)
 
   const [openNodes, setOpenNodes] = useState<Set<string>>(new Set())
   const [isOpenNodesLoaded, setIsOpenNodesLoaded] = useState(false)
@@ -283,38 +284,63 @@ export default function WorkspaceSection() {
     }
   }
 
-  const handleNodeDrop = async (draggedId: string, targetParentId: string | null) => {
+  const handleNodeDrop = async (
+    draggedId: string,
+    targetId: string | null,
+    position: 'before' | 'inside' | 'after'
+  ) => {
     if (!draggedId) return
-    
-    if (draggedId === targetParentId) return
 
-    if (targetParentId) {
-      const targetNode = nodes.find(n => n.id === targetParentId)
-      if (!targetNode || targetNode.type !== 'folder') return
-      
-      const draggedNode = nodes.find(n => n.id === draggedId)
-      if (draggedNode && draggedNode.type === 'folder') {
-        const isDescendant = (parentId: string, childId: string): boolean => {
-          let curr = nodes.find(n => n.id === childId)
-          while (curr && curr.parent_id) {
-            if (curr.parent_id === parentId) return true
-            const nextParentId = curr.parent_id
-            curr = nodes.find(n => n.id === nextParentId)
-          }
-          return false
-        }
-        if (isDescendant(draggedId, targetParentId)) {
-          alert('Không thể kéo thư mục cha vào thư mục con của chính nó!')
-          return
-        }
+    if (targetId === null) {
+      try {
+        const rootNodes = nodes.filter(n => n.parent_id === null && n.id !== draggedId)
+        const newOrder = Math.max(...rootNodes.map(n => n.order || 0), -1) + 1
+        await updateNode(draggedId, { parent_id: null, order: newOrder })
+      } catch (err: any) {
+        alert(`Lỗi khi di chuyển file: ${err.message}`)
       }
+      return
     }
-    
+
+    if (draggedId === targetId) return
+
+    const draggedNode = nodes.find(n => n.id === draggedId)
+    const targetNode = nodes.find(n => n.id === targetId)
+    if (!draggedNode || !targetNode) return
+
+    let newParentId: string | null = null
+    let newOrder = 0
+
+    if (position === 'inside') {
+      if (targetNode.type !== 'folder') return
+      newParentId = targetNode.id
+      const children = nodes.filter(n => n.parent_id === targetNode.id && n.id !== draggedId)
+      newOrder = Math.max(...children.map(n => n.order || 0), -1) + 1
+    } else {
+      newParentId = targetNode.parent_id
+      const siblings = nodes
+        .filter(n => n.parent_id === newParentId && n.id !== draggedId)
+        .sort((a, b) => (a.order || 0) - (b.order || 0))
+
+      const targetIndex = siblings.findIndex(s => s.id === targetNode.id)
+      if (targetIndex === -1) return
+
+      let insertIndex = targetIndex
+      if (position === 'after') {
+        insertIndex = targetIndex + 1
+      }
+
+      // Fractional ordering: chỉ cần 1 write duy nhất cho dragged node
+      // Tính order = midpoint giữa 2 sibling xung quanh điểm thả
+      const prevOrder = siblings[insertIndex - 1]?.order ?? -1
+      const nextOrder = siblings[insertIndex]?.order ?? (prevOrder + 2)
+      newOrder = (prevOrder + nextOrder) / 2
+    }
+
     try {
-      const newOrder = Math.max(...nodes.filter(n => n.parent_id === targetParentId).map(n => n.order || 0), -1) + 1
-      await updateNode(draggedId, { parent_id: targetParentId, order: newOrder })
-      if (targetParentId && !openNodes.has(targetParentId)) {
-        toggleNode(targetParentId)
+      await updateNode(draggedId, { parent_id: newParentId, order: newOrder })
+      if (position === 'inside' && !openNodes.has(targetId)) {
+        toggleNode(targetId)
       }
     } catch (err: any) {
       alert(`Lỗi khi di chuyển file: ${err.message}`)
@@ -345,9 +371,12 @@ export default function WorkspaceSection() {
     onSelectLink: handleSelectLink,
     draggedNodeId,
     dragOverNodeId,
+    dropPosition,
     setDraggedNodeId,
     setDragOverNodeId,
-    handleNodeDrop
+    setDropPosition,
+    handleNodeDrop,
+    nodes
   }
 
   return (
@@ -456,7 +485,7 @@ export default function WorkspaceSection() {
           onDrop={async (e) => {
             if (draggedNodeId) {
               e.preventDefault()
-              await handleNodeDrop(draggedNodeId, null)
+              await handleNodeDrop(draggedNodeId, null, 'inside')
               setDraggedNodeId(null)
             }
           }}
@@ -665,9 +694,12 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
     onSelectLink,
     draggedNodeId,
     dragOverNodeId,
+    dropPosition,
     setDraggedNodeId,
     setDragOverNodeId,
-    handleNodeDrop
+    setDropPosition,
+    handleNodeDrop,
+    nodes
   } = useSidebar()
 
   const { icon: Icon, color } = getNodeIconData(node.type, node.url)
@@ -677,9 +709,11 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
                    (node.type === 'link' && node.id === activeLinkId)
 
   const isActiveNote = node.type === 'note' && node.note_id === activeNoteId
-  const isDragOver = dragOverNodeId === node.id && node.type === 'folder' && draggedNodeId !== node.id
+  const isDragOver = dragOverNodeId === node.id && draggedNodeId !== node.id
 
   const isDraggingRef = React.useRef(false)
+  // Cache danh sách node con của dragged node để check O(1) trong onDragOver
+  const invalidTargetIdsRef = React.useRef<Set<string>>(new Set())
 
   return (
     <div className="flex flex-col gap-0.5">
@@ -694,40 +728,77 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
           setDraggedNodeId(node.id)
           e.dataTransfer.effectAllowed = 'move'
           e.dataTransfer.setData('text/plain', node.id)
+          // Tính tất cả node con 1 lần khi bắt đầu kéo
+          const getDescendantIds = (id: string): string[] => {
+            const children = nodes.filter(n => n.parent_id === id)
+            return [id, ...children.flatMap(c => getDescendantIds(c.id))]
+          }
+          invalidTargetIdsRef.current = new Set(getDescendantIds(node.id))
         }}
         onDragEnd={() => {
           isDraggingRef.current = false
           setDraggedNodeId(null)
           setDragOverNodeId(null)
+          setDropPosition(null)
         }}
         onDragOver={(e) => {
-          if (node.type === 'folder' && draggedNodeId && draggedNodeId !== node.id) {
-            e.preventDefault()
-            e.stopPropagation()
-            setDragOverNodeId(node.id)
+          // O(1) check bằng ref đã cache từ onDragStart
+          if (!draggedNodeId || invalidTargetIdsRef.current.has(node.id)) return
+
+          e.preventDefault()
+          e.stopPropagation()
+
+          const rect = e.currentTarget.getBoundingClientRect()
+          const relativeY = e.clientY - rect.top
+
+          let position: 'before' | 'inside' | 'after' = 'inside'
+
+          if (node.type === 'folder') {
+            if (relativeY < rect.height * 0.25) {
+              position = 'before'
+            } else if (relativeY > rect.height * 0.75) {
+              position = 'after'
+            } else {
+              position = 'inside'
+            }
+          } else {
+            if (relativeY < rect.height * 0.5) {
+              position = 'before'
+            } else {
+              position = 'after'
+            }
           }
+
+          setDragOverNodeId(node.id)
+          setDropPosition(position)
         }}
         onDragLeave={(e) => {
-          if (node.type === 'folder') {
-            e.stopPropagation()
-            setDragOverNodeId(null)
-          }
+          // Chỉ reset khi chuột thực sự rời khỏi node item (không phải rời child element)
+          if (e.currentTarget.contains(e.relatedTarget as Node)) return
+          setDragOverNodeId(null)
+          setDropPosition(null)
         }}
         onDrop={async (e) => {
-          if (node.type === 'folder' && draggedNodeId) {
-            e.preventDefault()
-            e.stopPropagation()
-            setDragOverNodeId(null)
-            await handleNodeDrop(draggedNodeId, node.id)
-            setDraggedNodeId(null)
-          }
+          if (!draggedNodeId || draggedNodeId === node.id) return
+
+          e.preventDefault()
+          e.stopPropagation()
+
+          const position = dropPosition
+          setDragOverNodeId(null)
+          setDropPosition(null)
+
+          if (!position) return
+
+          await handleNodeDrop(draggedNodeId, node.id, position)
+          setDraggedNodeId(null)
         }}
-        className={`flex items-center gap-2 p-1.5 rounded-lg cursor-grab active:cursor-grabbing transition-all group select-none
+        className={`relative flex items-center gap-2 p-1.5 rounded-lg cursor-grab active:cursor-grabbing transition-all group select-none
           ${isActive 
             ? 'bg-primary/5 text-primary font-bold' 
             : 'text-secondary hover:text-foreground hover:bg-hover-bg'}
-          ${isDragOver ? 'bg-blue-50/70 border border-blue-500' : ''}
-          ${level === 0 ? 'text-[13px]' : 'text-[12px]'}
+          ${isDragOver && dropPosition === 'inside' ? 'bg-blue-50/70 border border-blue-500' : ''}
+          text-standard
         `}
         style={{ marginLeft: level > 0 ? `${level * 12}px` : '0' }}
         onClick={() => {
@@ -752,6 +823,12 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
           })
         }}
       >
+        {dragOverNodeId === node.id && dropPosition === 'before' && (
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-zinc-300 dark:bg-zinc-600 pointer-events-none" />
+        )}
+        {dragOverNodeId === node.id && dropPosition === 'after' && (
+          <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-zinc-300 dark:bg-zinc-600 pointer-events-none" />
+        )}
         {node.type === 'folder' ? (
           <ChevronRight className={`w-3 h-3 transition-transform text-secondary/30 ${isOpen ? 'rotate-90' : ''}`} />
         ) : (

@@ -130,11 +130,7 @@ export default function SidebarHeader() {
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between p-1.5 rounded-lg hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40 text-foreground transition-all duration-200 cursor-pointer group text-left focus:outline-none"
       >
-        <div className="flex items-center gap-2 min-w-0">
-          {/* Colored Circle Avatar */}
-          <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold tracking-tight shrink-0 shadow-sm ${avatarBg}`}>
-            {initials}
-          </div>
+        <div className="flex items-center gap-1.5 min-w-0">
           {/* Display Name */}
           <span className="font-normal truncate pr-1" style={{ fontSize: 'var(--font-size-system, 13px)' }}>
             {displayName}

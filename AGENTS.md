@@ -14,6 +14,4 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Ưu tiên cao nhất cho việc tối ưu "Cảm giác tốc độ" (Perceived Performance) cho người dùng.
 
 
-## AI Agent Skills
-- Khi thực hiện các tính năng mới hoặc phức tạp, hãy chủ động tham khảo và áp dụng các quy trình chuẩn trong thư mục `.skills/`.
 <!-- END:nextjs-agent-rules -->

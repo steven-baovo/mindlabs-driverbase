@@ -39,7 +39,7 @@ Mọi màu sắc sử dụng trong Mindlabs đều tuân thủ nghiêm ngặt ti
 
 ### B. Chiều Sâu & Bóng Đổ (Subtle Shadows & Modern Tactility Policy)
 
-Mindlabs áp dụng chính sách đổ bóng siêu mỏng và mịn màng của Linear để tạo ra cảm giác vật lý tinh tế và phân lớp rõ ràng giữa các thành phần giao diện:
+Mindlabs áp dụng chính sách đổ bóng siêu mỏng và mịn màng để tạo ra cảm giác vật lý tinh tế và phân lớp rõ ràng giữa các thành phần giao diện:
 
 *   **Bóng đổ nút bấm & Ô nhập liệu (Tactile Shadow)**: Sử dụng lớp bóng đổ siêu mỏng `.shadow-subtle` (`box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);` hoặc `shadow-xs`) để nút bấm và input trông có vẻ nổi nhẹ trên bề mặt canvas, kích thích người dùng click.
 *   **Bóng đổ thanh nổi & Sidebar (Floating Shadow)**: Sử dụng lớp bóng đổ lan tỏa rộng mờ `.shadow-floating` (`box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);` hoặc `shadow-sm`) cho Floating Toolbars, Sidebar, Cards để tạo ranh giới lớp mượt mà.
@@ -84,8 +84,7 @@ graph LR
     *   **Trạng thái Hover**: `hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-foreground transition-all duration-150`
     *   **Trạng thái Active (Đang bật)**: `bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold`
     *   **Trạng thái Disabled (Không khả dụng)**: `opacity-30 cursor-not-allowed`
-3.  **Vách ngăn giữa các cụm nút**:
-    *   Sử dụng thẻ `div` hoặc `span` có class `w-[1px] h-3.5 bg-border-main mx-1` để phân tách logic rõ ràng.
+
 
 ### B. Quy chuẩn các Node Tương Tác trên Canvas (Canvas Interactive Nodes)
 Áp dụng cho: *TextNode*, *NoteNode* trên bảng mindmap.
