@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { User as UserIcon, Paintbrush, X, ChevronDown, ShieldCheck, Database } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { User as UserIcon, Paintbrush, X, ChevronDown, ShieldCheck, Database, Cloud } from 'lucide-react'
 
 type Theme = 'light' | 'dark' | 'system'
 
@@ -79,6 +79,21 @@ export default function SettingsModal({
   user,
 }: SettingsModalProps) {
   const [activeTab, setActiveTab] = useState<'account' | 'appearance'>('account')
+  const [isDriveConnected, setIsDriveConnected] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    async function checkDrive() {
+      try {
+        const res = await fetch('/api/gdrive/token')
+        setIsDriveConnected(res.ok)
+      } catch {
+        setIsDriveConnected(false)
+      }
+    }
+    if (isOpen) {
+      checkDrive()
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
@@ -246,9 +261,37 @@ export default function SettingsModal({
 
                     <div className="p-4.5 rounded-md border border-border-main bg-surface flex items-center justify-between">
                       <div>
-                        <h5 className="text-[13px] font-medium text-foreground">Sync status</h5>
+                        <h5 className="text-[13px] font-medium text-foreground">Google Drive Sync</h5>
                       </div>
-                      <span className="text-[13px] font-normal text-foreground">Synced</span>
+                      {isDriveConnected === null ? (
+                        <span className="text-[13px] font-normal text-foreground/40">Checking...</span>
+                      ) : isDriveConnected ? (
+                        <div className="flex items-center gap-2.5">
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[11px] font-medium border border-emerald-500/20">
+                            Connected
+                          </span>
+                          <a
+                            href="/api/gdrive/connect"
+                            onClick={onClose}
+                            className="text-[13px] text-foreground/60 hover:text-foreground font-medium underline cursor-pointer"
+                          >
+                            Manage
+                          </a>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2.5">
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-zinc-500/10 text-zinc-500 text-[11px] font-medium border border-zinc-500/20">
+                            Not Connected
+                          </span>
+                          <a
+                            href="/api/gdrive/connect"
+                            onClick={onClose}
+                            className="text-[13px] text-primary hover:underline font-bold cursor-pointer"
+                          >
+                            Connect
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

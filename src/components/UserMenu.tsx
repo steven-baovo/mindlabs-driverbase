@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { User as UserIcon, LogOut, Settings, Sun, Moon, Monitor, X } from 'lucide-react'
-import { signOut } from 'next-auth/react'
+import { createClient } from '@/utils/supabase/client'
 
 interface UserMenuProps {
   user: {
@@ -105,15 +105,6 @@ export default function UserMenu({ user, profile }: UserMenuProps) {
             <p className="text-[10px] text-foreground/50 truncate">{user?.email}</p>
           </div>
           
-          <Link 
-            href="/account" 
-            className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:bg-hover-bg transition-colors cursor-pointer"
-            onClick={() => setIsOpen(false)}
-          >
-            <UserIcon className="w-4 h-4 text-foreground/50" />
-            Tài khoản
-          </Link>
-
           <button 
             type="button"
             onClick={() => {
@@ -135,10 +126,12 @@ export default function UserMenu({ user, profile }: UserMenuProps) {
                 await db.delete(); // Xoá sạch IndexedDB
                 localStorage.removeItem('mindlabs_initial_pull_done');
                 localStorage.removeItem('mindlabs-user');
+                const supabase = createClient()
+                await supabase.auth.signOut()
               } catch (err) {
                 console.error('Failed to clear local db on signout', err);
               }
-              signOut({ callbackUrl: '/login' });
+              window.location.href = '/login';
             }}
             className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors text-left cursor-pointer"
           >

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { User as UserIcon, LogOut, Settings, Sun, Moon, Monitor, X, ChevronDown } from 'lucide-react'
-import { signOut } from 'next-auth/react'
+import { createClient } from '@/utils/supabase/client'
 import { DropdownCard, DropdownHeader, DropdownItem } from '@/components/ui/DropdownCard'
 import SettingsModal from './SettingsModal'
 
@@ -148,14 +148,6 @@ export default function SidebarHeader() {
           />
           
           <DropdownItem 
-            href="/account"
-            icon={UserIcon}
-            onClick={() => setIsOpen(false)}
-          >
-            Tài khoản
-          </DropdownItem>
-
-          <DropdownItem 
             icon={Settings}
             onClick={() => {
               setIsOpen(false)
@@ -175,10 +167,12 @@ export default function SidebarHeader() {
                 await db.delete() // Clear IndexedDB
                 localStorage.removeItem('mindlabs_initial_pull_done')
                 localStorage.removeItem('mindlabs-user')
+                const supabase = createClient()
+                await supabase.auth.signOut()
               } catch (err) {
                 console.error('Failed to clear local db on signout', err)
               }
-              signOut({ callbackUrl: '/login' })
+              window.location.href = '/login'
             }}
           >
             Đăng xuất

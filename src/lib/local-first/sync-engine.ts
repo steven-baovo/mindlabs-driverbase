@@ -14,10 +14,10 @@ let lastActivityThrottleTime = 0
 
 async function getAccessToken(): Promise<string | null> {
   try {
-    const res = await fetch('/api/auth/session');
+    const res = await fetch('/api/gdrive/token');
     if (!res.ok) return null;
-    const session = await res.json();
-    return session?.accessToken || null;
+    const data = await res.json();
+    return data?.accessToken || null;
   } catch {
     return null;
   }
