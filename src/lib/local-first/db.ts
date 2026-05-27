@@ -123,7 +123,7 @@ export interface LocalFocusSetting {
 export interface LocalOutboxItem {
   id?: number
   action: 'create' | 'update' | 'delete'
-  table_name: 'workspace_nodes' | 'mind_notes' | 'mindmaps' | 'focus_tasks' | 'projects' | 'cycles' | 'issues' | 'focus_sessions' | 'focus_settings'
+  table_name: 'workspace_nodes' | 'mind_notes' | 'mindmaps' | 'projects' | 'cycles' | 'issues' | 'focus_sessions' | 'focus_settings'
   record_id: string
   created_at: string
   status?: 'pending' | 'failed'
@@ -133,7 +133,6 @@ class MindlabsOfflineDatabase extends Dexie {
   workspace_nodes!: Table<LocalWorkspaceNode>
   mind_notes!: Table<LocalMindNote>
   mindmaps!: Table<LocalMindmap>
-  focus_tasks!: Table<LocalFocusTask>
   projects!: Table<LocalProject>
   cycles!: Table<LocalCycle>
   issues!: Table<LocalIssue>
@@ -182,6 +181,19 @@ class MindlabsOfflineDatabase extends Dexie {
       mind_notes: 'id, is_synced, is_deleted',
       mindmaps: 'id, is_synced, is_deleted',
       focus_tasks: 'id, is_completed, is_synced',
+      projects: 'id, user_id, status, is_synced, is_deleted',
+      cycles: 'id, user_id, is_active, is_synced, is_deleted',
+      issues: 'id, user_id, project_id, cycle_id, status, priority, is_synced, is_deleted',
+      focus_sessions: 'id, user_id, task_id, session_type, is_synced',
+      focus_settings: 'id, user_id, is_synced',
+      outbox: '++id, table_name, record_id, created_at, [record_id+table_name]'
+    })
+
+    // v7: Loại bỏ hoàn toàn bảng focus_tasks để hợp nhất vào issues
+    this.version(7).stores({
+      workspace_nodes: 'id, parent_id, order, type, note_id, map_id, is_synced, is_deleted',
+      mind_notes: 'id, is_synced, is_deleted',
+      mindmaps: 'id, is_synced, is_deleted',
       projects: 'id, user_id, status, is_synced, is_deleted',
       cycles: 'id, user_id, is_active, is_synced, is_deleted',
       issues: 'id, user_id, project_id, cycle_id, status, priority, is_synced, is_deleted',

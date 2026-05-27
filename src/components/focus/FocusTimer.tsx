@@ -74,8 +74,8 @@ export default function FocusTimer() {
       onClick={resetHideTimeout}
       onTouchStart={resetHideTimeout}
       className={`flex flex-col items-center justify-center transition-all duration-700 ${isFullscreen
-          ? 'fixed inset-0 bg-black z-[9999] h-screen w-screen cursor-none'
-          : 'p-6 sm:p-12 bg-surface rounded-3xl border border-border-main relative overflow-hidden'
+        ? 'fixed inset-0 bg-black z-[9999] h-screen w-screen cursor-none'
+        : 'p-6 sm:p-12 bg-surface rounded-3xl border border-border-main relative overflow-hidden'
         } ${isFullscreen && !showFullscreenUI ? 'cursor-none' : ''}`}
     >
       {/* Fullscreen Close Button */}
@@ -131,26 +131,25 @@ export default function FocusTimer() {
       )}
 
       {/* Timer Display - Master Typography */}
-      <div className={`relative z-10 font-black tracking-[-0.08em] leading-none select-none transition-all duration-700 ${
-        isFullscreen 
-          ? `text-[120px] sm:text-[320px] ${mode === 'pomodoro' ? 'text-white' : 'text-green-500'}` 
+      <div className={`relative z-10 font-black tracking-[-0.08em] leading-none select-none transition-all duration-700 ${isFullscreen
+          ? `text-[120px] sm:text-[320px] ${mode === 'pomodoro' ? 'text-white' : 'text-green-500'}`
           : 'text-[72px] sm:text-[160px] text-foreground mb-8 sm:mb-16'
-      }`}>
+        }`}>
         {formatTime(timeLeft)}
       </div>
 
       {/* Controls */}
       <div className={`flex items-center gap-6 relative z-10 transition-all duration-500 ${isFullscreen
-          ? (showFullscreenUI ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none')
-          : 'opacity-100'
+        ? (showFullscreenUI ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none')
+        : 'opacity-100'
         }`}>
         <button
           onClick={toggleTimer}
           className={`flex items-center justify-center transition-all duration-500 active:scale-95 border border-white/20 group/play ${isFullscreen
-              ? 'h-16 px-10 rounded-full bg-white/10 text-white hover:bg-white/20'
-              : isActive
-                ? 'h-24 px-12 rounded-full bg-surface text-primary border border-border-main hover:bg-hover-bg'
-                : 'h-24 px-12 rounded-full bg-primary text-white hover:opacity-90'
+            ? 'h-16 px-10 rounded-full bg-white/10 text-white hover:bg-white/20'
+            : isActive
+              ? 'h-24 px-12 rounded-full bg-surface text-primary border border-border-main hover:bg-hover-bg'
+              : 'h-24 px-12 rounded-full bg-primary text-white hover:opacity-90'
             }`}
         >
           {isActive ? (
@@ -171,8 +170,8 @@ export default function FocusTimer() {
               exit={{ opacity: 0, scale: 0.8, x: -20 }}
               onClick={skipTimer}
               className={`flex items-center justify-center rounded-full transition-all active:scale-95 ${isFullscreen
-                  ? 'w-16 h-16 bg-white/5 text-white/40 hover:text-white'
-                  : 'w-14 h-14 bg-hover-bg text-foreground/40 hover:text-foreground hover:bg-active-bg'
+                ? 'w-16 h-16 bg-white/5 text-white/40 hover:text-white'
+                : 'w-14 h-14 bg-hover-bg text-foreground/40 hover:text-foreground hover:bg-active-bg'
                 }`}
               title="Bỏ qua"
             >

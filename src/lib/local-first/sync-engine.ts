@@ -56,7 +56,6 @@ async function recoverOrphanedItems(): Promise<number> {
     await checkAndAdd(db.mind_notes, 'mind_notes');
     await checkAndAdd(db.mindmaps, 'mindmaps');
     await checkAndAdd(db.workspace_nodes, 'workspace_nodes');
-    await checkAndAdd(db.focus_tasks, 'focus_tasks');
     await checkAndAdd(db.projects, 'projects');
     await checkAndAdd(db.cycles, 'cycles');
     await checkAndAdd(db.issues, 'issues');
@@ -221,7 +220,7 @@ export function triggerSync(): Promise<void> {
 
 async function pullRemoteChanges(remoteData: any) {
   // remoteData: { workspace_nodes: { id1: {...}, id2: {...} }, mind_notes: {...} }
-  const tables = ['mind_notes', 'mindmaps', 'workspace_nodes', 'focus_tasks', 'projects', 'cycles', 'issues', 'focus_sessions', 'focus_settings'];
+  const tables = ['mind_notes', 'mindmaps', 'workspace_nodes', 'projects', 'cycles', 'issues', 'focus_sessions', 'focus_settings'];
 
   for (const tableName of tables) {
     const tableRemoteData = remoteData[tableName];

@@ -25,11 +25,9 @@ interface FocusContextType {
   isActive: boolean
   settings: FocusSettings
   pomodorosCompleted: number
-  activeTaskId: string | null
   setMode: (mode: FocusMode) => void
   toggleTimer: () => void
   skipTimer: () => void
-  setActiveTaskId: (id: string | null) => void
   updateSettings: (newSettings: Partial<FocusSettings>) => void
   formatTime: (seconds: number) => string
 }
@@ -53,7 +51,6 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
   const [timeLeft, setTimeLeft] = useState(defaultSettings.pomodoro_duration * 60)
   const [isActive, setIsActive] = useState(false)
   const [pomodorosCompleted, setPomodorosCompleted] = useState(0)
-  const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
 
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const alarmAudioRef = useRef<HTMLAudioElement | null>(null)
@@ -159,7 +156,7 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
       await db.focus_sessions.put({
         id: sessionId,
         user_id: userId,
-        task_id: activeTaskId,
+        task_id: null,
         session_type: mode,
         duration_minutes: duration,
         is_completed: true,
@@ -173,37 +170,14 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
         action: 'create',
         table_name: 'focus_sessions',
         record_id: sessionId,
-        payload: { task_id: activeTaskId, session_type: mode, duration_minutes: duration },
+        payload: { task_id: null, session_type: mode, duration_minutes: duration },
         created_at: now
       })
     } catch (err) {
       console.error('Failed to log focus session locally:', err)
     }
 
-    // Update local completed pomodoros count instantly in local DB!
-    if (mode === 'pomodoro' && activeTaskId) {
-      try {
-        const localTask = await db.focus_tasks.get(activeTaskId)
-        if (localTask) {
-          const newCompleted = (localTask.completed_pomodoros || 0) + 1
-          const now = new Date().toISOString()
-          await db.focus_tasks.update(activeTaskId, {
-            completed_pomodoros: newCompleted,
-            updated_at: now,
-            is_synced: 0
-          })
-          await db.outbox.add({
-            action: 'update',
-            table_name: 'focus_tasks',
-            record_id: activeTaskId,
-            payload: { completed_pomodoros: newCompleted },
-            created_at: now
-          })
-        }
-      } catch (dbErr) {
-        console.error('Failed to increment local task pomodoros count:', dbErr)
-      }
-    }
+    // (Nhiệm vụ Pomodoro đã được gỡ bỏ hoàn toàn)
     
     // Trigger sync engine to push all local changes to server
     triggerSync()
@@ -272,11 +246,9 @@ export function FocusProvider({ children }: { children: React.ReactNode }) {
       isActive,
       settings,
       pomodorosCompleted,
-      activeTaskId,
       setMode,
       toggleTimer,
       skipTimer,
-      setActiveTaskId,
       updateSettings: updateSettingsState,
       formatTime
     }}>
