@@ -78,14 +78,8 @@ export default async function Home() {
       <Header />
 
       {/* Hero Section */}
-      <main className="pt-32 lg:pt-40 px-6 max-w-[1440px] mx-auto flex flex-col items-center text-center">
+      <main className="pt-20 lg:pt-24 px-6 max-w-[1440px] mx-auto flex flex-col items-center text-center">
         
-        {/* Animated Badge */}
-        <div className="inline-flex items-center space-x-2 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-1.5 text-xs font-bold text-zinc-600 mb-8 shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Phiên bản v1.0.0 chính thức phát hành</span>
-        </div>
-
         {/* Hero Headings */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight pb-4 leading-[1.1] text-zinc-950">
           Không Gian Làm Việc Số
