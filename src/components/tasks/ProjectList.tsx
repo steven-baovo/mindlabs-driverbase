@@ -183,16 +183,40 @@ export default function ProjectList() {
                   </div>
 
                   {/* Col 3: Health */}
-                  <div className="flex items-center gap-1.5 select-none">
+                  <div className="flex items-center select-none pl-2">
                     {proj.health.label === 'No updates' ? (
-                      <div className="w-3.5 h-3.5 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 shrink-0" />
+                      <div className="w-3.5 h-3.5 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 shrink-0" title="No updates" />
                     ) : (
-                      <div className="relative w-3.5 h-3.5 flex items-center justify-center shrink-0">
-                        <span className={`absolute inset-0 rounded-full opacity-25 ${proj.health.bgClass}`} />
-                        <span className={`w-1.5 h-1.5 rounded-full ${proj.health.bgClass}`} />
+                      <div className="relative w-3.5 h-3.5 flex items-center justify-center shrink-0" title={`Sức khỏe: ${proj.health.label} | Tiến độ: ${proj.progress}%`}>
+                        <svg className="w-full h-full transform -rotate-90">
+                          <circle
+                            cx="7"
+                            cy="7"
+                            r="5"
+                            fill="none"
+                            stroke="currentColor"
+                            className="text-zinc-100 dark:text-zinc-800"
+                            strokeWidth="1.5"
+                          />
+                          <circle
+                            cx="7"
+                            cy="7"
+                            r="5"
+                            fill="none"
+                            stroke="currentColor"
+                            className={
+                              proj.health.label === 'Off track' ? 'text-red-500' :
+                              proj.health.label === 'At risk' ? 'text-amber-500' :
+                              'text-emerald-500'
+                            }
+                            strokeWidth="1.5"
+                            strokeDasharray="31.4"
+                            strokeDashoffset={31.4 - (31.4 * proj.progress) / 100}
+                            strokeLinecap="round"
+                          />
+                        </svg>
                       </div>
                     )}
-                    <span className={`text-[11px] font-semibold ${proj.health.textClass}`}>{proj.health.label}</span>
                   </div>
 
                   {/* Col 4: Priority */}

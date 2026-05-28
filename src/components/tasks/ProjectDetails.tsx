@@ -418,11 +418,36 @@ export default function ProjectDetails({ projectId }: { projectId: string }) {
               </div>
               <div className="flex items-center gap-1.5 font-medium">
                 {healthData.label === 'No updates' ? (
-                  <div className="w-3 h-3 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 shrink-0" />
+                  <div className="w-3.5 h-3.5 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 shrink-0" />
                 ) : (
                   <div className="relative w-3.5 h-3.5 flex items-center justify-center shrink-0">
-                    <span className={`absolute inset-0 rounded-full opacity-25 ${healthData.bgClass}`} />
-                    <span className={`w-1.5 h-1.5 rounded-full ${healthData.bgClass}`} />
+                    <svg className="w-full h-full transform -rotate-90">
+                      <circle
+                        cx="7"
+                        cy="7"
+                        r="5"
+                        fill="none"
+                        stroke="currentColor"
+                        className="text-zinc-100 dark:text-zinc-800"
+                        strokeWidth="1.5"
+                      />
+                      <circle
+                        cx="7"
+                        cy="7"
+                        r="5"
+                        fill="none"
+                        stroke="currentColor"
+                        className={
+                          healthData.label === 'Off track' ? 'text-red-500' :
+                          healthData.label === 'At risk' ? 'text-amber-500' :
+                          'text-emerald-500'
+                        }
+                        strokeWidth="1.5"
+                        strokeDasharray="31.4"
+                        strokeDashoffset={31.4 - (31.4 * progress) / 100}
+                        strokeLinecap="round"
+                      />
+                    </svg>
                   </div>
                 )}
                 <span className={`text-[11px] font-semibold ${healthData.textClass}`}>{healthData.label}</span>
