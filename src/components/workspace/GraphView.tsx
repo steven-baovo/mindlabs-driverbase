@@ -3,6 +3,8 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react'
 import ForceGraph2D from 'react-force-graph-2d'
 import { WorkspaceNode } from '@/lib/node-utils'
+import { Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 const STANDARD_FONT_SIZE = 13
 
@@ -32,9 +34,12 @@ const interpolateColor = (
 
 interface GraphViewProps {
   nodes: WorkspaceNode[]
+  loading?: boolean
 }
 
-export default function GraphView({ nodes }: GraphViewProps) {
+export default function GraphView({ nodes, loading }: GraphViewProps) {
+  const router = useRouter()
+  const prevNodesRef = useRef<any[]>([])
   const [hoveredNode, setHoveredNode] = useState<any>(null)
   const [hoverProgress, setHoverProgress] = useState(0)
   const hoverProgressRef = useRef(0) // Ref để tránh stale closure trong animation
@@ -104,12 +109,22 @@ export default function GraphView({ nodes }: GraphViewProps) {
   const { graphData } = useMemo(() => {
     const filteredNodes = nodes.filter(n => n.type === 'note' || n.type === 'map' || n.type === 'link')
 
-    const gNodes = filteredNodes.map(n => ({
-      id: n.id,
-      name: n.title,
-      type: n.type,
-      connected_node_ids: n.connected_node_ids || []
-    }))
+    const gNodes = filteredNodes.map(n => {
+      // Tìm xem node này đã tồn tại trong prevNodes chưa để tái sử dụng tọa độ & vận tốc của D3
+      const existingNode = prevNodesRef.current.find(pn => pn.id === n.id);
+      return {
+        id: n.id,
+        name: n.title,
+        type: n.type,
+        note_id: n.note_id,
+        map_id: n.map_id,
+        connected_node_ids: n.connected_node_ids || [],
+        x: existingNode ? existingNode.x : undefined,
+        y: existingNode ? existingNode.y : undefined,
+        vx: existingNode ? existingNode.vx : undefined,
+        vy: existingNode ? existingNode.vy : undefined
+      };
+    })
 
     // Tạo danh sách Links cho đồ thị (Tránh lặp lại kết nối hai chiều)
     const gLinks: { source: string; target: string; type: 'hierarchy' | 'custom' }[] = []
@@ -134,6 +149,9 @@ export default function GraphView({ nodes }: GraphViewProps) {
       }
     })
 
+    // Lưu lại danh sách node hiện tại vào ref để dùng cho lần sau
+    prevNodesRef.current = gNodes;
+
     return { 
       graphData: { nodes: gNodes, links: gLinks }
     }
@@ -143,7 +161,12 @@ export default function GraphView({ nodes }: GraphViewProps) {
 
   return (
     <div ref={containerRef} className="w-full h-full bg-background relative">
-      {graphData.nodes.length === 0 ? (
+      {loading ? (
+        <div className="w-full h-full flex flex-col items-center justify-center text-secondary/45 text-[11px] gap-2 select-none">
+          <Loader2 className="w-4 h-4 text-primary animate-spin" />
+          <span>Đang tải sơ đồ liên kết...</span>
+        </div>
+      ) : graphData.nodes.length === 0 ? (
         <div className="w-full h-full flex items-center justify-center text-secondary/50 text-xs">
           Không có dữ liệu node để hiển thị. Hãy tạo note hoặc canvas trước!
         </div>
@@ -188,18 +211,22 @@ export default function GraphView({ nodes }: GraphViewProps) {
               // Tính font size động theo tỉ lệ zoom để không bị quá to so với node
               const screenFontSize = 8 + 4 * globalScale;
               const TEXT_GAP_PX = 8; // Khoảng cách cố định bằng pixel trên màn hình giữa node và chữ
+              const dpi = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
               
               if (m) {
                 ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.font = `${screenFontSize}px Inter, sans-serif`;
+                ctx.font = `${screenFontSize * dpi}px Inter, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
                 ctx.fillStyle = color;
-                // node.y * m.d + m.f là tọa độ y của tâm node trên màn hình
-                // radius * globalScale là bán kính node trên màn hình
-                // TEXT_GAP_PX là khoảng cách cố định từ viền node đến chữ
-                const screenY = node.y * m.d + m.f + radius * globalScale + TEXT_GAP_PX;
-                ctx.fillText(label, node.x * m.a + m.e, screenY);
+                
+                // m.d chứa cả tỷ lệ zoom (globalScale) lẫn mật độ điểm ảnh (devicePixelRatio)
+                // Ta tính toán hoàn toàn theo tọa độ pixel vật lý (physical pixels) trên canvas để chính xác 100%
+                const physicalRadius = radius * Math.abs(m.d);
+                const physicalGap = TEXT_GAP_PX * dpi;
+                const physicalY = node.y * m.d + m.f + physicalRadius + physicalGap;
+                
+                ctx.fillText(label, node.x * m.a + m.e, physicalY);
               } else {
                 ctx.font = `${screenFontSize / globalScale}px Inter, sans-serif`;
                 ctx.textAlign = 'center';
@@ -235,7 +262,21 @@ export default function GraphView({ nodes }: GraphViewProps) {
             return interpolateColor(normalRGB, targetRGB, hoverProgress);
           }}
           
-          onNodeHover={node => setHoveredNode(node)}
+          onNodeHover={node => {
+            setHoveredNode(node)
+            if (containerRef.current) {
+              containerRef.current.style.cursor = node ? 'pointer' : 'default'
+            }
+          }}
+          onNodeClick={node => {
+            if (node.type === 'note' && node.note_id) {
+              router.push(`/workspace?note=${node.note_id}`)
+            } else if (node.type === 'map' && node.map_id) {
+              router.push(`/workspace?canvas=${node.map_id}`)
+            } else if (node.type === 'link') {
+              router.push(`/workspace?link=${node.id}`)
+            }
+          }}
           d3VelocityDecay={0.4}
         />
       )}

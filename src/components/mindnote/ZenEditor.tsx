@@ -136,21 +136,24 @@ const MediaImageNodeView = (props: any) => {
     }
   }, [src])
 
+  if (isLoading || !displaySrc) {
+    return (
+      <NodeViewWrapper className="w-full max-w-[650px] my-6 select-none">
+        <div className="w-full aspect-[16/9] min-h-[260px] bg-hover-bg/30 border border-border-main/50 rounded-2xl animate-pulse relative overflow-hidden flex items-center justify-center">
+          {/* Faint, elegant visual image placeholder icon in the center */}
+          <ImageIcon className="w-10 h-10 text-secondary/20" strokeWidth={1} />
+        </div>
+      </NodeViewWrapper>
+    )
+  }
+
   return (
     <NodeViewWrapper className="relative inline-block my-4 max-w-full">
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-hover-bg/50 backdrop-blur-[2px] rounded-lg min-h-[150px] min-w-[200px] border border-border-main animate-pulse">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-[11px] text-secondary">Đang tải ảnh...</span>
-          </div>
-        </div>
-      )}
       <img
-        src={displaySrc || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150"><rect width="200" height="150" fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="12" fill="%239ca3af">Loading...</text></svg>'}
+        src={displaySrc}
         alt={node.attrs.alt}
         title={node.attrs.title}
-        className={`rounded-lg max-w-full border border-border-main transition-opacity duration-300 ${isLoading ? 'opacity-30' : 'opacity-100'}`}
+        className="rounded-xl max-w-full border border-border-main transition-all duration-300 shadow-subtle hover:shadow-overlay"
       />
     </NodeViewWrapper>
   )
