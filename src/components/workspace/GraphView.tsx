@@ -122,12 +122,20 @@ export default function GraphView({ nodes }: GraphViewProps) {
     }
   }, [nodes])
 
-  // Tự động căn giữa và fit toàn bộ các node vào giữa khung hình khi dữ liệu thay đổi
+  const hasCenteredRef = useRef(false)
+
+  // Reset flag căn giữa khi dữ liệu thay đổi
   useEffect(() => {
+    hasCenteredRef.current = false
+    
+    // Fallback timer: Căn giữa sau 500ms phòng trường hợp engine D3 đã dừng từ trước
     if (graphRef.current && graphData.nodes.length > 0) {
       const timer = setTimeout(() => {
-        graphRef.current.zoomToFit(300, 80) // 300ms animation, 80px padding để không sát viền
-      }, 200)
+        if (graphRef.current && !hasCenteredRef.current) {
+          graphRef.current.zoomToFit(400, 80)
+          hasCenteredRef.current = true
+        }
+      }, 500)
       return () => clearTimeout(timer)
     }
   }, [graphData])
@@ -146,6 +154,12 @@ export default function GraphView({ nodes }: GraphViewProps) {
           backgroundColor={isDark ? '#08080a' : '#ffffff'}
           maxZoom={1.8}
           minZoom={0.4}
+          onEngineStop={() => {
+            if (graphRef.current && !hasCenteredRef.current && graphData.nodes.length > 0) {
+              graphRef.current.zoomToFit(400, 80)
+              hasCenteredRef.current = true
+            }
+          }}
           
           // Tự vẽ Node và Chữ (Vẽ Canvas)
           nodeCanvasObject={(node: any, ctx, globalScale) => {
