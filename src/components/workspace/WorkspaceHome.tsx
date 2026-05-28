@@ -7,6 +7,7 @@ import { LocalIssue } from '@/lib/local-first/db'
 import { buildTree, TreeNode, WorkspaceNode, getNodeIconData } from '@/lib/node-utils'
 import {
   AlertCircle,
+  ChevronsUp,
   ChevronUp,
   GitFork,
   Share2,
@@ -108,8 +109,8 @@ function getPriorityIcon(priority: string) {
   const cls = 'w-3 h-3 shrink-0'
   switch (priority) {
     case 'urgent': return <AlertCircle className={`${cls} text-red-500`} />
-    case 'high': return <ChevronUp className={`${cls} text-orange-500`} />
-    case 'medium': return <ChevronRight className={`${cls} text-blue-500`} />
+    case 'high': return <ChevronsUp className={`${cls} text-orange-500`} />
+    case 'medium': return <ChevronUp className={`${cls} text-blue-500`} />
     case 'low': return <ChevronDown className={`${cls} text-zinc-400`} />
     default: return null
   }

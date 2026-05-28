@@ -1,6 +1,5 @@
-import React from 'react';
 import { 
-  CheckCircle2, Circle, Clock, AlertCircle, ChevronUp, ChevronRight, 
+  CheckCircle2, Circle, Clock, AlertCircle, ChevronsUp, ChevronUp, ChevronRight, 
   ChevronDown as ChevronDownIcon, Minus, CircleDot,
   LayoutGrid, List
 } from 'lucide-react';
@@ -102,9 +101,9 @@ export const getPriorityIcon = (priority: IssuePriority, className = "w-3.5 h-3.
     case 'urgent':
       return <AlertCircle className={`${className} text-red-500 dark:text-red-400`} />;
     case 'high':
-      return <ChevronUp className={`${className} text-orange-500 dark:text-orange-400`} />;
+      return <ChevronsUp className={`${className} text-orange-500 dark:text-orange-400`} />;
     case 'medium':
-      return <ChevronRight className={`${className} text-blue-500 dark:text-blue-400`} />;
+      return <ChevronUp className={`${className} text-blue-500 dark:text-blue-400`} />;
     case 'low':
       return <ChevronDownIcon className={`${className} text-zinc-500 dark:text-zinc-400`} />;
     case 'none':
