@@ -161,15 +161,19 @@ export default function GraphView({ nodes }: GraphViewProps) {
             if (globalScale > 0.6) {
               ctx.save();
               const m = ctx.getTransform?.();
+              
+              // Tính font size động theo tỉ lệ zoom để không bị quá to so với node
+              const screenFontSize = 8 + 4 * globalScale;
+              
               if (m) {
                 ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.font = `${STANDARD_FONT_SIZE * globalScale}px Inter, sans-serif`;
+                ctx.font = `${screenFontSize}px Inter, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
                 ctx.fillStyle = color;
                 ctx.fillText(label, node.x * m.a + m.e, node.y * m.d + m.f + (radius + 1.5) * globalScale);
               } else {
-                ctx.font = `${STANDARD_FONT_SIZE}px Inter, sans-serif`;
+                ctx.font = `${screenFontSize / globalScale}px Inter, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
                 ctx.fillStyle = color;
