@@ -155,8 +155,6 @@ export default function GraphView({ nodes }: GraphViewProps) {
           height={dimensions.height}
           nodeLabel="name"
           backgroundColor={isDark ? '#08080a' : '#ffffff'}
-          maxZoom={1.8}
-          minZoom={0.4}
           
           // Tự vẽ Node và Chữ (Vẽ Canvas)
           nodeCanvasObject={(node: any, ctx, globalScale) => {
@@ -189,6 +187,7 @@ export default function GraphView({ nodes }: GraphViewProps) {
               
               // Tính font size động theo tỉ lệ zoom để không bị quá to so với node
               const screenFontSize = 8 + 4 * globalScale;
+              const TEXT_GAP_PX = 8; // Khoảng cách cố định bằng pixel trên màn hình giữa node và chữ
               
               if (m) {
                 ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -196,13 +195,17 @@ export default function GraphView({ nodes }: GraphViewProps) {
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
                 ctx.fillStyle = color;
-                ctx.fillText(label, node.x * m.a + m.e, node.y * m.d + m.f + (radius + 1.5) * globalScale);
+                // node.y * m.d + m.f là tọa độ y của tâm node trên màn hình
+                // radius * globalScale là bán kính node trên màn hình
+                // TEXT_GAP_PX là khoảng cách cố định từ viền node đến chữ
+                const screenY = node.y * m.d + m.f + radius * globalScale + TEXT_GAP_PX;
+                ctx.fillText(label, node.x * m.a + m.e, screenY);
               } else {
                 ctx.font = `${screenFontSize / globalScale}px Inter, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
                 ctx.fillStyle = color;
-                ctx.fillText(label, node.x, node.y + radius + 1.5);
+                ctx.fillText(label, node.x, node.y + radius + TEXT_GAP_PX / globalScale);
               }
               ctx.restore();
             }
