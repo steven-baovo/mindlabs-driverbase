@@ -70,7 +70,7 @@ export default function Header({
               </div>
             </div>
 
-            <a href="/#about" className="hover:text-zinc-950 transition-colors duration-200">About</a>
+            <Link href="/about" className="hover:text-zinc-950 transition-colors duration-200">About</Link>
           </nav>
         </div>
 
