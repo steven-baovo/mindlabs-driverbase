@@ -489,7 +489,7 @@ export default function IssueDetails({ issueId }: { issueId: string }) {
           </Link>
           <div className="flex items-center gap-1 text-standard text-zinc-400 leading-none">
             {issue.projectId ? (
-              <Link href={`/tasks?project=${issue.projectId}`} className="hover:text-standard-text transition-colors leading-none">{projectName}</Link>
+              <Link href={`/tasks?project=${issue.projectId}`} className="hover:text-standard-text transition-colors leading-none">{projectName || 'Dự án không tồn tại'}</Link>
             ) : <span className="leading-none">Nhiệm vụ</span>}
             <span className="mx-1 leading-none">/</span>
             <span className="text-standard-text font-semibold leading-none">{issue.displayId}</span>

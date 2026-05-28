@@ -593,7 +593,7 @@ export default function IssueList({
             })}
           </div>
         ) : (
-          <div className="flex gap-4 h-[calc(100vh-200px)] overflow-x-auto select-none pb-8 custom-scrollbar">
+          <div className={`flex gap-4 overflow-x-auto select-none pb-8 custom-scrollbar ${disableScroll ? 'min-h-[400px]' : 'h-[calc(100vh-200px)]'}`}>
             {(['backlog', 'todo', 'in_progress', 'done'] as IssueStatus[]).map(status => {
               const statusIssues = filteredIssues.filter(i => i.status === status);
               return (
