@@ -333,131 +333,152 @@ export default function ProjectDetails({ projectId }: { projectId: string }) {
   };
 
   return (
-    <div className="flex-1 flex overflow-hidden bg-background">
+    <div className="flex flex-col h-full overflow-hidden bg-background">
 
-      {/* Center */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <div className="px-10 pt-10 pb-4 shrink-0">
-          <div className="max-w-2xl">
-            <input
-              type="text"
-              value={localName}
-              onChange={e => setLocalName(e.target.value)}
-              onBlur={() => { if (localName.trim() && localName !== project.name) handleUpdate('name', localName); }}
-              className="w-full bg-transparent text-[22px] font-bold text-foreground outline-none placeholder:text-zinc-300 leading-snug"
-              placeholder="Tên dự án..."
-            />
-            <textarea
-              value={localDescription}
-              onChange={e => setLocalDescription(e.target.value)}
-              onBlur={() => { if (localDescription !== (project.description || '')) handleUpdate('description', localDescription); }}
-              placeholder="Add description..."
-              rows={3}
-              className="mt-3 w-full bg-transparent text-sm text-zinc-500 placeholder:text-zinc-300 outline-none resize-none leading-relaxed"
-            />
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-5 h-[44px] border-b border-border-main shrink-0 select-none">
+        <div className="flex items-center gap-2">
+          <Link href="/tasks?view=projects" className="p-1 rounded-md text-zinc-400 hover:bg-hover-bg hover:text-foreground transition-colors">
+            <ChevronLeft className="w-4 h-4" />
+          </Link>
+          <div className="flex items-center gap-1 text-standard text-zinc-400 leading-none">
+            <Link href="/tasks?view=projects" className="hover:text-standard-text transition-colors leading-none">Project</Link>
+            <span className="mx-1 leading-none">/</span>
+            <span className="text-standard-text font-semibold leading-none">{project.name}</span>
           </div>
         </div>
-        <div className="flex-1 overflow-hidden">
-          <IssueList projectId={projectId} title="" hideHeader={false} hideTitle={true} />
-        </div>
+        <button onClick={handleDelete} className="p-1.5 rounded-md text-zinc-400 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer" title="Xóa dự án">
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
       </div>
 
-      {/* Right Sidebar — blocks float riêng, không có wrapper bao ── */}
-      <div className="w-[220px] shrink-0 overflow-y-auto custom-scrollbar px-3 py-4 flex flex-col gap-3">
+      {/* Body */}
+      <div className="flex flex-1 overflow-y-auto custom-scrollbar min-h-0">
 
-        {/* Block: Properties */}
-        <SidebarBlock title="Properties">
-          {/* Status */}
-          <div className="relative">
-            <PropRow
-              icon={getProjectStatusIcon(project.status, 'w-4 h-4')}
-              label={getProjectStatusLabel(project.status)}
-              onClick={() => setStatusOpen(v => !v)}
-            />
-            <Popover open={statusOpen} onClose={() => setStatusOpen(false)}>
-              {PROJECT_STATUSES.map(s => (
-                <MenuOption key={s} icon={getProjectStatusIcon(s, 'w-3.5 h-3.5')} label={getProjectStatusLabel(s)}
-                  active={project.status === s}
-                  onClick={() => { handleUpdate('status', s); setStatusOpen(false); }}
-                />
-              ))}
-            </Popover>
-          </div>
-
-          {/* Priority */}
-          <div className="relative">
-            <PropRow
-              icon={getPriorityIcon(project.priority || 'none', 'w-4 h-4')}
-              label={getPriorityLabel(project.priority || 'none')}
-              onClick={() => setPriorityOpen(v => !v)}
-            />
-            <Popover open={priorityOpen} onClose={() => setPriorityOpen(false)}>
-              {PRIORITIES.map(p => (
-                <MenuOption key={p} icon={getPriorityIcon(p, 'w-3.5 h-3.5')} label={getPriorityLabel(p)}
-                  active={(project.priority || 'none') === p}
-                  onClick={() => { handleUpdate('priority', p); setPriorityOpen(false); }}
-                />
-              ))}
-            </Popover>
-          </div>
-
-          {/* Start date */}
-          <div className="relative">
-            <PropRow
-              icon={<Calendar className="w-4 h-4" />}
-              label={fmt(project.startDate) ?? 'Start date'}
-              onClick={() => setStartOpen(v => !v)}
-            />
-            <Popover open={startOpen} onClose={() => setStartOpen(false)}>
-              <CalendarPicker
-                value={project.startDate}
-                onChange={dateStr => handleUpdate('startDate', dateStr)}
-                onClose={() => setStartOpen(false)}
+        {/* Center */}
+        <div className="flex-1 min-w-0">
+          <div className="px-10 pt-10 pb-4">
+            <div className="max-w-2xl">
+              <input
+                type="text"
+                value={localName}
+                onChange={e => setLocalName(e.target.value)}
+                onBlur={() => { if (localName.trim() && localName !== project.name) handleUpdate('name', localName); }}
+                className="w-full bg-transparent text-[22px] font-bold text-foreground outline-none placeholder:text-zinc-300 leading-snug"
+                placeholder="Tên dự án..."
               />
-            </Popover>
-          </div>
-
-          {/* Target date */}
-          <div className="relative">
-            <PropRow
-              icon={<Calendar className="w-4 h-4" />}
-              label={fmt(project.targetDate) ?? 'Target date'}
-              onClick={() => setTargetOpen(v => !v)}
-            />
-            <Popover open={targetOpen} onClose={() => setTargetOpen(false)}>
-              <CalendarPicker
-                value={project.targetDate}
-                onChange={dateStr => handleUpdate('targetDate', dateStr)}
-                onClose={() => setTargetOpen(false)}
+              <textarea
+                value={localDescription}
+                onChange={e => setLocalDescription(e.target.value)}
+                onBlur={() => { if (localDescription !== (project.description || '')) handleUpdate('description', localDescription); }}
+                placeholder="Add description..."
+                rows={3}
+                className="mt-3 w-full bg-transparent text-sm text-zinc-500 placeholder:text-zinc-300 outline-none resize-none leading-relaxed"
               />
-            </Popover>
-          </div>
-        </SidebarBlock>
-
-        {/* Block: Progress */}
-        <SidebarBlock title="Progress">
-          <div className="px-4 py-3 flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-zinc-500">{done.length}/{active.length} tasks</span>
-              <span className="text-xs font-bold text-secondary">{progress}%</span>
-            </div>
-            <div className="h-1.5 bg-active-bg rounded-full overflow-hidden">
-              <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
             </div>
           </div>
-        </SidebarBlock>
+          <div>
+            <IssueList projectId={projectId} title="" hideHeader={false} hideTitle={true} disableScroll={true} />
+          </div>
+        </div>
 
-        {/* Block: Danger zone */}
-        <SidebarBlock title="Danger zone">
-          <button
-            onClick={handleDelete}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>Xóa dự án</span>
-          </button>
-        </SidebarBlock>
+        {/* Right Sidebar — blocks float riêng, không có wrapper bao ── */}
+        <div className="w-[220px] shrink-0 px-3 py-4 flex flex-col gap-3">
 
+          {/* Block: Properties */}
+          <SidebarBlock title="Properties">
+            {/* Status */}
+            <div className="relative">
+              <PropRow
+                icon={getProjectStatusIcon(project.status, 'w-4 h-4')}
+                label={getProjectStatusLabel(project.status)}
+                onClick={() => setStatusOpen(v => !v)}
+              />
+              <Popover open={statusOpen} onClose={() => setStatusOpen(false)}>
+                {PROJECT_STATUSES.map(s => (
+                  <MenuOption key={s} icon={getProjectStatusIcon(s, 'w-3.5 h-3.5')} label={getProjectStatusLabel(s)}
+                    active={project.status === s}
+                    onClick={() => { handleUpdate('status', s); setStatusOpen(false); }}
+                  />
+                ))}
+              </Popover>
+            </div>
+
+            {/* Priority */}
+            <div className="relative">
+              <PropRow
+                icon={getPriorityIcon(project.priority || 'none', 'w-4 h-4')}
+                label={getPriorityLabel(project.priority || 'none')}
+                onClick={() => setPriorityOpen(v => !v)}
+              />
+              <Popover open={priorityOpen} onClose={() => setPriorityOpen(false)}>
+                {PRIORITIES.map(p => (
+                  <MenuOption key={p} icon={getPriorityIcon(p, 'w-3.5 h-3.5')} label={getPriorityLabel(p)}
+                    active={(project.priority || 'none') === p}
+                    onClick={() => { handleUpdate('priority', p); setPriorityOpen(false); }}
+                  />
+                ))}
+              </Popover>
+            </div>
+
+            {/* Start date */}
+            <div className="relative">
+              <PropRow
+                icon={<Calendar className="w-4 h-4" />}
+                label={fmt(project.startDate) ?? 'Start date'}
+                onClick={() => setStartOpen(v => !v)}
+              />
+              <Popover open={startOpen} onClose={() => setStartOpen(false)}>
+                <CalendarPicker
+                  value={project.startDate}
+                  onChange={dateStr => handleUpdate('startDate', dateStr)}
+                  onClose={() => setStartOpen(false)}
+                />
+              </Popover>
+            </div>
+
+            {/* Target date */}
+            <div className="relative">
+              <PropRow
+                icon={<Calendar className="w-4 h-4" />}
+                label={fmt(project.targetDate) ?? 'Target date'}
+                onClick={() => setTargetOpen(v => !v)}
+              />
+              <Popover open={targetOpen} onClose={() => setTargetOpen(false)}>
+                <CalendarPicker
+                  value={project.targetDate}
+                  onChange={dateStr => handleUpdate('targetDate', dateStr)}
+                  onClose={() => setTargetOpen(false)}
+                />
+              </Popover>
+            </div>
+          </SidebarBlock>
+
+          {/* Block: Progress */}
+          <SidebarBlock title="Progress">
+            <div className="px-4 py-3 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-zinc-500">{done.length}/{active.length} tasks</span>
+                <span className="text-xs font-bold text-secondary">{progress}%</span>
+              </div>
+              <div className="h-1.5 bg-active-bg rounded-full overflow-hidden">
+                <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+          </SidebarBlock>
+
+          {/* Block: Danger zone */}
+          <SidebarBlock title="Danger zone">
+            <button
+              onClick={handleDelete}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Xóa dự án</span>
+            </button>
+          </SidebarBlock>
+
+        </div>
       </div>
     </div>
   );

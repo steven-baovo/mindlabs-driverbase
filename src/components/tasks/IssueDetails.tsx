@@ -481,7 +481,10 @@ export default function IssueDetails({ issueId }: { issueId: string }) {
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 h-[44px] border-b border-border-main shrink-0 select-none">
         <div className="flex items-center gap-2">
-          <Link href="/tasks" className="p-1 rounded-md text-zinc-400 hover:bg-hover-bg hover:text-foreground transition-colors">
+          <Link 
+            href={issue.projectId ? `/tasks?project=${issue.projectId}` : "/tasks"} 
+            className="p-1 rounded-md text-zinc-400 hover:bg-hover-bg hover:text-foreground transition-colors"
+          >
             <ChevronLeft className="w-4 h-4" />
           </Link>
           <div className="flex items-center gap-1 text-standard text-zinc-400 leading-none">

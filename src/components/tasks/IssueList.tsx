@@ -74,6 +74,7 @@ interface IssueListProps {
   title?: string;
   hideHeader?: boolean;
   hideTitle?: boolean;
+  disableScroll?: boolean;
 }
 
 export default function IssueList({ 
@@ -81,7 +82,8 @@ export default function IssueList({
   cycleId = null, 
   title = 'My tasks', 
   hideHeader = false,
-  hideTitle = false
+  hideTitle = false,
+  disableScroll = false
 }: IssueListProps) {
   const router = useRouter();
   
@@ -226,7 +228,7 @@ export default function IssueList({
 
 
   return (
-    <div className="flex flex-col flex-1 h-full overflow-hidden">
+    <div className={`flex flex-col ${disableScroll ? 'w-full' : 'flex-1 h-full overflow-hidden'}`}>
       
       {!hideHeader && (
         <header className="flex flex-col bg-background shrink-0 select-none">
@@ -304,7 +306,7 @@ export default function IssueList({
       )}
 
       {/* Main Area */}
-      <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+      <div className={disableScroll ? "p-4" : "flex-1 overflow-y-auto p-4 custom-scrollbar"}>
         {filteredIssues.length === 0 ? (
           <div className="h-64 flex flex-col items-center justify-center text-center gap-2 select-none">
             <Command className="w-8 h-8 text-zinc-300 dark:text-zinc-800 animate-pulse" />
@@ -319,7 +321,7 @@ export default function IssueList({
 
               return (
                 <div key={status} className="space-y-1.5">
-                  <div className="flex items-center justify-between py-1.5 px-2 text-[13px] tracking-tight font-medium text-secondary sticky top-0 bg-background z-10">
+                  <div className={`flex items-center justify-between py-1.5 px-2 text-[13px] tracking-tight font-medium text-secondary bg-background z-10 ${disableScroll ? '' : 'sticky top-0'}`}>
                     <div className="flex items-center gap-1.5">
                       <span>{getStatusLabel(status)}</span>
                     </div>
