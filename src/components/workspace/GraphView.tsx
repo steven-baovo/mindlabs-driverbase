@@ -163,13 +163,13 @@ export default function GraphView({ nodes }: GraphViewProps) {
               const m = ctx.getTransform?.();
               if (m) {
                 ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.font = `${STANDARD_FONT_SIZE}px Inter, sans-serif`;
+                ctx.font = `${STANDARD_FONT_SIZE * globalScale}px Inter, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
                 ctx.fillStyle = color;
                 ctx.fillText(label, node.x * m.a + m.e, node.y * m.d + m.f + (radius + 1.5) * globalScale);
               } else {
-                ctx.font = `${STANDARD_FONT_SIZE / globalScale}px Inter, sans-serif`;
+                ctx.font = `${STANDARD_FONT_SIZE}px Inter, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
                 ctx.fillStyle = color;

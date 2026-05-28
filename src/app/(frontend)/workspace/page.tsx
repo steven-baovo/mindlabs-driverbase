@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useWorkspace } from '@/contexts/WorkspaceContext'
 import NoteEditorClient from '@/components/mindnote/NoteEditorClient'
-import MindmapOverview from '@/components/workspace/MindmapOverview'
 import WorkspaceHome from '@/components/workspace/WorkspaceHome'
 import ConnectNodeModal from '@/components/workspace/ConnectNodeModal'
 import { WorkspaceNode } from '@/lib/local-first/db'
@@ -65,24 +64,6 @@ function WorkspaceContent() {
   const activeCanvasId = selection.canvasId
   const activeLinkId = selection.linkId
   const showGraphView = selection.graphView
-  const [graphMode, setGraphMode] = useState<'tree' | 'network'>('tree')
-
-  // Load graphMode from localStorage on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('workspace-graph-mode') as 'tree' | 'network'
-      if (saved === 'tree' || saved === 'network') {
-        setGraphMode(saved)
-      }
-    }
-  }, [])
-
-  const handleSetGraphMode = (mode: 'tree' | 'network') => {
-    setGraphMode(mode)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('workspace-graph-mode', mode)
-    }
-  }
 
   // State cho việc mở Modal kết nối
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false)
@@ -114,9 +95,6 @@ function WorkspaceContent() {
     return () => clearTimeout(timer)
   }, [])
 
-  // State quản lý các node đang mở ở Sidebar
-  const [openNodes, setOpenNodes] = useState<Set<string>>(new Set())
-  const [isOpenNodesLoaded, setIsOpenNodesLoaded] = useState(false)
   // Sync Context with Next.js searchParams (for external links / router.push from other pages)
   useEffect(() => {
     const noteParam = searchParams?.get('note')
@@ -136,45 +114,6 @@ function WorkspaceContent() {
       clearSelection()
     }
   }, [searchParams, selection, selectNote, selectCanvas, selectLink, selectGraphView, clearSelection])
-
-
-  // Tự động mở các thư mục cha của file đang active trên sidebar cây thư mục
-  useEffect(() => {
-    if (nodes.length > 0 && (activeNoteId || activeCanvasId || activeLinkId)) {
-      const activeNode = nodes.find(n => n.note_id === activeNoteId || n.map_id === activeCanvasId || n.id === activeLinkId)
-      if (activeNode && activeNode.parent_id) {
-        setOpenNodes(prev => {
-          const next = new Set(prev)
-          let currParentId = activeNode.parent_id
-          while (currParentId) {
-            next.add(currParentId)
-            const parentNode = nodes.find(n => n.id === currParentId)
-            currParentId = parentNode?.parent_id || null
-          }
-          return next
-        })
-      }
-    }
-  }, [nodes, activeNoteId, activeCanvasId, activeLinkId])
-
-  // Đọc openNodes từ localStorage khi mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('project-open-nodes')
-      if (saved) {
-        const arr = JSON.parse(saved)
-        setOpenNodes(new Set(arr))
-      }
-      setIsOpenNodesLoaded(true)
-    }
-  }, [])
-
-  // Lưu openNodes vào localStorage khi thay đổi
-  useEffect(() => {
-    if (isOpenNodesLoaded) {
-      localStorage.setItem('project-open-nodes', JSON.stringify(Array.from(openNodes)))
-    }
-  }, [openNodes, isOpenNodesLoaded])
 
   // Sử dụng toàn bộ các node để vẽ sơ đồ tổng quan
   const globalTreeNodes = useMemo(() => {
@@ -223,55 +162,18 @@ function WorkspaceContent() {
           </div>
         ) : showGraphView ? (
           <div className="flex-1 flex flex-col h-full bg-background overflow-hidden">
-            {/* Control Switcher Bar */}
-            <div className="flex items-center justify-between px-6 py-3 border-b border-border-main shrink-0 bg-surface/30 backdrop-blur-md">
-              <h2 className="text-sm font-semibold text-foreground">Tổng quan Library</h2>
-              <div className="flex items-center gap-1 p-0.5 bg-hover-bg rounded-lg border border-border-main/50">
-                <button
-                  onClick={() => handleSetGraphMode('tree')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                    graphMode === 'tree'
-                      ? 'bg-surface text-foreground shadow-subtle border border-border-main/50'
-                      : 'text-secondary hover:text-foreground'
-                  }`}
-                >
-                  <GitFork className="w-3.5 h-3.5" />
-                  <span>Sơ đồ cây thư mục</span>
-                </button>
-                <button
-                  onClick={() => handleSetGraphMode('network')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                    graphMode === 'network'
-                      ? 'bg-surface text-foreground shadow-subtle border border-border-main/50'
-                      : 'text-secondary hover:text-foreground'
-                  }`}
-                >
-                  <Share2 className="w-3.5 h-3.5" />
-                  <span>Mạng liên kết (Graph)</span>
-                </button>
+            {/* Header top bar theo chuẩn tasks */}
+            <header className="flex items-center justify-between px-4 h-[44px] border-b border-border-main shrink-0 bg-background select-none">
+              <div className="flex items-center gap-1.5 text-[13px] tracking-tight font-medium text-secondary capitalize">
+                <span>library</span>
+                <span className="text-zinc-400 dark:text-zinc-600">/</span>
+                <span className="text-foreground">graph view</span>
               </div>
-            </div>
-            
+            </header>
+
             {/* View Render */}
             <div className="flex-1 min-h-0 relative">
-              {graphMode === 'tree' ? (
-                <MindmapOverview
-                  nodes={globalTreeNodes}
-                  onRefetch={fetchProjectNodes}
-                  onNodeCreated={(parentId) => {
-                    setOpenNodes(prev => {
-                      const next = new Set(prev)
-                      next.add(parentId)
-                      return next
-                    })
-                  }}
-                  onSelectNote={handleSelectNote}
-                  onSelectCanvas={handleSelectCanvas}
-                  onSelectLink={handleSelectLink}
-                />
-              ) : (
-                <GraphView nodes={nodes} />
-              )}
+              <GraphView nodes={nodes} />
             </div>
           </div>
         ) : (
