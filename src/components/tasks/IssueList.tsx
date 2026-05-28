@@ -321,7 +321,7 @@ export default function IssueList({
 
               return (
                 <div key={status} className="space-y-1.5">
-                  <div className={`flex items-center justify-between py-1.5 px-2 text-[13px] tracking-tight font-medium text-secondary bg-background z-10 ${disableScroll ? '' : 'sticky top-0'}`}>
+                  <div className="flex items-center justify-between py-1.5 px-2 text-[13px] tracking-tight font-medium text-secondary bg-background z-10">
                     <div className="flex items-center gap-1.5">
                       <span>{getStatusLabel(status)}</span>
                     </div>
