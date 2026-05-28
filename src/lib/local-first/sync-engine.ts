@@ -1,5 +1,5 @@
 import { db, LocalOutboxItem } from './db'
-import { findOrCreateSyncFile, downloadSyncData, uploadSyncData } from '../gdrive-api'
+import { findOrCreateSyncFile, downloadSyncData, uploadSyncData, uploadMediaFile } from '../gdrive-api'
 
 let activeSyncPromise: Promise<void> | null = null
 let lastSyncFinishedTime = 0
@@ -199,6 +199,9 @@ export function triggerSync(): Promise<void> {
       }
       lastSuccessfulSyncTime = Date.now()
       console.log('[Sync Engine] Đồng bộ hóa hoàn tất thành công!');
+      
+      // Đồng bộ các tệp tin hình ảnh song song (không chặn luồng text chính)
+      syncMediaFiles();
     } catch (err) {
       console.error('[Sync Engine] Đồng bộ hóa thất bại:', err)
     } finally {
@@ -216,6 +219,42 @@ export function triggerSync(): Promise<void> {
 
   activeSyncPromise = promise
   return activeSyncPromise
+}
+
+async function syncMediaFiles(): Promise<void> {
+  if (typeof window !== 'undefined' && !navigator.onLine) return;
+  const accessToken = await getAccessToken();
+  if (!accessToken) return;
+
+  try {
+    const mediaOutboxItems = await db.media_outbox.orderBy('id').toArray();
+    if (mediaOutboxItems.length === 0) return;
+
+    console.log(`[Sync Engine] Phát hiện ${mediaOutboxItems.length} tệp tin đa phương tiện cần đồng bộ.`);
+    for (const item of mediaOutboxItems) {
+      if (item.action === 'create') {
+        const mediaItem = await db.media_cache.get(item.record_id);
+        if (mediaItem && mediaItem.is_synced === 0) {
+          console.log(`[Sync Engine] Đang tải lên tệp: ${mediaItem.id}...`);
+          const success = await uploadMediaFile(accessToken, mediaItem.id, mediaItem.data_url);
+          if (success) {
+            await db.media_cache.update(mediaItem.id, { is_synced: 1 });
+            await db.media_outbox.delete(item.id!);
+            console.log(`[Sync Engine] Đã đồng bộ thành công tệp: ${mediaItem.id}`);
+          } else {
+            console.error(`[Sync Engine] Tải lên tệp thất bại: ${mediaItem.id}`);
+          }
+        } else {
+          // Record đã được sync hoặc không tìm thấy, xóa khỏi outbox
+          await db.media_outbox.delete(item.id!);
+        }
+      } else if (item.action === 'delete') {
+        await db.media_outbox.delete(item.id!);
+      }
+    }
+  } catch (err) {
+    console.error('[Sync Engine] Lỗi đồng bộ tệp đa phương tiện:', err);
+  }
 }
 
 async function pullRemoteChanges(remoteData: any) {

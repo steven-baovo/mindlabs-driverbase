@@ -246,3 +246,61 @@ body {
   background: rgba(255, 255, 255, 0.35);
   background-clip: padding-box;
 }
+
+/* ==========================================================================
+   Tiptap Table Custom Premium Styles (Leanity Design Integration)
+   ========================================================================== */
+
+.prose table {
+  border-collapse: collapse !important;
+  table-layout: fixed;
+  width: 100%;
+  margin: 24px 0;
+  border: 1px solid var(--border-strong) !important;
+}
+
+.prose table td,
+.prose table th {
+  min-width: 1em;
+  border: 1px solid var(--border-strong) !important;
+  padding: 10px 14px !important;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+  font-size: 13px;
+}
+
+.prose table th {
+  font-weight: 600;
+  text-align: left;
+  background-color: var(--hover-bg);
+  border-bottom: 2px solid var(--border-strong);
+}
+
+.prose table .selectedCell:after {
+  background: rgba(94, 106, 210, 0.08); /* Primary brand color overlay */
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+.prose table .column-resize-handle {
+  background-color: var(--primary);
+  bottom: -2px;
+  position: absolute;
+  right: -2px;
+  pointer-events: none;
+  top: 0;
+  width: 4px;
+  z-index: 20;
+}
+
+.prose .tableWrapper {
+  overflow-x: auto;
+  margin: 24px 0;
+}

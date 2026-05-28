@@ -130,6 +130,23 @@ export interface LocalOutboxItem {
   status?: 'pending' | 'failed'
 }
 
+export interface LocalMediaCacheItem {
+  id: string
+  data_url: string
+  created_at: string
+  updated_at: string
+  is_synced: number
+  is_deleted: number
+}
+
+export interface LocalMediaOutboxItem {
+  id?: number
+  record_id: string
+  action: 'create' | 'delete'
+  created_at: string
+  status?: 'pending' | 'failed'
+}
+
 class MindlabsOfflineDatabase extends Dexie {
   workspace_nodes!: Table<LocalWorkspaceNode>
   mind_notes!: Table<LocalMindNote>
@@ -140,6 +157,8 @@ class MindlabsOfflineDatabase extends Dexie {
   focus_sessions!: Table<LocalFocusSession>
   focus_settings!: Table<LocalFocusSetting>
   outbox!: Table<LocalOutboxItem>
+  media_cache!: Table<LocalMediaCacheItem>
+  media_outbox!: Table<LocalMediaOutboxItem>
 
   constructor() {
     super('MindlabsOfflineDatabase')
@@ -201,6 +220,21 @@ class MindlabsOfflineDatabase extends Dexie {
       focus_sessions: 'id, user_id, task_id, session_type, is_synced',
       focus_settings: 'id, user_id, is_synced',
       outbox: '++id, table_name, record_id, created_at, [record_id+table_name]'
+    })
+
+    // v8: Thêm bảng media_cache và media_outbox để đồng bộ tệp đa phương tiện riêng biệt
+    this.version(8).stores({
+      workspace_nodes: 'id, parent_id, order, type, note_id, map_id, is_synced, is_deleted',
+      mind_notes: 'id, is_synced, is_deleted',
+      mindmaps: 'id, is_synced, is_deleted',
+      projects: 'id, user_id, status, is_synced, is_deleted',
+      cycles: 'id, user_id, is_active, is_synced, is_deleted',
+      issues: 'id, user_id, project_id, cycle_id, status, priority, is_synced, is_deleted',
+      focus_sessions: 'id, user_id, task_id, session_type, is_synced',
+      focus_settings: 'id, user_id, is_synced',
+      outbox: '++id, table_name, record_id, created_at, [record_id+table_name]',
+      media_cache: 'id, is_synced, is_deleted',
+      media_outbox: '++id, record_id, action, created_at'
     })
   }
 }

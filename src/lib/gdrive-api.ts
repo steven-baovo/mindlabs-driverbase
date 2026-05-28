@@ -99,3 +99,88 @@ export async function uploadSyncData(accessToken: string, fileId: string, data: 
     return false;
   }
 }
+
+export async function uploadMediaFile(accessToken: string, mediaId: string, dataUrl: string): Promise<boolean> {
+  try {
+    // 1. Check if file already exists in appDataFolder
+    const query = encodeURIComponent(`name='${mediaId}' and 'appDataFolder' in parents and trashed=false`);
+    const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&spaces=appDataFolder&fields=files(id)`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: 'no-store'
+    });
+    if (!searchRes.ok) return false;
+    const searchData = await searchRes.json();
+    let fileId = searchData.files?.[0]?.id;
+
+    // 2. If not, create file metadata in appDataFolder
+    if (!fileId) {
+      const metadata = {
+        name: mediaId,
+        parents: ['appDataFolder']
+      };
+      const createRes = await fetch('https://www.googleapis.com/drive/v3/files?fields=id', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(metadata)
+      });
+      if (!createRes.ok) {
+        console.error('[GDrive API] Create media file metadata failed:', await createRes.text());
+        return false;
+      }
+      const createData = await createRes.json();
+      fileId = createData.id;
+    }
+
+    // 3. Upload content as plain text (Base64 string)
+    const uploadRes = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'text/plain'
+      },
+      body: dataUrl,
+      cache: 'no-store'
+    });
+
+    if (!uploadRes.ok) {
+      console.error('[GDrive API] Upload media file content failed:', await uploadRes.text());
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('[GDrive API] uploadMediaFile error:', err);
+    return false;
+  }
+}
+
+export async function downloadMediaFile(accessToken: string, mediaId: string): Promise<string | null> {
+  try {
+    // 1. Find fileId by name in appDataFolder
+    const query = encodeURIComponent(`name='${mediaId}' and 'appDataFolder' in parents and trashed=false`);
+    const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&spaces=appDataFolder&fields=files(id)`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: 'no-store'
+    });
+    if (!searchRes.ok) return null;
+    const searchData = await searchRes.json();
+    const fileId = searchData.files?.[0]?.id;
+    if (!fileId) return null;
+
+    // 2. Download content (raw text/Base64)
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: 'no-store'
+    });
+    if (!res.ok) {
+      console.error('[GDrive API] Download media file content failed:', await res.text());
+      return null;
+    }
+    return await res.text();
+  } catch (err) {
+    console.error('[GDrive API] downloadMediaFile error:', err);
+    return null;
+  }
+}
