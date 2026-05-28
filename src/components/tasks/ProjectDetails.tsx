@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2, Check, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trash2, Check, Calendar, ChevronLeft, ChevronRight, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { useLocalProjects, useLocalIssues } from '@/lib/local-first/useLocalTasks';
 import IssueList from '@/components/tasks/IssueList';
@@ -318,6 +318,27 @@ export default function ProjectDetails({ projectId }: { projectId: string }) {
   const done = active.filter(i => i.status === 'done');
   const progress = active.length > 0 ? Math.round((done.length / active.length) * 100) : 0;
 
+  const healthData = useMemo(() => {
+    if (projIssues.length === 0) {
+      return { label: 'No updates', bgClass: 'border border-dashed border-zinc-300 dark:border-zinc-700', textClass: 'text-zinc-500' };
+    }
+    if (progress === 100) {
+      return { label: 'Completed', bgClass: 'bg-emerald-500', textClass: 'text-emerald-600 dark:text-emerald-450' };
+    }
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const overdueIssues = active.filter(i => i.status !== 'done' && i.due_date && i.due_date < todayStr);
+
+    if (overdueIssues.length > 0) {
+      if (overdueIssues.length >= 3) {
+        return { label: 'Off track', bgClass: 'bg-red-500', textClass: 'text-red-600 dark:text-red-400' };
+      }
+      return { label: 'At risk', bgClass: 'bg-amber-500', textClass: 'text-amber-600 dark:text-amber-400' };
+    }
+
+    return { label: 'On track', bgClass: 'bg-emerald-500', textClass: 'text-emerald-600 dark:text-emerald-450' };
+  }, [projIssues, active, progress]);
+
   const PROJECT_STATUSES: MockProject['status'][] = ['planned', 'active', 'paused', 'completed', 'canceled'];
   const PRIORITIES = ['urgent', 'high', 'medium', 'low', 'none'] as const;
 
@@ -387,6 +408,20 @@ export default function ProjectDetails({ projectId }: { projectId: string }) {
 
           {/* Block: Properties */}
           <SidebarBlock title="Properties">
+            {/* Health (Auto-calculated) */}
+            <div className="flex items-center justify-between px-4 py-2 text-xs text-zinc-600 border-b border-border-main/10 select-none">
+              <div className="flex items-center gap-2">
+                <span className="w-4 h-4 shrink-0 flex items-center justify-center text-zinc-400">
+                  <Activity className="w-3.5 h-3.5" />
+                </span>
+                <span>Health</span>
+              </div>
+              <div className="flex items-center gap-1.5 font-medium">
+                <span className={`w-1.5 h-1.5 rounded-full ${healthData.bgClass === 'bg-emerald-500' ? 'bg-emerald-500' : healthData.bgClass === 'bg-amber-500' ? 'bg-amber-500' : healthData.bgClass === 'bg-red-500' ? 'bg-red-500' : 'border border-dashed border-zinc-400 w-2 h-2'}`} />
+                <span className={`text-[11px] font-semibold ${healthData.textClass}`}>{healthData.label}</span>
+              </div>
+            </div>
+
             {/* Status */}
             <div className="relative">
               <PropRow

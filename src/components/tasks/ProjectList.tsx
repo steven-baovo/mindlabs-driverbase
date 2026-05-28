@@ -55,6 +55,25 @@ export default function ProjectList() {
       const doneIssues = projIssues.filter(i => i.status === 'done');
       const progress = projIssues.length > 0 ? Math.round((doneIssues.length / projIssues.length) * 100) : 0;
 
+      let health = { label: 'No updates', bgClass: 'border border-dashed border-zinc-300 dark:border-zinc-700', textClass: 'text-zinc-500' };
+      if (projIssues.length > 0) {
+        if (progress === 100) {
+          health = { label: 'Completed', bgClass: 'bg-emerald-500', textClass: 'text-emerald-600 dark:text-emerald-450' };
+        } else {
+          const todayStr = new Date().toISOString().split('T')[0];
+          const overdueIssues = projIssues.filter(i => i.status !== 'done' && i.due_date && i.due_date < todayStr);
+          if (overdueIssues.length > 0) {
+            if (overdueIssues.length >= 3) {
+              health = { label: 'Off track', bgClass: 'bg-red-500', textClass: 'text-red-600 dark:text-red-400' };
+            } else {
+              health = { label: 'At risk', bgClass: 'bg-amber-500', textClass: 'text-amber-600 dark:text-amber-400' };
+            }
+          } else {
+            health = { label: 'On track', bgClass: 'bg-emerald-500', textClass: 'text-emerald-600 dark:text-emerald-450' };
+          }
+        }
+      }
+
       return {
         id: p.id,
         name: p.name,
@@ -64,7 +83,8 @@ export default function ProjectList() {
         targetDate: p.target_date || '',
         description: p.description || '',
         progress,
-        issuesCount: projIssues.length
+        issuesCount: projIssues.length,
+        health
       };
     }).sort((a, b) => {
       // Sắp xếp: Dự án đang thực hiện trước, sau đó là dự án chuẩn bị, cuối cùng là đã xong
@@ -163,11 +183,9 @@ export default function ProjectList() {
                   </div>
 
                   {/* Col 3: Health */}
-                  <div className="flex items-center gap-1.5 text-zinc-500">
-                    <div className="w-3.5 h-3.5 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 flex items-center justify-center shrink-0">
-                      {/* Rỗng */}
-                    </div>
-                    <span className="text-[11px] font-medium">No updates</span>
+                  <div className="flex items-center gap-1.5 select-none">
+                    <span className={`w-1.5 h-1.5 rounded-full ${proj.health.bgClass === 'bg-emerald-500' ? 'bg-emerald-500' : proj.health.bgClass === 'bg-amber-500' ? 'bg-amber-500' : proj.health.bgClass === 'bg-red-500' ? 'bg-red-500' : 'border border-dashed border-zinc-400 w-2.5 h-2.5 shrink-0'}`} />
+                    <span className={`text-[11px] font-semibold ${proj.health.textClass}`}>{proj.health.label}</span>
                   </div>
 
                   {/* Col 4: Priority */}
