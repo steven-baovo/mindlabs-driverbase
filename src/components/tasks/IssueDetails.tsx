@@ -10,7 +10,8 @@ import {
 import { useLocalIssues, useLocalProjects, useLocalCycles } from '@/lib/local-first/useLocalTasks';
 import {
   MockIssue, IssueStatus, IssuePriority,
-  getStatusIcon, getPriorityIcon, getStatusLabel, getPriorityLabel
+  getStatusIcon, getPriorityIcon, getStatusLabel, getPriorityLabel,
+  getIssueDisplayId
 } from '@/components/tasks/types';
 
 // ─── Popover ───────────────────────────────────────────────────────────────────
@@ -294,7 +295,7 @@ function PropRow({ icon, label, onClick, children }: {
 
 // ─── Sub-issue row ─────────────────────────────────────────────────────────────
 function SubIssueRow({ sub, onToggle, onDelete }: {
-  sub: { id: string; number: number; title: string; status: IssueStatus };
+  sub: { id: string; displayId: string; title: string; status: IssueStatus };
   onToggle: () => void;
   onDelete: () => void;
 }) {
@@ -308,7 +309,7 @@ function SubIssueRow({ sub, onToggle, onDelete }: {
         href={`/tasks?issue=${sub.id}`}
         className={`flex-1 text-xs truncate transition-colors hover:text-foreground ${isDone ? 'line-through text-zinc-400' : 'text-zinc-600'}`}
       >
-        <span className="text-zinc-300 mr-1.5">ML-{sub.number}</span>
+        <span className="text-zinc-300 mr-1.5">{sub.displayId}</span>
         {sub.title}
       </Link>
       <button
@@ -348,7 +349,7 @@ export default function IssueDetails({ issueId }: { issueId: string }) {
     if (!found) return null;
     return {
       id: found.id,
-      displayId: `ML-${found.number}`,
+      displayId: getIssueDisplayId(found.created_at, found.number),
       title: found.title,
       description: found.description,
       status: found.status,
@@ -524,7 +525,12 @@ export default function IssueDetails({ issueId }: { issueId: string }) {
               {subIssues.map(sub => (
                 <SubIssueRow
                   key={sub.id}
-                  sub={{ id: sub.id, number: sub.number, title: sub.title, status: sub.status as IssueStatus }}
+                  sub={{
+                    id: sub.id,
+                    displayId: getIssueDisplayId(sub.created_at, sub.number),
+                    title: sub.title,
+                    status: sub.status as IssueStatus
+                  }}
                   onToggle={() => updateIssue(sub.id, { status: sub.status === 'done' ? 'todo' : 'done' })}
                   onDelete={() => deleteIssue(sub.id)}
                 />

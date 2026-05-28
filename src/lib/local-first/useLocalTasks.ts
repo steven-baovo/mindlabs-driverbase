@@ -170,8 +170,21 @@ export function useLocalIssues() {
 
     await db.transaction('rw', [db.issues, db.outbox], async () => {
       const allIssues = await db.issues.toArray()
-      const maxNumber = allIssues.reduce((max, i) => Math.max(max, i.number || 0), 0)
+      
+      const localNow = new Date()
+      const year = localNow.getFullYear()
+      const month = localNow.getMonth()
+      const day = localNow.getDate()
+      
+      const issuesToday = allIssues.filter(i => {
+        if (!i.created_at) return false
+        const d = new Date(i.created_at)
+        return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day
+      })
+      
+      const maxNumber = issuesToday.reduce((max, i) => Math.max(max, i.number || 0), 0)
       const number = maxNumber + 1
+
 
       const newIssue: LocalIssue = {
         ...payload,

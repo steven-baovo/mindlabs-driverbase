@@ -4,14 +4,69 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Search, Plus, List, LayoutGrid, Calendar, ChevronDown, X, Command, Trash2,
-  Tag, Box, History, Maximize2, Check, Paperclip
+  Tag, Box, History, Maximize2, Check, Paperclip, Folder, Clock, Play
 } from 'lucide-react';
 import { useLocalIssues, useLocalProjects, useLocalCycles } from '@/lib/local-first/useLocalTasks';
 import { 
   MockIssue, IssueStatus, IssuePriority, 
-  getStatusIcon, getStatusLabel, getPriorityIcon, getPriorityLabel, formatDueDate 
+  getStatusIcon, getStatusLabel, getPriorityIcon, getPriorityLabel, formatDueDate,
+  getIssueDisplayId
 } from './types';
 import { useQuickCreate } from '@/contexts/QuickCreateContext';
+
+// ─── Popover & MenuOption cho dòng Task ─────────────────────────────────────────
+function RowPopover({ children, onClose, align = 'left' }: { children: React.ReactNode; onClose: () => void; align?: 'left' | 'right' }) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    const handleOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, [onClose]);
+
+  return (
+    <div
+      ref={ref}
+      className={`row-popover-container absolute top-[calc(100%+4px)] z-[100] min-w-[140px] bg-surface border border-border-main rounded-lg overflow-hidden shadow-overlay py-1 flex flex-col ${
+        align === 'left' ? 'left-0' : 'right-4'
+      }`}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {children}
+    </div>
+  );
+}
+
+interface RowMenuOptionProps {
+  icon?: React.ReactNode;
+  label: string;
+  active?: boolean;
+  onClick: () => void;
+}
+
+function RowMenuOption({ icon, label, active, onClick }: RowMenuOptionProps) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-hover-bg transition-colors text-left outline-none cursor-pointer"
+    >
+      {icon && <span className="w-3.5 h-3.5 shrink-0 flex items-center justify-center text-zinc-400 dark:text-zinc-500">{icon}</span>}
+      <span className="flex-1 text-[11.5px] text-foreground capitalize truncate">{label}</span>
+      {active && <Check className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 shrink-0 ml-1.5" />}
+    </button>
+  );
+}
+
+const STATUS_OPTIONS: IssueStatus[] = ['backlog', 'todo', 'in_progress', 'done', 'canceled'];
+const PRIORITY_OPTIONS: IssuePriority[] = ['urgent', 'high', 'medium', 'low', 'none'];
+
 
 interface IssueListProps {
   projectId?: string | null;
@@ -46,7 +101,7 @@ export default function IssueList({
 
   const issues = useMemo<MockIssue[]>(() => (dbIssues || []).map(i => ({
     id: i.id,
-    displayId: `ML-${i.number}`,
+    displayId: getIssueDisplayId(i.created_at, i.number),
     title: i.title,
     description: i.description,
     status: i.status,
@@ -58,11 +113,30 @@ export default function IssueList({
     createdAt: i.created_at
   })), [dbIssues]);
 
+
   const { open: openQuickCreate } = useQuickCreate();
 
   const [view, setView] = useState<'list' | 'board'>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPriority, setFilterPriority] = useState<string | null>(null);
+  const [activeRowDropdown, setActiveRowDropdown] = useState<{ issueId: string; type: 'status' | 'priority' | 'project' | 'cycle' } | null>(null);
+
+  useEffect(() => {
+    if (!activeRowDropdown) return;
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.row-popover-container')) {
+        setActiveRowDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [activeRowDropdown]);
+
+  const handleUpdateIssueField = async (issueId: string, field: string, value: any) => {
+    await dbUpdateIssue(issueId, { [field]: value });
+    setActiveRowDropdown(null);
+  };
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const [dragOverStatus, setDragOverStatus] = useState<IssueStatus | null>(null);
 
@@ -252,26 +326,72 @@ export default function IssueList({
                     <span className="text-[13px] tracking-tight text-secondary/70">{statusIssues.length}</span>
                   </div>
 
-                  <div className="rounded-md bg-surface overflow-hidden ml-6">
-                    {statusIssues.map((issue) => (
+                  <div className="rounded-md bg-surface ml-6">
+                    {statusIssues.map((issue, index) => (
                       <div
                         key={issue.id}
                         onClick={() => router.push(`/tasks?issue=${issue.id}`)}
-                        className={`flex items-center justify-between gap-4 py-2 px-3 transition-colors cursor-pointer group hover:bg-hover-bg/30`}
+                        className={`flex items-center justify-between gap-4 py-2 px-3 transition-colors cursor-pointer group hover:bg-hover-bg/30 ${
+                          index === 0 ? 'rounded-t-md' : ''
+                        } ${
+                          index === statusIssues.length - 1 ? 'rounded-b-md' : ''
+                        }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleUpdateStatus(issue.id, issue.status === 'done' ? 'todo' : 'done');
-                            }}
-                            className="shrink-0 transition-transform active:scale-95 cursor-pointer"
-                          >
-                            {getStatusIcon(issue.status, "w-4 h-4")}
-                          </button>
-                          <span className="text-[13px] tracking-tight font-medium text-secondary/70 shrink-0 font-mono">
-                            {issue.displayId}
-                          </span>
+                          {/* Priority */}
+                          <div className="relative shrink-0">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveRowDropdown(activeRowDropdown?.issueId === issue.id && activeRowDropdown?.type === 'priority' ? null : { issueId: issue.id, type: 'priority' });
+                              }}
+                              className="flex items-center p-1 rounded hover:bg-hover-bg/80 transition-colors"
+                              title={`Độ ưu tiên: ${getPriorityLabel(issue.priority)}`}
+                            >
+                              {getPriorityIcon(issue.priority, "w-3.5 h-3.5")}
+                            </button>
+                            {activeRowDropdown?.issueId === issue.id && activeRowDropdown?.type === 'priority' && (
+                              <RowPopover onClose={() => setActiveRowDropdown(null)}>
+                                {PRIORITY_OPTIONS.map(p => (
+                                  <RowMenuOption
+                                    key={p}
+                                    icon={getPriorityIcon(p, 'w-3.5 h-3.5')}
+                                    label={getPriorityLabel(p)}
+                                    active={issue.priority === p}
+                                    onClick={() => handleUpdateIssueField(issue.id, 'priority', p)}
+                                  />
+                                ))}
+                              </RowPopover>
+                            )}
+                          </div>
+
+                          {/* Status */}
+                          <div className="relative shrink-0">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveRowDropdown(activeRowDropdown?.issueId === issue.id && activeRowDropdown?.type === 'status' ? null : { issueId: issue.id, type: 'status' });
+                              }}
+                              className="transition-transform active:scale-95 cursor-pointer p-1 rounded hover:bg-hover-bg/80 transition-colors flex items-center"
+                              title={`Trạng thái: ${getStatusLabel(issue.status)}`}
+                            >
+                              {getStatusIcon(issue.status, "w-4 h-4")}
+                            </button>
+                            {activeRowDropdown?.issueId === issue.id && activeRowDropdown?.type === 'status' && (
+                              <RowPopover onClose={() => setActiveRowDropdown(null)}>
+                                {STATUS_OPTIONS.map(s => (
+                                  <RowMenuOption
+                                    key={s}
+                                    icon={getStatusIcon(s, 'w-3.5 h-3.5')}
+                                    label={getStatusLabel(s)}
+                                    active={issue.status === s}
+                                    onClick={() => handleUpdateIssueField(issue.id, 'status', s)}
+                                  />
+                                ))}
+                              </RowPopover>
+                            )}
+                          </div>
+
                           <p className={`text-[13px] tracking-tight font-normal truncate flex-1 text-foreground ${issue.status === 'done' ? 'text-zinc-400 line-through' : ''}`}>
                             {issue.title}
                           </p>
@@ -286,17 +406,169 @@ export default function IssueList({
                           )}
                         </div>
 
-                        <div className="flex items-center gap-4 shrink-0 text-zinc-500">
+                        <div className="flex items-center gap-2.5 shrink-0 text-zinc-500 select-none">
+                          {/* Project Badge/Picker */}
                           {!projectId && issue.projectId && (
-                            <div className="flex items-center text-[13px] tracking-tight text-secondary/70 max-w-[120px]">
-                              <span className="truncate font-medium">
-                                {projects.find(p => p.id === issue.projectId)?.name}
-                              </span>
+                            <div className="relative shrink-0">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveRowDropdown(activeRowDropdown?.issueId === issue.id && activeRowDropdown?.type === 'project' ? null : { issueId: issue.id, type: 'project' });
+                                }}
+                                className="flex items-center gap-1.5 text-[12px] tracking-tight text-secondary/70 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/10 px-2 py-0.5 rounded-full max-w-[180px] hover:bg-hover-bg/85 transition-colors"
+                                title="Đổi dự án"
+                              >
+                                <Box className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 shrink-0" />
+                                <span className="truncate font-medium">
+                                  {projects.find(p => p.id === issue.projectId)?.name}
+                                </span>
+                              </button>
+                              {activeRowDropdown?.issueId === issue.id && activeRowDropdown?.type === 'project' && (
+                                <RowPopover onClose={() => setActiveRowDropdown(null)} align="right">
+                                  <RowMenuOption
+                                    label="Không thuộc dự án"
+                                    active={!issue.projectId}
+                                    icon={<Box className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 opacity-40" />}
+                                    onClick={() => handleUpdateIssueField(issue.id, 'project_id', null)}
+                                  />
+                                  {projects.map(p => (
+                                    <RowMenuOption
+                                      key={p.id}
+                                      label={p.name}
+                                      active={issue.projectId === p.id}
+                                      icon={<Box className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />}
+                                      onClick={() => handleUpdateIssueField(issue.id, 'project_id', p.id)}
+                                    />
+                                  ))}
+                                </RowPopover>
+                              )}
                             </div>
                           )}
-                          <div className="flex items-center" title={`Độ ưu tiên: ${getPriorityLabel(issue.priority)}`}>
-                            {getPriorityIcon(issue.priority, "w-3.5 h-3.5")}
-                          </div>
+                          {!projectId && !issue.projectId && (
+                            <div className="relative shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveRowDropdown(activeRowDropdown?.issueId === issue.id && activeRowDropdown?.type === 'project' ? null : { issueId: issue.id, type: 'project' });
+                                }}
+                                className="flex items-center justify-center p-1 hover:bg-hover-bg rounded text-zinc-400 hover:text-foreground transition-colors"
+                                title="Gán dự án"
+                              >
+                                <Box className="w-3.5 h-3.5" />
+                              </button>
+                              {activeRowDropdown?.issueId === issue.id && activeRowDropdown?.type === 'project' && (
+                                <RowPopover onClose={() => setActiveRowDropdown(null)} align="right">
+                                  <RowMenuOption
+                                    label="Không thuộc dự án"
+                                    active={true}
+                                    icon={<Box className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 opacity-40" />}
+                                    onClick={() => handleUpdateIssueField(issue.id, 'project_id', null)}
+                                  />
+                                  {projects.map(p => (
+                                    <RowMenuOption
+                                      key={p.id}
+                                      label={p.name}
+                                      active={false}
+                                      icon={<Box className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />}
+                                      onClick={() => handleUpdateIssueField(issue.id, 'project_id', p.id)}
+                                    />
+                                  ))}
+                                </RowPopover>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Cycle Badge/Picker */}
+                          {!cycleId && issue.cycleId && (
+                            <div className="relative shrink-0">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveRowDropdown(activeRowDropdown?.issueId === issue.id && activeRowDropdown?.type === 'cycle' ? null : { issueId: issue.id, type: 'cycle' });
+                                }}
+                                className="flex items-center gap-1.5 text-[12px] tracking-tight text-secondary/70 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/10 px-2 py-0.5 rounded-full hover:bg-hover-bg/85 transition-colors"
+                                title="Đổi chu kỳ"
+                              >
+                                <div className="w-3.5 h-3.5 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center shrink-0">
+                                  <Play className="w-1.5 h-1.5 text-zinc-400 dark:text-zinc-500 fill-zinc-400 dark:fill-zinc-500 translate-x-[0.5px]" />
+                                </div>
+                                <span className="truncate font-medium">
+                                  {(() => {
+                                    const name = cycles.find(c => c.id === issue.cycleId)?.name || '';
+                                    return name.startsWith('Cycle ') ? name.replace('Cycle ', '') : name;
+                                  })()}
+                                </span>
+                              </button>
+                              {activeRowDropdown?.issueId === issue.id && activeRowDropdown?.type === 'cycle' && (
+                                <RowPopover onClose={() => setActiveRowDropdown(null)} align="right">
+                                  <RowMenuOption
+                                    label="Không thuộc chu kỳ"
+                                    active={!issue.cycleId}
+                                    icon={
+                                      <div className="w-3.5 h-3.5 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center shrink-0 opacity-40">
+                                        <Play className="w-1.5 h-1.5 text-zinc-400 dark:text-zinc-500 fill-zinc-400 dark:fill-zinc-500 translate-x-[0.5px]" />
+                                      </div>
+                                    }
+                                    onClick={() => handleUpdateIssueField(issue.id, 'cycle_id', null)}
+                                  />
+                                  {cycles.map(c => (
+                                    <RowMenuOption
+                                      key={c.id}
+                                      label={c.name}
+                                      active={issue.cycleId === c.id}
+                                      icon={
+                                        <div className="w-3.5 h-3.5 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center shrink-0">
+                                          <Play className="w-1.5 h-1.5 text-zinc-400 dark:text-zinc-500 fill-zinc-400 dark:fill-zinc-500 translate-x-[0.5px]" />
+                                        </div>
+                                      }
+                                      onClick={() => handleUpdateIssueField(issue.id, 'cycle_id', c.id)}
+                                    />
+                                  ))}
+                                </RowPopover>
+                              )}
+                            </div>
+                          )}
+                          {!cycleId && !issue.cycleId && (
+                            <div className="relative shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveRowDropdown(activeRowDropdown?.issueId === issue.id && activeRowDropdown?.type === 'cycle' ? null : { issueId: issue.id, type: 'cycle' });
+                                }}
+                                className="flex items-center justify-center p-1 hover:bg-hover-bg rounded text-zinc-400 hover:text-foreground transition-colors"
+                                title="Gán chu kỳ"
+                              >
+                                <Clock className="w-3.5 h-3.5" />
+                              </button>
+                              {activeRowDropdown?.issueId === issue.id && activeRowDropdown?.type === 'cycle' && (
+                                <RowPopover onClose={() => setActiveRowDropdown(null)} align="right">
+                                  <RowMenuOption
+                                    label="Không thuộc chu kỳ"
+                                    active={true}
+                                    icon={
+                                      <div className="w-3.5 h-3.5 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center shrink-0 opacity-40">
+                                        <Play className="w-1.5 h-1.5 text-zinc-400 dark:text-zinc-500 fill-zinc-400 dark:fill-zinc-500 translate-x-[0.5px]" />
+                                      </div>
+                                    }
+                                    onClick={() => handleUpdateIssueField(issue.id, 'cycle_id', null)}
+                                  />
+                                  {cycles.map(c => (
+                                    <RowMenuOption
+                                      key={c.id}
+                                      label={c.name}
+                                      active={false}
+                                      icon={
+                                        <div className="w-3.5 h-3.5 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center shrink-0">
+                                          <Play className="w-1.5 h-1.5 text-zinc-400 dark:text-zinc-500 fill-zinc-400 dark:fill-zinc-500 translate-x-[0.5px]" />
+                                        </div>
+                                      }
+                                      onClick={() => handleUpdateIssueField(issue.id, 'cycle_id', c.id)}
+                                    />
+                                  ))}
+                                </RowPopover>
+                              )}
+                            </div>
+                          )}
                           {issue.dueDate && (
                             <div className="flex items-center gap-1 text-[13px] tracking-tight text-secondary/70">
                               <Calendar className="w-3 h-3" />
@@ -373,7 +645,6 @@ export default function IssueList({
                                 {projects.find(p => p.id === issue.projectId)?.name}
                               </span>
                             )}
-                            <span className="text-[13px] tracking-tight font-mono text-secondary/70">{issue.displayId}</span>
                           </div>
                           <button
                             onClick={(e) => { e.stopPropagation(); handleDeleteIssue(issue.id); }}

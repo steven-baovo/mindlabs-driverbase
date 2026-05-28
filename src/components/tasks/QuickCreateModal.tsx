@@ -128,12 +128,9 @@ export default function QuickCreateModal() {
         className="w-full max-w-2xl bg-white dark:bg-[#121214] border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-overlay flex flex-col overflow-visible animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-800 select-none">
-          <div className="flex items-center gap-1 text-[11px] font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-900 px-2.5 py-0.5 rounded-full">
-            <span className="font-bold text-[#5e6ad2]">ML</span>
-            <span className="text-[9px] text-zinc-400">/</span>
-            <span>Tạo nhiệm vụ mới</span>
+          <div className="text-[13px] font-semibold text-foreground">
+            Tạo nhiệm vụ mới
           </div>
           <div className="flex items-center gap-2">
             <button type="button" className="p-1 rounded-md text-zinc-400 hover:text-foreground hover:bg-hover-bg transition-colors" title="Mở rộng">

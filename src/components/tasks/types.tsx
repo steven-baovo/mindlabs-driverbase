@@ -131,3 +131,14 @@ export const formatDueDate = (dateStr: string) => {
   }
   return dateStr;
 };
+
+export const getIssueDisplayId = (createdAtStr: string, number: number): string => {
+  if (!createdAtStr) return `ML-${number}`;
+  const date = new Date(createdAtStr);
+  if (isNaN(date.getTime())) return `ML-${number}`;
+  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  const month = months[date.getMonth()];
+  const day = date.getDate();
+  return `${month}${day}-${number}`;
+};
+
