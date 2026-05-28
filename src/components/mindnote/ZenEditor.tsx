@@ -163,6 +163,27 @@ const MediaImage = Image.extend({
   addNodeView() {
     return ReactNodeViewRenderer(MediaImageNodeView)
   },
+  renderHTML({ HTMLAttributes }) {
+    // Nếu src là local-media://, dùng data-src để tránh browser tự tải URL không hợp lệ
+    const { src, ...rest } = HTMLAttributes
+    if (typeof src === 'string' && src.startsWith('local-media://')) {
+      return ['img', { ...rest, 'data-src': src, src: '' }]
+    }
+    return ['img', HTMLAttributes]
+  },
+  parseHTML() {
+    return [
+      {
+        tag: 'img[src]',
+        getAttrs: (node) => {
+          const el = node as HTMLElement
+          // Ưu tiên data-src nếu có (đã bị strip src để tránh browser tải)
+          const src = el.getAttribute('data-src') || el.getAttribute('src')
+          return src ? { src } : false
+        },
+      },
+    ]
+  },
 })
 
 const CustomTableCell = TableCell.extend({

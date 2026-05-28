@@ -1029,11 +1029,11 @@ export default function MindmapBoard({
         >
           <HelperLinesRenderer horizontal={helperLines.horizontal} vertical={helperLines.vertical} />
           
-          <Panel position="top-right" className="m-4 bg-white/90 backdrop-blur-md p-1 rounded-xl border border-gray-200 flex flex-col gap-0.5 z-50">
+          <Panel position="top-right" className="m-4 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-1 rounded-md border border-zinc-200 dark:border-zinc-800 flex flex-col gap-0.5 z-50 shadow-floating">
             <button
               onClick={undo}
               disabled={past.length === 0}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-500 transition-colors flex items-center justify-center"
+              className="w-7 h-7 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-150 active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
               title="Undo (Ctrl+Z)"
             >
               <Undo className="w-4 h-4" />
@@ -1041,31 +1041,31 @@ export default function MindmapBoard({
             <button
               onClick={redo}
               disabled={future.length === 0}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-500 transition-colors flex items-center justify-center"
+              className="w-7 h-7 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-150 active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
               title="Redo (Ctrl+Y)"
             >
               <Redo className="w-4 h-4" />
             </button>
             
-            <div className="w-full h-px bg-gray-100 my-0.5" />
+            <div className="w-full h-px bg-zinc-200 dark:bg-zinc-800 my-0.5" />
             
             <button
               onClick={() => zoomIn()}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors flex items-center justify-center"
+              className="w-7 h-7 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-150 active:scale-95"
               title="Zoom In"
             >
               <Plus className="w-4 h-4" />
             </button>
             <button
               onClick={() => zoomOut()}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors flex items-center justify-center"
+              className="w-7 h-7 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-150 active:scale-95"
               title="Zoom Out"
             >
               <Minus className="w-4 h-4" />
             </button>
             <button
               onClick={() => fitView()}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors flex items-center justify-center"
+              className="w-7 h-7 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-150 active:scale-95"
               title="Fit View"
             >
               <Maximize className="w-4 h-4" />
@@ -1073,33 +1073,56 @@ export default function MindmapBoard({
             
             <button
               onClick={onLayout}
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors flex items-center justify-center"
+              className="w-7 h-7 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-150 active:scale-95"
               title="Tự động sắp xếp"
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
-            
 
-
-            <div className="w-full h-px bg-gray-100 my-0.5" />
+            <div className="w-full h-px bg-zinc-200 dark:bg-zinc-800 my-0.5" />
 
             <div className="relative" ref={pathMenuRef}>
               <button
                 onClick={() => setIsPathMenuOpen(!isPathMenuOpen)}
-                className={`p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors flex items-center justify-center ${isPathMenuOpen ? 'bg-gray-100 text-blue-600' : ''}`}
+                className={`w-7 h-7 rounded-sm flex items-center justify-center transition-all duration-150 active:scale-95 ${
+                  isPathMenuOpen 
+                    ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold' 
+                    : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                }`}
                 title="Edge Style"
               >
                 <Activity className="w-4 h-4" />
               </button>
               {isPathMenuOpen && (
-                <div className="absolute top-0 right-full mr-2 bg-white border border-gray-200 rounded-xl p-1.5 flex flex-col gap-1 z-50 w-36 animate-in fade-in zoom-in slide-in-from-right-2 duration-200">
-                  <button onClick={() => updateGlobalPathType('bezier')} className={`px-3 py-2 text-sm rounded-lg text-left transition-colors ${edgePathType === 'bezier' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}>
+                <div className="absolute top-0 right-full mr-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-md p-1.5 flex flex-col gap-0.5 z-50 w-36 shadow-floating animate-in fade-in zoom-in slide-in-from-right-2 duration-200">
+                  <button
+                    onClick={() => updateGlobalPathType('bezier')}
+                    className={`px-2.5 py-1.5 text-xs rounded-sm text-left transition-colors font-medium ${
+                      edgePathType === 'bezier'
+                        ? 'bg-[#5e6ad2] text-white shadow-subtle'
+                        : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                    }`}
+                  >
                     Curved
                   </button>
-                  <button onClick={() => updateGlobalPathType('smoothstep')} className={`px-3 py-2 text-sm rounded-lg text-left transition-colors ${edgePathType === 'smoothstep' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}>
+                  <button
+                    onClick={() => updateGlobalPathType('smoothstep')}
+                    className={`px-2.5 py-1.5 text-xs rounded-sm text-left transition-colors font-medium ${
+                      edgePathType === 'smoothstep'
+                        ? 'bg-[#5e6ad2] text-white shadow-subtle'
+                        : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                    }`}
+                  >
                     Structured
                   </button>
-                  <button onClick={() => updateGlobalPathType('straight')} className={`px-3 py-2 text-sm rounded-lg text-left transition-colors ${edgePathType === 'straight' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}>
+                  <button
+                    onClick={() => updateGlobalPathType('straight')}
+                    className={`px-2.5 py-1.5 text-xs rounded-sm text-left transition-colors font-medium ${
+                      edgePathType === 'straight'
+                        ? 'bg-[#5e6ad2] text-white shadow-subtle'
+                        : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                    }`}
+                  >
                     Straight
                   </button>
                 </div>
@@ -1177,91 +1200,105 @@ export default function MindmapBoard({
 
 
 
-          <Panel position="bottom-center" className="mb-6 flex items-center gap-2 bg-white/90 backdrop-blur-md p-1.5 rounded-xl border border-gray-200">
+          <Panel position="bottom-center" className="mb-6 flex items-center gap-1 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-1 rounded-md border border-zinc-200 dark:border-zinc-800 shadow-floating z-50 px-2 py-1">
             <button
               onClick={addCard}
-              className="p-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors flex items-center gap-2 group relative"
+              className="w-8 h-8 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-150 active:scale-95 group relative"
               title="Add Card"
             >
-              <SquarePlus className="w-5 h-5 text-gray-600" />
-              <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              <SquarePlus className="w-4 h-4" />
+              <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-zinc-950 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-700 text-zinc-50 dark:text-zinc-200 text-xs px-2 py-1 rounded-sm shadow-floating opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap pointer-events-none z-50">
                 Add Card
               </span>
             </button>
             
             <button
               onClick={() => setIsAddNoteModalOpen(true)}
-              className="p-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors flex items-center gap-2 group relative"
+              className="w-8 h-8 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-150 active:scale-95 group relative"
               title="Thêm Note"
             >
-              <FileText className="w-5 h-5 text-gray-600" />
-              <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              <FileText className="w-4 h-4" />
+              <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-zinc-950 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-700 text-zinc-50 dark:text-zinc-200 text-xs px-2 py-1 rounded-sm shadow-floating opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap pointer-events-none z-50">
                 Thêm Note
               </span>
             </button>
             
-            <div className="w-px h-6 bg-gray-200 mx-1"></div>
+            <div className="w-px h-5 bg-zinc-200 dark:bg-zinc-800 mx-0.5"></div>
             
-            <div className="flex bg-gray-100 p-1 rounded-lg gap-1">
+            <div className="flex bg-zinc-100 dark:bg-zinc-950 p-0.5 rounded-sm gap-0.5">
               <button
                 onClick={() => setIsPanMode(false)}
-                className={`p-1.5 rounded-md transition-colors relative group ${!isPanMode ? 'bg-white text-blue-600 border border-blue-200' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200'}`}
+                className={`w-7 h-7 flex items-center justify-center rounded-sm transition-all duration-150 active:scale-95 relative group ${
+                  !isPanMode 
+                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 border border-zinc-200/50 dark:border-zinc-700/50 shadow-subtle font-medium' 
+                    : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200/60 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-100'
+                }`}
                 title="Select Mode (V)"
               >
-                <MousePointer2 className="w-4 h-4" strokeWidth={2.5} />
-                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                <MousePointer2 className="w-4 h-4" strokeWidth={2} />
+                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-zinc-950 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-700 text-zinc-50 dark:text-zinc-200 text-xs px-2 py-1 rounded-sm shadow-floating opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap pointer-events-none z-50">
                   Select
                 </span>
               </button>
               <button
                 onClick={() => setIsPanMode(true)}
-                className={`p-1.5 rounded-md transition-colors relative group ${isPanMode ? 'bg-white text-blue-600 border border-blue-200' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200'}`}
+                className={`w-7 h-7 flex items-center justify-center rounded-sm transition-all duration-150 active:scale-95 relative group ${
+                  isPanMode 
+                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 border border-zinc-200/50 dark:border-zinc-700/50 shadow-subtle font-medium' 
+                    : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200/60 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-100'
+                }`}
                 title="Pan Mode (Space)"
               >
-                <Hand className="w-4 h-4" strokeWidth={2.5} />
-                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                <Hand className="w-4 h-4" strokeWidth={2} />
+                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-zinc-950 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-700 text-zinc-50 dark:text-zinc-200 text-xs px-2 py-1 rounded-sm shadow-floating opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap pointer-events-none z-50">
                   Pan (Hold Space)
                 </span>
               </button>
             </div>
-                        {/* Edge Style moved to top-right panel */}
-
           </Panel>
           
           <Panel position="bottom-right" className="mb-6 mr-6 z-50">
             <button
               onClick={() => setIsLinksPanelOpen(!isLinksPanelOpen)}
-              className={`p-2.5 rounded-xl transition-colors bg-white/90 backdrop-blur-md border border-gray-200 flex items-center gap-2 group ${isLinksPanelOpen ? 'text-blue-600' : 'text-gray-700 hover:bg-gray-50'}`}
+              className={`flex items-center gap-1.5 h-8 px-2.5 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-md shadow-subtle text-zinc-650 dark:text-zinc-350 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-150 active:scale-95 ${
+                isLinksPanelOpen 
+                  ? '!bg-zinc-900 dark:!bg-zinc-100 !text-white dark:!text-zinc-900 font-semibold' 
+                  : ''
+              }`}
               title="Liên kết Graph View"
             >
-              <Link2 className="w-5 h-5" />
-              <span className="text-sm font-medium">Liên kết</span>
+              <Link2 className="w-4 h-4" />
+              <span className="text-xs font-semibold">Liên kết</span>
             </button>
             
             {isLinksPanelOpen && (
-              <div ref={linksPanelRef} className="absolute bottom-full right-0 mb-2 bg-white/95 backdrop-blur-md rounded-xl border border-gray-300 p-4 w-72 max-h-80 flex flex-col z-50 animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-200">
+              <div ref={linksPanelRef} className="absolute bottom-full right-0 mb-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md rounded-md border border-zinc-200 dark:border-zinc-800 p-4 w-72 max-h-80 flex flex-col z-50 shadow-floating animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-200">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-sm font-bold text-gray-800">Liên kết Graph View</h4>
-                  <span className="text-xs text-gray-400">{linkedNodeIds.length} đã nối</span>
+                  <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Liên kết Graph View</h4>
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">{linkedNodeIds.length} đã nối</span>
                 </div>
                 
                 {/* List linked files */}
-                <div className="space-y-1.5 max-h-32 overflow-y-auto mb-3 border-b border-gray-100 pb-3">
+                <div className="space-y-1.5 max-h-32 overflow-y-auto mb-3 border-b border-zinc-100 dark:border-zinc-800 pb-3">
                   {linkedNodeIds.length === 0 ? (
-                    <p className="text-xs text-gray-400 italic text-center py-2">Chưa có liên kết nào.</p>
+                    <p className="text-xs text-zinc-400 dark:text-zinc-555 italic text-center py-2">Chưa có liên kết nào.</p>
                   ) : (
                     linkedNodeIds.map(id => {
                       const linkedNode = allWorkspaceNodes.find(n => n.id === id)
                       const file = allAvailableFiles.find(f => f.id === id)
                       return (
-                        <div key={id} className="flex items-center justify-between text-xs p-2 bg-gray-50/50 hover:bg-gray-50 rounded-lg transition-colors border border-gray-100">
-                          <span className="truncate flex-1 mr-2 flex items-center gap-1.5 font-medium text-gray-700">
-                            {file?.type === 'note' ? <FileText className="w-3.5 h-3.5 text-gray-400" /> : <Network className="w-3.5 h-3.5 text-gray-400" />}
+                        <div key={id} className="flex items-center justify-between text-xs p-2 bg-zinc-50/50 dark:bg-zinc-800/30 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-md transition-colors border border-zinc-150/40 dark:border-zinc-800/50">
+                          <span className="truncate flex-1 mr-2 flex items-center gap-1.5 font-medium text-zinc-700 dark:text-zinc-300">
+                            {file?.type === 'note' ? (
+                              <FileText className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
+                            ) : (
+                              <Network className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
+                            )}
                             {linkedNode?.title || file?.title || id}
                           </span>
                           <button
                             onClick={() => handleRemoveLink(id)}
-                            className="text-gray-400 hover:text-red-500 p-1 rounded-md hover:bg-white transition-colors"
+                            className="text-zinc-450 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 p-1 rounded-sm hover:bg-white dark:hover:bg-zinc-900 transition-colors"
                             title="Xóa liên kết"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1274,10 +1311,10 @@ export default function MindmapBoard({
                 
                 {/* Add new link */}
                 <div>
-                  <h5 className="text-xs font-semibold text-gray-500 mb-2">Thêm liên kết mới:</h5>
+                  <h5 className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 mb-2">Thêm liên kết mới:</h5>
                   <div className="space-y-1 max-h-40 overflow-y-auto">
                     {allAvailableFiles.filter(f => f.id !== mindmapId && !linkedNodeIds.includes(f.id)).length === 0 ? (
-                      <p className="text-xs text-gray-400 italic text-center py-2">Không có file nào khả dụng</p>
+                      <p className="text-xs text-zinc-400 dark:text-zinc-555 italic text-center py-2">Không có file nào khả dụng</p>
                     ) : (
                       allAvailableFiles
                         .filter(f => f.id !== mindmapId && !linkedNodeIds.includes(f.id))
@@ -1285,13 +1322,17 @@ export default function MindmapBoard({
                           <button
                             key={f.id}
                             onClick={() => handleAddLink(f.id)}
-                            className="w-full text-left px-2 py-1.5 text-xs rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-between group border border-transparent hover:border-gray-100"
+                            className="w-full text-left px-2 py-1.5 text-xs rounded-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center justify-between group border border-transparent hover:border-zinc-100 dark:hover:border-zinc-800/50"
                           >
-                            <span className="truncate flex-1 flex items-center gap-1.5 text-gray-600 group-hover:text-gray-800">
-                              {f.type === 'note' ? <FileText className="w-3.5 h-3.5 text-gray-400" /> : <Network className="w-3.5 h-3.5 text-gray-400" />}
+                            <span className="truncate flex-1 flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 font-medium">
+                              {f.type === 'note' ? (
+                                <FileText className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
+                              ) : (
+                                <Network className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
+                              )}
                               {f.title}
                             </span>
-                            <Plus className="w-3.5 h-3.5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <Plus className="w-3.5 h-3.5 text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                           </button>
                         ))
                     )}

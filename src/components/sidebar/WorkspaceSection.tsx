@@ -799,7 +799,7 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
   return (
     <div className="flex flex-col gap-0.5">
       <div
-        draggable={true}
+        draggable={editingNodeId !== node.id}
         onMouseDown={() => {
           isDraggingRef.current = false
         }}
@@ -925,6 +925,7 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
             defaultValue={node.title}
             className="flex-1 bg-surface border border-blue-500 rounded px-1 text-xs outline-none text-foreground"
             autoFocus
+            onFocus={(e) => e.currentTarget.select()}
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {

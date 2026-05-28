@@ -82,29 +82,33 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
   return (
     <>
       <NodeToolbar isVisible={selected} position={Position.Top} offset={10}>
-        <div className="flex items-center gap-1 bg-white/80 backdrop-blur-md border border-border-strong rounded-xl p-1 animate-in fade-in zoom-in duration-200">
+        <div className="flex items-center gap-0.5 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-md px-1.5 py-0.5 shadow-subtle animate-in fade-in zoom-in duration-200">
           <button
             onClick={deleteNode}
             aria-label="Xóa thẻ"
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-secondary hover:bg-red-50 hover:text-red-600 active:scale-95 transition-all duration-200"
+            className="w-7 h-7 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-400 transition-all duration-150 active:scale-95"
             title="Delete Card"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
 
-          <div className="w-[1px] h-4 bg-border-main mx-1" />
+          <div className="w-px h-4 bg-zinc-200 dark:bg-zinc-800 mx-0.5" />
 
           <div className="relative">
             <button
               onClick={() => setActiveMenu(activeMenu === 'color' ? null : 'color')}
               aria-label="Đổi màu sắc thẻ"
-              className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 active:scale-95 ${activeMenu === 'color' ? 'bg-slate-100 text-primary' : 'text-secondary hover:bg-slate-100 hover:text-foreground'}`}
+              className={`w-7 h-7 rounded-sm flex items-center justify-center transition-all duration-150 active:scale-95 ${
+                activeMenu === 'color' 
+                  ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100' 
+                  : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+              }`}
               title="Change Color"
             >
               <Palette className="w-3.5 h-3.5" />
             </button>
             {activeMenu === 'color' && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white border border-border-strong rounded-xl p-2 flex gap-1.5 z-50 animate-in fade-in zoom-in duration-150">
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-md p-1.5 flex gap-1 z-50 shadow-floating animate-in fade-in zoom-in duration-150">
                 {nodeColors.map((c) => (
                   <button
                     key={c.name}
@@ -112,23 +116,25 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
                       updateNodeColor(c)
                       setActiveMenu(null)
                     }}
-                    className={`w-5 h-5 rounded-full border border-border-main hover:scale-110 transition-transform flex items-center justify-center`}
+                    className="w-5 h-5 rounded-full border border-zinc-200 dark:border-zinc-800 hover:scale-110 transition-transform flex items-center justify-center"
                     style={{ backgroundColor: c.border }}
                     title={c.name}
                   >
-                    {(data.color?.name === c.name || (!data.color && c.name === 'Default')) && <Check className="w-3 h-3 text-white mix-blend-difference" />}
+                    {(data.color?.name === c.name || (!data.color && c.name === 'Default')) && (
+                      <Check className="w-3 h-3 text-white mix-blend-difference" />
+                    )}
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          <div className="w-[1px] h-4 bg-border-main mx-1" />
+          <div className="w-px h-4 bg-zinc-200 dark:bg-zinc-800 mx-0.5" />
 
           <button
             onClick={() => setIsEditing(true)}
             aria-label="Chỉnh sửa văn bản"
-            className="w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 active:scale-95 text-secondary hover:bg-slate-100 hover:text-foreground"
+            className="w-7 h-7 rounded-sm flex items-center justify-center transition-all duration-150 active:scale-95 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100"
             title="Edit Text"
           >
             <Edit2 className="w-3.5 h-3.5" />

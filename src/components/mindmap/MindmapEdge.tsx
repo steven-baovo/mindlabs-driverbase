@@ -134,7 +134,7 @@ export default function MindmapEdge({
               pointerEvents: 'all',
               zIndex: 1001,
             }}
-            className="nodrag nopan bg-white px-2 py-0.5 rounded border border-gray-200 text-xs text-gray-700 whitespace-nowrap"
+            className="nodrag nopan bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm px-2.5 py-1 rounded border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-700 dark:text-zinc-300 font-medium whitespace-nowrap cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors shadow-subtle"
             onClick={() => setActiveMenu('edit')}
           >
             {edgeData.label}
@@ -147,14 +147,14 @@ export default function MindmapEdge({
           <div
             style={{
               position: 'absolute',
-              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY - (edgeData?.label ? 30 : 0)}px) scale(${1 / zoom})`,
+              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY - 36 - (edgeData?.label ? 24 : 0)}px) scale(${1 / zoom})`,
               pointerEvents: 'all',
               zIndex: 1001,
             }}
             className="nodrag nopan relative"
           >
             {activeMenu === 'edit' ? (
-              <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1">
+              <div className="flex items-center gap-1 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-md p-1 shadow-subtle animate-in fade-in zoom-in duration-150">
                 <input
                   autoFocus
                   type="text"
@@ -169,37 +169,41 @@ export default function MindmapEdge({
                       setActiveMenu(null)
                     }
                   }}
-                  className="px-2 py-1 text-sm outline-none w-32"
+                  className="px-2 py-1 text-xs bg-transparent outline-none border-none text-zinc-800 dark:text-zinc-200 w-32 placeholder-zinc-400"
                   placeholder="Note..."
                 />
               </div>
             ) : (
-              <div className="flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-0.5 animate-in fade-in zoom-in duration-200">
+              <div className="flex items-center gap-0.5 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-md p-1 shadow-subtle animate-in fade-in zoom-in duration-200">
                 <button
                   onClick={deleteEdge}
-                  className="p-1 hover:bg-red-50 text-gray-500 hover:text-red-600 rounded-md transition-colors"
+                  className="w-7 h-7 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-400 transition-all duration-150 active:scale-95"
                   title="Delete Connection"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
                 
-                <div className="w-px h-4 bg-gray-200 mx-0.5" />
+                <div className="w-px h-4 bg-zinc-200 dark:bg-zinc-800 mx-0.5" />
 
                 <div className="relative">
                   <button
                     onClick={() => setActiveMenu(activeMenu === 'color' ? null : 'color')}
-                    className={`p-1 rounded-md transition-colors ${activeMenu === 'color' ? 'bg-gray-100 text-blue-600' : 'text-gray-500 hover:bg-gray-100'}`}
+                    className={`w-7 h-7 rounded-sm flex items-center justify-center transition-all duration-150 active:scale-95 ${
+                      activeMenu === 'color' 
+                        ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100' 
+                        : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                    }`}
                     title="Change Color"
                   >
                     <Palette className="w-3.5 h-3.5" />
                   </button>
                   {activeMenu === 'color' && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white border border-gray-200 rounded-lg p-2 flex gap-1.5 z-50 animate-in fade-in zoom-in duration-150">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-md p-1.5 flex gap-1.5 z-50 animate-in fade-in zoom-in duration-150">
                       {colors.map((c) => (
                         <button
                           key={c.value}
                           onClick={() => updateColor(c.value)}
-                          className={`w-5 h-5 rounded-full border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center`}
+                          className="w-5 h-5 rounded-full border border-zinc-200 dark:border-zinc-800 hover:scale-110 transition-transform flex items-center justify-center"
                           style={{ backgroundColor: c.value }}
                           title={c.name}
                         >
@@ -213,31 +217,45 @@ export default function MindmapEdge({
                 <div className="relative">
                   <button
                     onClick={() => setActiveMenu(activeMenu === 'direction' ? null : 'direction')}
-                    className={`p-1 rounded-md transition-colors ${activeMenu === 'direction' ? 'bg-gray-100 text-blue-600' : 'text-gray-500 hover:bg-gray-100'}`}
+                    className={`w-7 h-7 rounded-sm flex items-center justify-center transition-all duration-150 active:scale-95 ${
+                      activeMenu === 'direction' 
+                        ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100' 
+                        : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                    }`}
                     title="Change Direction"
                   >
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                   {activeMenu === 'direction' && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white border border-gray-200 rounded-lg p-1 flex gap-0.5 z-50 animate-in fade-in zoom-in duration-150">
-                      <button onClick={() => updateDirection('none')} className="p-2 hover:bg-gray-100 rounded-md transition-colors" title="Nondirectional">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-md p-1 flex gap-0.5 z-50 shadow-floating animate-in fade-in zoom-in duration-150">
+                      <button
+                        onClick={() => updateDirection('none')}
+                        className="w-7 h-7 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-150 active:scale-95"
+                        title="Nondirectional"
+                      >
                         <Minus className="w-4 h-4" strokeWidth={3} />
                       </button>
-                      <button onClick={() => updateDirection('one')} className="p-2 hover:bg-gray-100 rounded-md transition-colors" title="Unidirectional">
+                      <button
+                        onClick={() => updateDirection('one')}
+                        className="w-7 h-7 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-150 active:scale-95"
+                        title="Unidirectional"
+                      >
                         <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
                       </button>
-                      <button onClick={() => updateDirection('both')} className="p-2 hover:bg-gray-100 rounded-md transition-colors" title="Bidirectional">
+                      <button
+                        onClick={() => updateDirection('both')}
+                        className="w-7 h-7 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-150 active:scale-95"
+                        title="Bidirectional"
+                      >
                         <ArrowLeftRight className="w-4 h-4" strokeWidth={2.5} />
                       </button>
                     </div>
                   )}
                 </div>
 
-
-
                 <button
                   onClick={() => setActiveMenu('edit')}
-                  className="p-1 rounded-md transition-colors text-gray-500 hover:bg-gray-100"
+                  className="w-7 h-7 rounded-sm flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-850 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-150 active:scale-95"
                   title="Add Note"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
