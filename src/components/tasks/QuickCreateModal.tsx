@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   X, Maximize2, ChevronDown, Check, Calendar, Paperclip,
   Tag, Box, History,
@@ -50,19 +51,23 @@ export default function QuickCreateModal() {
   const [activeDropdown, setActiveDropdown] = useState<'status' | 'priority' | 'project' | 'cycle' | 'labels' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Reset form khi mở
+  // Reset form mỗi lần mở — tự nhận project/cycle nếu đang xem trang đó
   useEffect(() => {
-    if (isOpen) {
-      setTitle('');
-      setDescription('');
-      setStatus('backlog');
-      setPriority('none');
-      setProjectId(null);
-      setCycleId(cycles.find(c => c.is_active)?.id || null);
-      setLabels([]);
-      setDueDate('');
-      setActiveDropdown(null);
-    }
+    if (!isOpen) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const urlProject = params.get('project') || null;
+    const urlCycle   = params.get('cycle')   || null;
+
+    setTitle('');
+    setDescription('');
+    setStatus('backlog');
+    setPriority('none');
+    setProjectId(urlProject);          // null nếu không ở trang project cụ thể
+    setCycleId(urlCycle);              // null nếu không ở trang cycle cụ thể
+    setLabels([]);
+    setDueDate('');
+    setActiveDropdown(null);
   }, [isOpen]);
 
   // Đóng khi nhấn Escape
