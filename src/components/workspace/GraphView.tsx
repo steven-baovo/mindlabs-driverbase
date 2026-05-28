@@ -39,6 +39,7 @@ export default function GraphView({ nodes }: GraphViewProps) {
   const [hoverProgress, setHoverProgress] = useState(0)
   const hoverProgressRef = useRef(0) // Ref để tránh stale closure trong animation
   const [isDark, setIsDark] = useState(false)
+  const graphRef = useRef<any>(null)
 
   // Hoạt ảnh chuyển đổi mượt mà khi hover thay đổi
   useEffect(() => {
@@ -121,6 +122,16 @@ export default function GraphView({ nodes }: GraphViewProps) {
     }
   }, [nodes])
 
+  // Tự động căn giữa và fit toàn bộ các node vào giữa khung hình khi dữ liệu thay đổi
+  useEffect(() => {
+    if (graphRef.current && graphData.nodes.length > 0) {
+      const timer = setTimeout(() => {
+        graphRef.current.zoomToFit(300, 80) // 300ms animation, 80px padding để không sát viền
+      }, 200)
+      return () => clearTimeout(timer)
+    }
+  }, [graphData])
+
   return (
     <div className="w-full h-full bg-background relative">
       {graphData.nodes.length === 0 ? (
@@ -129,6 +140,7 @@ export default function GraphView({ nodes }: GraphViewProps) {
         </div>
       ) : (
         <ForceGraph2D
+          ref={graphRef}
           graphData={graphData}
           nodeLabel="name"
           backgroundColor={isDark ? '#08080a' : '#ffffff'}
