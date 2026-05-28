@@ -145,16 +145,29 @@ export default function TasksSection() {
                 <Box className="w-3.5 h-3.5 text-zinc-400/80" />
                 <span className="font-medium text-[13px]">Projects</span>
               </div>
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsProjectsExpanded(!isProjectsExpanded);
-                }}
-                className="p-0.5 rounded hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-400 hover:text-foreground transition-colors cursor-pointer"
-              >
-                <ChevronDown className={`w-3.5 h-3.5 transform transition-transform ${isProjectsExpanded ? '' : '-rotate-90'}`} />
-              </button>
+              <div className="flex items-center gap-0.5">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    router.push('/tasks?view=cycles');
+                  }}
+                  className="p-0.5 rounded hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-400 hover:text-foreground transition-colors cursor-pointer"
+                  title="Xem Cycles"
+                >
+                  <History className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsProjectsExpanded(!isProjectsExpanded);
+                  }}
+                  className="p-0.5 rounded hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-400 hover:text-foreground transition-colors cursor-pointer"
+                >
+                  <ChevronDown className={`w-3.5 h-3.5 transform transition-transform ${isProjectsExpanded ? '' : '-rotate-90'}`} />
+                </button>
+              </div>
             </Link>
           </div>
           
