@@ -494,8 +494,9 @@ export default function WorkspaceSection() {
           onDrop={async (e) => {
             if (draggedNodeId) {
               e.preventDefault()
-              await handleNodeDrop(draggedNodeId, null, 'inside')
+              const currentDraggedId = draggedNodeId
               setDraggedNodeId(null)
+              handleNodeDrop(currentDraggedId, null, 'inside')
             }
           }}
           className="flex-1 overflow-y-auto no-scrollbar pt-3 flex flex-col gap-0.5"
@@ -796,13 +797,15 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
           if (draggedNodeId === node.id) return
 
           const position = dropPosition
+          const currentDraggedId = draggedNodeId
+
           setDragOverNodeId(null)
           setDropPosition(null)
+          setDraggedNodeId(null)
 
           if (!position) return
 
-          await handleNodeDrop(draggedNodeId, node.id, position)
-          setDraggedNodeId(null)
+          handleNodeDrop(currentDraggedId, node.id, position)
         }}
         className={`relative flex items-center gap-2 p-1.5 rounded-lg cursor-grab active:cursor-grabbing transition-all group select-none
           ${isActive 

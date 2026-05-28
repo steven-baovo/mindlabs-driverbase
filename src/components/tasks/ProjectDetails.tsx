@@ -294,25 +294,6 @@ export default function ProjectDetails({ projectId }: { projectId: string }) {
     }
   }, [project?.id]);
 
-  if (!dbProjects) return <div className="flex-1 bg-background" />;
-  if (!project) return (
-    <div className="p-8 flex flex-col items-center justify-center flex-1 h-full gap-4 text-zinc-500 bg-background">
-      <p className="text-sm">Dự án không tồn tại hoặc đã bị xóa.</p>
-      <Link href="/tasks" className="text-xs font-semibold text-zinc-900 hover:underline">Quay lại</Link>
-    </div>
-  );
-
-  const handleUpdate = (field: keyof MockProject, value: any) => {
-    const map: Record<string, string> = { startDate: 'start_date', targetDate: 'target_date' };
-    updateProject(projectId, { [map[field] || field]: value });
-  };
-
-  const handleDelete = () => {
-    if (window.confirm('Xóa dự án này? Tất cả nhiệm vụ sẽ bị mất.')) {
-      deleteProject(projectId); router.push('/tasks');
-    }
-  };
-
   const projIssues = (dbIssues || []).filter(i => i.project_id === projectId);
   const active = projIssues.filter(i => i.status !== 'canceled');
   const done = active.filter(i => i.status === 'done');
@@ -338,6 +319,25 @@ export default function ProjectDetails({ projectId }: { projectId: string }) {
 
     return { label: 'On track', bgClass: 'bg-emerald-500', textClass: 'text-emerald-600 dark:text-emerald-450' };
   }, [projIssues, active, progress]);
+
+  if (!dbProjects) return <div className="flex-1 bg-background" />;
+  if (!project) return (
+    <div className="p-8 flex flex-col items-center justify-center flex-1 h-full gap-4 text-zinc-500 bg-background">
+      <p className="text-sm">Dự án không tồn tại hoặc đã bị xóa.</p>
+      <Link href="/tasks" className="text-xs font-semibold text-zinc-900 hover:underline">Quay lại</Link>
+    </div>
+  );
+
+  const handleUpdate = (field: keyof MockProject, value: any) => {
+    const map: Record<string, string> = { startDate: 'start_date', targetDate: 'target_date' };
+    updateProject(projectId, { [map[field] || field]: value });
+  };
+
+  const handleDelete = () => {
+    if (window.confirm('Xóa dự án này? Tất cả nhiệm vụ sẽ bị mất.')) {
+      deleteProject(projectId); router.push('/tasks');
+    }
+  };
 
   const PROJECT_STATUSES: MockProject['status'][] = ['planned', 'active', 'paused', 'completed', 'canceled'];
   const PRIORITIES = ['urgent', 'high', 'medium', 'low', 'none'] as const;

@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState, useEffect, useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, LocalWorkspaceNode } from './db'
 import { scheduleSync } from './sync-engine'
@@ -9,7 +9,68 @@ export function useLocalWorkspace() {
   const liveNodes = useLiveQuery(() => db.workspace_nodes.where({ is_deleted: 0 }).toArray())
 
   // Dùng liveNodes nếu đã sẵn sàng, nếu chưa thì dùng mảng rỗng
-  const nodes = liveNodes !== undefined ? liveNodes : []
+  const baseNodes = liveNodes !== undefined ? liveNodes : []
+
+  // --- Optimistic UI States ---
+  const [optimisticUpdates, setOptimisticUpdates] = useState<Record<string, Partial<WorkspaceNode>>>({})
+  const [optimisticDeletes, setOptimisticDeletes] = useState<Set<string>>(new Set())
+
+  // Tự động dọn dẹp Optimistic State khi liveNodes đã cập nhật xong
+  useEffect(() => {
+    if (Object.keys(optimisticUpdates).length === 0 && optimisticDeletes.size === 0) return
+
+    let shouldUpdateUpdates = false
+    let shouldUpdateDeletes = false
+
+    setOptimisticUpdates(prev => {
+      const next = { ...prev }
+      for (const id in next) {
+        const node = baseNodes.find(n => n.id === id)
+        if (node) {
+          const opt = next[id]
+          const isReflected = Object.keys(opt).every(key => (node as any)[key] === (opt as any)[key])
+          if (isReflected) {
+            delete next[id]
+            shouldUpdateUpdates = true
+          }
+        }
+      }
+      return shouldUpdateUpdates ? next : prev
+    })
+
+    setOptimisticDeletes(prev => {
+      const next = new Set(prev)
+      for (const id of next) {
+        // Nếu node không còn trong baseNodes, nghĩa là delete đã commit thành công
+        if (!baseNodes.some(n => n.id === id)) {
+          next.delete(id)
+          shouldUpdateDeletes = true
+        }
+      }
+      return shouldUpdateDeletes ? next : prev
+    })
+  }, [baseNodes, optimisticUpdates, optimisticDeletes])
+
+  const nodes = useMemo(() => {
+    let result = baseNodes
+
+    // Áp dụng optimistic deletes
+    if (optimisticDeletes.size > 0) {
+      result = result.filter(n => !optimisticDeletes.has(n.id))
+    }
+
+    // Áp dụng optimistic updates
+    if (Object.keys(optimisticUpdates).length > 0) {
+      result = result.map(node => {
+        if (optimisticUpdates[node.id]) {
+          return { ...node, ...optimisticUpdates[node.id] } as LocalWorkspaceNode
+        }
+        return node
+      })
+    }
+
+    return result
+  }, [baseNodes, optimisticUpdates, optimisticDeletes])
 
   /**
    * Tạo node mới trong IndexedDB và xếp hàng vào outbox.
@@ -121,6 +182,9 @@ export function useLocalWorkspace() {
   const localUpdateNode = useCallback(async (id: string, updates: Partial<WorkspaceNode>) => {
     const now = new Date().toISOString()
 
+    // Optimistic UI update
+    setOptimisticUpdates(prev => ({ ...prev, [id]: updates }))
+
     await db.transaction('rw', [db.workspace_nodes, db.outbox], async () => {
       await db.workspace_nodes.update(id, {
         ...updates,
@@ -165,6 +229,13 @@ export function useLocalWorkspace() {
     const descendants = await getDescendants(id)
     const targetNode = await db.workspace_nodes.get(id)
     const allToDelete = [targetNode, ...descendants].filter(Boolean) as LocalWorkspaceNode[]
+
+    // Optimistic UI delete
+    setOptimisticDeletes(prev => {
+      const next = new Set(prev)
+      allToDelete.forEach(n => next.add(n.id))
+      return next
+    })
 
     // Thu thập các note/canvas ID liên quan
     const noteIds = allToDelete.filter(n => n.type === 'note' && n.note_id).map(n => n.note_id!)
