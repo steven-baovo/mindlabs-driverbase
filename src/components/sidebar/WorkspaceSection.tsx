@@ -33,7 +33,7 @@ export default function WorkspaceSection() {
   const { nodes, updateNode, deleteNode, createNode, liveNodesReady } = useLocalWorkspace()
   const { updateNote: updateMindNote } = useLocalNotes()
   const { updateCanvas: updateMindmap } = useLocalCanvas()
-  const { selection, selectNote: ctxSelectNote, selectCanvas: ctxSelectCanvas, selectLink: ctxSelectLink, selectGraphView: ctxSelectGraphView } = useWorkspace()
+  const { selection, selectNote: ctxSelectNote, selectCanvas: ctxSelectCanvas, selectLink: ctxSelectLink, selectGraphView: ctxSelectGraphView, clearSelection } = useWorkspace()
 
   const activeNoteId = selection.noteId
   const activeCanvasId = selection.canvasId
@@ -280,6 +280,44 @@ export default function WorkspaceSection() {
     }
   }
 
+  const handleClearSelection = () => {
+    clearSelection()
+    if (pathname === '/workspace') {
+      window.history.replaceState(null, '', '/workspace')
+    } else {
+      router.push('/workspace')
+    }
+  }
+
+  const checkAndClearSelection = (deletedNodeId: string) => {
+    let activeNode = undefined
+    if (activeNoteId) {
+      activeNode = nodes.find(n => n.type === 'note' && n.note_id === activeNoteId)
+    } else if (activeCanvasId) {
+      activeNode = nodes.find(n => n.type === 'map' && n.map_id === activeCanvasId)
+    } else if (activeLinkId) {
+      activeNode = nodes.find(n => n.type === 'link' && n.id === activeLinkId)
+    }
+
+    if (!activeNode) return
+
+    let current: WorkspaceNode | undefined = activeNode
+    let isTarget = false
+    while (current) {
+      if (current.id === deletedNodeId) {
+        isTarget = true
+        break
+      }
+      if (!current.parent_id) break
+      const parentId = current.parent_id
+      current = nodes.find(n => n.id === parentId)
+    }
+
+    if (isTarget) {
+      handleClearSelection()
+    }
+  }
+
   const handleDeleteNode = async (id: string) => {
     const node = nodes.find(n => n.id === id)
     if (!node) return
@@ -293,6 +331,7 @@ export default function WorkspaceSection() {
     }
 
     if (confirm(`Bạn có chắc chắn muốn xóa ${node.type === 'folder' ? 'thư mục' : 'file'} này?`)) {
+      checkAndClearSelection(id)
       const { error } = await deleteNode(id)
       if (error) {
         alert(`Lỗi xóa: ${error}`)
@@ -604,6 +643,13 @@ export default function WorkspaceSection() {
                     for (const child of children) {
                       await updateNode(child.id, { parent_id: null })
                     }
+                    // For "Chỉ xóa thư mục", we only clear if the folder ITSELF is the active node. 
+                    // But active nodes are only notes, maps, or links, not folders.
+                    // However, we can still call checkAndClearSelection just to be safe, 
+                    // though it will do nothing because the active node's parent_id is set to null above, 
+                    // so it's no longer a descendant of `node.id`.
+                    // Actually, let's call it BEFORE we change parent_id to be safe? 
+                    // No, if we keep the children, the active child is NOT deleted, so we should NOT clear selection.
                     await deleteNode(node.id)
                   }}
                   icon={Trash2}
@@ -615,6 +661,7 @@ export default function WorkspaceSection() {
                   variant="danger"
                   onClick={async () => {
                     setContextMenu(null)
+                    checkAndClearSelection(node.id)
                     await deleteNode(node.id)
                   }}
                   icon={Trash2}
@@ -669,6 +716,7 @@ export default function WorkspaceSection() {
               </button>
               <button
                 onClick={async () => {
+                  checkAndClearSelection(nodeToDelete.id)
                   const { error } = await deleteNode(nodeToDelete.id)
                   if (error) {
                     alert(`Lỗi xóa: ${error}`)
