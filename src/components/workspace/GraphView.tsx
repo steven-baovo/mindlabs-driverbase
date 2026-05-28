@@ -144,6 +144,8 @@ export default function GraphView({ nodes }: GraphViewProps) {
           graphData={graphData}
           nodeLabel="name"
           backgroundColor={isDark ? '#08080a' : '#ffffff'}
+          maxZoom={1.8}
+          minZoom={0.4}
           
           // Tự vẽ Node và Chữ (Vẽ Canvas)
           nodeCanvasObject={(node: any, ctx, globalScale) => {
