@@ -237,7 +237,7 @@ const NoteEditorClient = ({ noteId, onOpenConnectModal }: NoteEditorClientProps)
                 initialContent={content} dùng state ổn định, KHÔNG phải note.content từ useLiveQuery */}
             <div className="prose prose-lg max-w-none">
               <ZenEditor
-                key={noteId}
+                noteId={noteId}
                 initialContent={content}
                 onChange={setContent}
                 onCountChange={(words, chars) => setWordCount({ words, chars })}

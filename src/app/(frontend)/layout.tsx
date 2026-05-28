@@ -5,6 +5,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { WorkspaceProvider } from "@/contexts/WorkspaceContext"
 import { FocusProvider } from "@/contexts/FocusContext"
 import { TasksProvider } from "@/lib/local-first/TasksProvider"
+import { TasksRouterProvider } from "@/contexts/TasksRouterContext"
 import { QuickCreateProvider } from "@/contexts/QuickCreateContext"
 import MobileNavigationWrapper from "@/components/MobileNavigationWrapper"
 import ContentWrapper from "@/components/ContentWrapper"
@@ -54,8 +55,9 @@ export default function FrontendLayout({
   return (
     <FocusProvider>
       <TasksProvider>
-        <QuickCreateProvider>
-          <WorkspaceProvider>
+        <TasksRouterProvider>
+          <QuickCreateProvider>
+            <WorkspaceProvider>
             {user && <SyncInitializer />}
             {/* Global shortcuts */}
             <GlobalKeyboardListener />
@@ -74,8 +76,9 @@ export default function FrontendLayout({
               {/* Main Content Island */}
               <ContentWrapper>{children}</ContentWrapper>
             </div>
-          </WorkspaceProvider>
-        </QuickCreateProvider>
+            </WorkspaceProvider>
+          </QuickCreateProvider>
+        </TasksRouterProvider>
       </TasksProvider>
     </FocusProvider>
   )

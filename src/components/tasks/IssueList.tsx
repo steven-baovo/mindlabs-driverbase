@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useTasksRouter } from '@/contexts/TasksRouterContext';
 import { 
   Search, Plus, List, LayoutGrid, Calendar, ChevronDown, X, Command, Trash2,
   Tag, Box, History, Maximize2, Check, Paperclip, Folder, Clock, Play
@@ -85,7 +85,7 @@ export default function IssueList({
   hideTitle = false,
   disableScroll = false
 }: IssueListProps) {
-  const router = useRouter();
+  const { goToIssue } = useTasksRouter();
   
   const { projects: dbProjects } = useLocalProjects();
   const { cycles: dbCycles } = useLocalCycles();
@@ -332,7 +332,7 @@ export default function IssueList({
                     {statusIssues.map((issue, index) => (
                       <div
                         key={issue.id}
-                        onClick={() => router.push(`/tasks?issue=${issue.id}`)}
+                        onClick={() => goToIssue(issue.id)}
                         className={`flex items-center justify-between gap-4 py-2 px-3 transition-colors cursor-pointer group hover:bg-hover-bg/30 ${
                           index === 0 ? 'rounded-t-md' : ''
                         } ${
@@ -617,7 +617,7 @@ export default function IssueList({
                           e.dataTransfer.effectAllowed = 'move';
                         }}
                         onDragEnd={() => setActiveDragId(null)}
-                        onClick={() => router.push(`/tasks?issue=${issue.id}`)}
+                        onClick={() => goToIssue(issue.id)}
                         className={`bg-surface p-3 rounded-md transition-all flex flex-col gap-3 shadow-subtle group cursor-grab active:cursor-grabbing ${
                           activeDragId === issue.id ? 'opacity-40 border border-dashed border-zinc-400 dark:border-zinc-500' : ''
                         }`}

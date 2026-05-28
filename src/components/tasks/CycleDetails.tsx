@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useTasksRouter } from '@/contexts/TasksRouterContext';
 import { Trash2, ChevronLeft, ChevronRight, Check, Calendar, Activity, X } from 'lucide-react';
 import Link from 'next/link';
 import { useLocalCycles, useLocalIssues } from '@/lib/local-first/useLocalTasks';
@@ -275,7 +275,7 @@ function CalendarPicker({ value, onChange, onClose }: {
 
 // ─── Main Component ─────────────────────────────────────────────────────────────────
 export default function CycleDetails({ cycleId }: { cycleId: string }) {
-  const router = useRouter();
+  const { goToMyTasks } = useTasksRouter();
   const { cycles: dbCycles, updateCycle, deleteCycle } = useLocalCycles();
   const { issues: dbIssues } = useLocalIssues();
   const [cyclesEnabled, setCyclesEnabled] = useState(true);
@@ -338,7 +338,7 @@ export default function CycleDetails({ cycleId }: { cycleId: string }) {
   const handleDelete = () => {
     if (window.confirm('Bạn có chắc chắn muốn xóa chu kỳ này? Tất cả nhiệm vụ bên trong sẽ trở về trạng thái tự do.')) {
       deleteCycle(cycleId);
-      router.push('/tasks');
+      goToMyTasks();
     }
   };
 

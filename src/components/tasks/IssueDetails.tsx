@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useTasksRouter } from '@/contexts/TasksRouterContext';
 import Link from 'next/link';
 import {
   Trash2, ChevronLeft, ChevronRight, Calendar, Check,
@@ -324,7 +324,7 @@ function SubIssueRow({ sub, onToggle, onDelete }: {
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function IssueDetails({ issueId }: { issueId: string }) {
-  const router = useRouter();
+  const { goToMyTasks } = useTasksRouter();
 
   const { issues: dbIssues, updateIssue, deleteIssue, addIssue } = useLocalIssues();
   const { projects: dbProjects } = useLocalProjects();
@@ -446,7 +446,7 @@ export default function IssueDetails({ issueId }: { issueId: string }) {
   const handleDelete = () => {
     if (window.confirm('Bạn có chắc chắn muốn xóa nhiệm vụ này?')) {
       deleteIssue(issueId);
-      router.push('/tasks');
+      goToMyTasks();
     }
   };
 

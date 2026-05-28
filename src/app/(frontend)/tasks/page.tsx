@@ -1,7 +1,7 @@
 'use client'
 
 import React, { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useTasksRouter } from '@/contexts/TasksRouterContext';
 import IssueList from '@/components/tasks/IssueList';
 import IssueDetails from '@/components/tasks/IssueDetails';
 import ProjectDetails from '@/components/tasks/ProjectDetails';
@@ -10,13 +10,10 @@ import CycleList from '@/components/tasks/CycleList';
 import ProjectList from '@/components/tasks/ProjectList';
 
 function TasksContent() {
-  const searchParams = useSearchParams();
+  const { state } = useTasksRouter();
   
-  // Read parameters
-  const issueId = searchParams?.get('issue');
-  const projectId = searchParams?.get('project');
-  const cycleId = searchParams?.get('cycle');
-  const view = searchParams?.get('view');
+  // Read parameters from context instead of URL
+  const { issueId, projectId, cycleId, view } = state;
 
   // SPA Routing logic
   if (issueId) return <IssueDetails issueId={issueId} />;

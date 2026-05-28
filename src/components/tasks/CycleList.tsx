@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useTasksRouter } from '@/contexts/TasksRouterContext';
 import { History, Plus, Calendar, Activity, ChevronRight } from 'lucide-react';
 import { useLocalCycles, useLocalIssues } from '@/lib/local-first/useLocalTasks';
 import { getCycleIcon } from '@/components/tasks/types';
@@ -19,7 +19,7 @@ const formatDate = (dateStr: string) => {
 };
 
 export default function CycleList() {
-  const router = useRouter();
+  const { goToCycle } = useTasksRouter();
   const { cycles: dbCycles, addCycle } = useLocalCycles();
   const { issues: dbIssues } = useLocalIssues();
 
@@ -30,7 +30,7 @@ export default function CycleList() {
       name: name.trim(),
       is_active: false
     });
-    if (newId) router.push(`/tasks?cycle=${newId}`);
+    if (newId) goToCycle(newId);
   };
 
   const cyclesData = useMemo(() => {

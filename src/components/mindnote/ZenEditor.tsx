@@ -27,6 +27,7 @@ import { Color } from '@tiptap/extension-color'
 import { FontSize } from '@/lib/tiptap-extensions'
 
 interface ZenEditorProps {
+  noteId?: string
   initialContent?: any
   onChange?: (content: any) => void
   onCountChange?: (words: number, chars: number) => void
@@ -59,7 +60,7 @@ const extensions = [
   FontSize,
 ]
 
-const ZenEditor = ({ initialContent, onChange, onCountChange, placeholder = 'Bắt đầu viết...' }: ZenEditorProps) => {
+const ZenEditor = ({ noteId, initialContent, onChange, onCountChange, placeholder = 'Bắt đầu viết...' }: ZenEditorProps) => {
   const [menuPos, setMenuPos] = useState<{ x: number; y: number } | null>(null)
 
   const editor = useEditor({
@@ -103,6 +104,16 @@ const ZenEditor = ({ initialContent, onChange, onCountChange, placeholder = 'B�
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Instantly update content when switching files without remounting the editor.
+  // We only run this when `noteId` changes to avoid resetting the cursor while typing.
+  useEffect(() => {
+    if (editor && initialContent) {
+      editor.commands.setContent(initialContent, false)
+    } else if (editor && !initialContent) {
+      editor.commands.clearContent(false)
+    }
+  }, [editor, noteId])
 
   if (!editor) {
     return null

@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useTasksRouter } from '@/contexts/TasksRouterContext';
 import { Plus, Folder, Layers, Keyboard, Command, X, CheckSquare, Settings, Box, History, ChevronDown } from 'lucide-react';
 import { useLocalProjects, useLocalCycles, useLocalIssues } from '@/lib/local-first/useLocalTasks';
 import { MockProject, MockCycle, getCycleIcon } from '@/components/tasks/types';
@@ -10,10 +9,7 @@ import { runAutoCycleEngine } from '@/lib/local-first/cycle-engine';
 import { SIDEBAR_STYLES } from '@/lib/sidebar-styles';
 
 export default function TasksSection() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  
+  const { state, goToMyTasks, goToProjectsView, goToCyclesView, goToProject } = useTasksRouter();
   const { projects: dbProjects } = useLocalProjects();
   const { cycles: dbCycles } = useLocalCycles();
   const { issues: dbIssues } = useLocalIssues();
@@ -109,28 +105,23 @@ export default function TasksSection() {
     return c.endDate < nowStr;
   }).sort((a, b) => b.startDate.localeCompare(a.startDate));
 
-  const isMyTasksActive = isClient && pathname === '/tasks' && 
-    !searchParams?.get('project') && 
-    !searchParams?.get('cycle') && 
-    !searchParams?.get('issue') && 
-    searchParams?.get('view') !== 'projects';
+  const isMyTasksActive = isClient && 
+    !state.projectId && 
+    !state.cycleId && 
+    !state.issueId && 
+    state.view !== 'projects';
 
-  const isProjectsHeaderActive = isClient && searchParams?.get('view') === 'projects';
+  const isProjectsHeaderActive = isClient && state.view === 'projects';
 
   return (
     <>
       <div className="flex flex-col gap-2 flex-none shrink-0">
         {/* Main Menu */}
         <div className="space-y-0.5">
-          <Link
-            href="/tasks"
+          <div
             onClick={(e) => {
-              // Force clear query parameters if they exist to avoid Next.js caching/shallow routing issues
-              if (searchParams && searchParams.toString() !== '') {
-                e.preventDefault();
-                router.push('/tasks');
-                router.refresh();
-              }
+              e.preventDefault();
+              goToMyTasks();
             }}
             className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${isMyTasksActive ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
           >
@@ -139,14 +130,17 @@ export default function TasksSection() {
               <span>My tasks</span>
             </div>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-200/50 dark:bg-zinc-800/50 text-secondary">{(dbIssues || []).length}</span>
-          </Link>
+          </div>
         </div>
 
         {/* Projects */}
         <div className="flex flex-col gap-1">
           <div className="relative group/header">
-            <Link
-              href="/tasks?view=projects"
+            <div
+              onClick={(e) => {
+                e.preventDefault();
+                goToProjectsView();
+              }}
               className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${isProjectsHeaderActive ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
             >
               <div className="flex items-center gap-2">
@@ -158,7 +152,7 @@ export default function TasksSection() {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    router.push('/tasks?view=cycles');
+                    goToCyclesView();
                   }}
                   className="p-0.5 rounded hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-400 hover:text-foreground transition-colors cursor-pointer"
                   title="Xem Cycles"
@@ -176,7 +170,7 @@ export default function TasksSection() {
                   <ChevronDown className={`w-3.5 h-3.5 transform transition-transform ${isProjectsExpanded ? '' : '-rotate-90'}`} />
                 </button>
               </div>
-            </Link>
+            </div>
           </div>
           
           {isProjectsExpanded && (
@@ -184,12 +178,15 @@ export default function TasksSection() {
               {projects.map(project => {
                 const count = (dbIssues || []).filter(i => i.project_id === project.id).length;
                 const progress = projectProgress[project.id] || 0;
-                const isActive = isClient && searchParams?.get('project') === project.id;
+                const isActive = isClient && state.projectId === project.id;
                 
                 return (
-                  <Link
+                  <div
                     key={project.id}
-                    href={`/tasks?project=${project.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      goToProject(project.id);
+                    }}
                     className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${isActive ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
                   >
                     <div className="flex items-center gap-2 min-w-0 pl-1.5">
@@ -202,7 +199,7 @@ export default function TasksSection() {
                       <span className="truncate">{project.name}</span>
                     </div>
                     <span className="text-[10px] text-zinc-400 font-medium px-1">{count}</span>
-                  </Link>
+                  </div>
                 );
               })}
             </div>
