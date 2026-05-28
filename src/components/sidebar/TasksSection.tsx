@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTasksRouter } from '@/contexts/TasksRouterContext';
+import { usePathname } from 'next/navigation';
 import { Plus, Folder, Layers, Keyboard, Command, X, CheckSquare, Settings, Box, History, ChevronDown } from 'lucide-react';
 import { useLocalProjects, useLocalCycles, useLocalIssues } from '@/lib/local-first/useLocalTasks';
 import { MockProject, MockCycle, getCycleIcon } from '@/components/tasks/types';
@@ -9,6 +10,7 @@ import { runAutoCycleEngine } from '@/lib/local-first/cycle-engine';
 import { SIDEBAR_STYLES } from '@/lib/sidebar-styles';
 
 export default function TasksSection() {
+  const pathname = usePathname();
   const { state, goToMyTasks, goToProjectsView, goToCyclesView, goToProject } = useTasksRouter();
   const { projects: dbProjects } = useLocalProjects();
   const { cycles: dbCycles } = useLocalCycles();
@@ -106,12 +108,13 @@ export default function TasksSection() {
   }).sort((a, b) => b.startDate.localeCompare(a.startDate));
 
   const isMyTasksActive = isClient && 
+    pathname === '/tasks' &&
     !state.projectId && 
     !state.cycleId && 
     !state.issueId && 
     state.view !== 'projects';
 
-  const isProjectsHeaderActive = isClient && state.view === 'projects';
+  const isProjectsHeaderActive = isClient && pathname === '/tasks' && state.view === 'projects';
 
   return (
     <>
