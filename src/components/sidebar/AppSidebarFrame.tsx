@@ -82,7 +82,7 @@ export default function AppSidebarFrame({ children, defaultWidth = 300 }: AppSid
 
         {/* Resize Handle */}
         <div
-          className="absolute top-0 -right-[13px] w-[22px] h-full cursor-col-resize z-50"
+          className="absolute top-0 -right-[4px] w-[8px] h-full cursor-col-resize z-50 hover:bg-zinc-500/10 dark:hover:bg-zinc-400/5 transition-colors duration-150"
           onMouseDown={(e) => {
             e.preventDefault()
             setIsResizing(true)
