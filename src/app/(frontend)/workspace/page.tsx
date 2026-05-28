@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useWorkspace } from '@/contexts/WorkspaceContext'
 import NoteEditorClient from '@/components/mindnote/NoteEditorClient'
 import MindmapOverview from '@/components/workspace/MindmapOverview'
 import WorkspaceHome from '@/components/workspace/WorkspaceHome'
@@ -24,10 +25,7 @@ const GraphView = dynamic(() => import('@/components/workspace/GraphView'), {
 function WorkspaceContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const noteParam = searchParams?.get('note')
-  const canvasParam = searchParams?.get('canvas')
-  const linkParam = searchParams?.get('link')
-  const viewParam = searchParams?.get('view')
+  const { selection, selectNote, selectCanvas, selectLink, selectGraphView, clearSelection } = useWorkspace()
 
   const { nodes, updateNode, liveNodesReady } = useLocalWorkspace()
   const [loading, setLoading] = useState(false)
@@ -63,10 +61,10 @@ function WorkspaceContent() {
     }
   }
 
-  const [activeNoteId, setActiveNoteId] = useState<string | null>(null)
-  const [activeCanvasId, setActiveCanvasId] = useState<string | null>(null)
-  const [activeLinkId, setActiveLinkId] = useState<string | null>(null)
-  const [showGraphView, setShowGraphView] = useState(false)
+  const activeNoteId = selection.noteId
+  const activeCanvasId = selection.canvasId
+  const activeLinkId = selection.linkId
+  const showGraphView = selection.graphView
   const [graphMode, setGraphMode] = useState<'tree' | 'network'>('tree')
 
   // Load graphMode from localStorage on mount
@@ -119,36 +117,26 @@ function WorkspaceContent() {
   // State quản lý các node đang mở ở Sidebar
   const [openNodes, setOpenNodes] = useState<Set<string>>(new Set())
   const [isOpenNodesLoaded, setIsOpenNodesLoaded] = useState(false)
-
-  // Đồng bộ URL search params với active states
+  // Sync Context with Next.js searchParams (for external links / router.push from other pages)
   useEffect(() => {
-    if (noteParam) {
-      setActiveNoteId(noteParam)
-      setActiveCanvasId(null)
-      setActiveLinkId(null)
-      setShowGraphView(false)
-    } else if (canvasParam) {
-      setActiveNoteId(null)
-      setActiveCanvasId(canvasParam)
-      setActiveLinkId(null)
-      setShowGraphView(false)
-    } else if (linkParam) {
-      setActiveNoteId(null)
-      setActiveCanvasId(null)
-      setActiveLinkId(linkParam)
-      setShowGraphView(false)
-    } else if (viewParam === 'graph') {
-      setActiveNoteId(null)
-      setActiveCanvasId(null)
-      setActiveLinkId(null)
-      setShowGraphView(true)
-    } else {
-      setActiveNoteId(null)
-      setActiveCanvasId(null)
-      setActiveLinkId(null)
-      setShowGraphView(false)
+    const noteParam = searchParams?.get('note')
+    const canvasParam = searchParams?.get('canvas')
+    const linkParam = searchParams?.get('link')
+    const viewParam = searchParams?.get('view')
+
+    if (noteParam && noteParam !== selection.noteId) {
+      selectNote(noteParam)
+    } else if (canvasParam && canvasParam !== selection.canvasId) {
+      selectCanvas(canvasParam)
+    } else if (linkParam && linkParam !== selection.linkId) {
+      selectLink(linkParam)
+    } else if (viewParam === 'graph' && !selection.graphView) {
+      selectGraphView()
+    } else if (!noteParam && !canvasParam && !linkParam && viewParam !== 'graph' && (selection.noteId || selection.canvasId || selection.linkId || selection.graphView)) {
+      clearSelection()
     }
-  }, [noteParam, canvasParam, linkParam, viewParam])
+  }, [searchParams, selection, selectNote, selectCanvas, selectLink, selectGraphView, clearSelection])
+
 
   // Tự động mở các thư mục cha của file đang active trên sidebar cây thư mục
   useEffect(() => {
@@ -194,26 +182,18 @@ function WorkspaceContent() {
   }, [nodes])
 
   const handleSelectNote = (noteId: string) => {
-    setActiveNoteId(noteId)
-    setActiveCanvasId(null)
-    setShowGraphView(false)
-    router.replace(`/workspace?note=${noteId}`)
+    selectNote(noteId)
+    window.history.replaceState(null, '', `/workspace?note=${noteId}`)
   }
 
   const handleSelectCanvas = (mapId: string) => {
-    setActiveNoteId(null)
-    setActiveCanvasId(mapId)
-    setActiveLinkId(null)
-    setShowGraphView(false)
-    router.replace(`/workspace?canvas=${mapId}`)
+    selectCanvas(mapId)
+    window.history.replaceState(null, '', `/workspace?canvas=${mapId}`)
   }
 
   const handleSelectLink = (linkId: string) => {
-    setActiveNoteId(null)
-    setActiveCanvasId(null)
-    setActiveLinkId(linkId)
-    setShowGraphView(false)
-    router.replace(`/workspace?link=${linkId}`)
+    selectLink(linkId)
+    window.history.replaceState(null, '', `/workspace?link=${linkId}`)
   }
 
   return (

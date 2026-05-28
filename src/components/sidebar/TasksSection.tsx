@@ -124,6 +124,14 @@ export default function TasksSection() {
         <div className="space-y-0.5">
           <Link
             href="/tasks"
+            onClick={(e) => {
+              // Force clear query parameters if they exist to avoid Next.js caching/shallow routing issues
+              if (searchParams && searchParams.toString() !== '') {
+                e.preventDefault();
+                router.push('/tasks');
+                router.refresh();
+              }
+            }}
             className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${isMyTasksActive ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
           >
             <div className="flex items-center gap-2">

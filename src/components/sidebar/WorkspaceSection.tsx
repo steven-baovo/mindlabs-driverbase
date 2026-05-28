@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo, useRef } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useWorkspace } from '@/contexts/WorkspaceContext'
 import {
   ChevronRight,
@@ -28,15 +28,16 @@ import { DropdownCard, DropdownItem, DropdownSeparator } from '@/components/ui/D
 
 export default function WorkspaceSection() {
   const router = useRouter()
-  const searchParams = useSearchParams()
+  const pathname = usePathname()
 
   const { nodes, updateNode, deleteNode, createNode, liveNodesReady } = useLocalWorkspace()
   const { updateNote: updateMindNote } = useLocalNotes()
   const { updateCanvas: updateMindmap } = useLocalCanvas()
+  const { selection, selectNote: ctxSelectNote, selectCanvas: ctxSelectCanvas, selectLink: ctxSelectLink, selectGraphView: ctxSelectGraphView } = useWorkspace()
 
-  const activeNoteId = searchParams?.get('note')
-  const activeCanvasId = searchParams?.get('canvas')
-  const activeLinkId = searchParams?.get('link')
+  const activeNoteId = selection.noteId
+  const activeCanvasId = selection.canvasId
+  const activeLinkId = selection.linkId
 
   const loading = !liveNodesReady
 
@@ -181,13 +182,28 @@ export default function WorkspaceSection() {
   }
 
   const handleSelectNote = (noteId: string) => {
-    router.push(`/workspace?note=${noteId}`)
+    ctxSelectNote(noteId)
+    if (pathname === '/workspace') {
+      window.history.replaceState(null, '', `/workspace?note=${noteId}`)
+    } else {
+      router.push(`/workspace?note=${noteId}`)
+    }
   }
   const handleSelectCanvas = (mapId: string) => {
-    router.push(`/workspace?canvas=${mapId}`)
+    ctxSelectCanvas(mapId)
+    if (pathname === '/workspace') {
+      window.history.replaceState(null, '', `/workspace?canvas=${mapId}`)
+    } else {
+      router.push(`/workspace?canvas=${mapId}`)
+    }
   }
   const handleSelectLink = (linkId: string) => {
-    router.push(`/workspace?link=${linkId}`)
+    ctxSelectLink(linkId)
+    if (pathname === '/workspace') {
+      window.history.replaceState(null, '', `/workspace?link=${linkId}`)
+    } else {
+      router.push(`/workspace?link=${linkId}`)
+    }
   }
 
   const handleLinkModalSubmit = async (title: string, url: string) => {
@@ -402,7 +418,14 @@ export default function WorkspaceSection() {
       <div className="flex-1 flex flex-col pt-0 px-0 relative group/sidebar min-h-0">
         {/* Tiêu đề mục Library tích hợp Hover và Nút điều khiển nhanh */}
         <div 
-          onClick={() => router.push('/workspace?view=graph')}
+          onClick={() => {
+            ctxSelectGraphView()
+            if (pathname === '/workspace') {
+              window.history.replaceState(null, '', '/workspace?view=graph')
+            } else {
+              router.push('/workspace?view=graph')
+            }
+          }}
           className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md select-none shrink-0 relative group/lib-header cursor-pointer transition-colors ${createMenuOpen ? 'bg-hover-bg' : 'hover:bg-hover-bg'}`}
         >
           <div className="flex items-center gap-2">
