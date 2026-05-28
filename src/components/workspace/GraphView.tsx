@@ -40,6 +40,23 @@ export default function GraphView({ nodes }: GraphViewProps) {
   const hoverProgressRef = useRef(0) // Ref để tránh stale closure trong animation
   const [isDark, setIsDark] = useState(false)
   const graphRef = useRef<any>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [dimensions, setDimensions] = useState({ width: 800, height: 600 })
+
+  // Đo đạc kích thước thực tế của parent container bằng ResizeObserver để tránh tràn màn hình sang phải
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect
+        setDimensions({ width, height })
+      }
+    })
+
+    resizeObserver.observe(containerRef.current)
+    return () => resizeObserver.disconnect()
+  }, [])
 
   // Hoạt ảnh chuyển đổi mượt mà khi hover thay đổi
   useEffect(() => {
@@ -141,7 +158,7 @@ export default function GraphView({ nodes }: GraphViewProps) {
   }, [graphData])
 
   return (
-    <div className="w-full h-full bg-background relative">
+    <div ref={containerRef} className="w-full h-full bg-background relative">
       {graphData.nodes.length === 0 ? (
         <div className="w-full h-full flex items-center justify-center text-secondary/50 text-xs">
           Không có dữ liệu node để hiển thị. Hãy tạo note hoặc canvas trước!
@@ -150,6 +167,8 @@ export default function GraphView({ nodes }: GraphViewProps) {
         <ForceGraph2D
           ref={graphRef}
           graphData={graphData}
+          width={dimensions.width}
+          height={dimensions.height}
           nodeLabel="name"
           backgroundColor={isDark ? '#08080a' : '#ffffff'}
           maxZoom={1.8}
