@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
 interface TasksRouteState {
@@ -37,22 +37,31 @@ function parseStateFromUrl(): TasksRouteState {
 
 const TasksRouterContext = createContext<TasksRouterContextType | null>(null)
 
-export function TasksRouterProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter()
+function TasksRouterSearchParamsSync({ onUpdate }: { onUpdate: () => void }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const [state, setState] = useState<TasksRouteState>(defaultState)
 
-  // Sync state from URL when mounted or when external navigation happens (e.g. from back/forward buttons or links)
   useEffect(() => {
-    setState(parseStateFromUrl())
+    onUpdate()
 
     const handlePopState = () => {
-      setState(parseStateFromUrl())
+      onUpdate()
     }
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
-  }, [pathname, searchParams])
+  }, [pathname, searchParams, onUpdate])
+
+  return null
+}
+
+export function TasksRouterProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const [state, setState] = useState<TasksRouteState>(defaultState)
+
+  const handleUpdateFromUrl = useCallback(() => {
+    setState(parseStateFromUrl())
+  }, [])
 
   const silentUpdateUrl = useCallback((path: string, query: Record<string, string>) => {
     if (pathname !== '/tasks') {
@@ -108,6 +117,9 @@ export function TasksRouterProvider({ children }: { children: React.ReactNode })
       goToCycle,
       goToIssue
     }}>
+      <Suspense fallback={null}>
+        <TasksRouterSearchParamsSync onUpdate={handleUpdateFromUrl} />
+      </Suspense>
       {children}
     </TasksRouterContext.Provider>
   )
