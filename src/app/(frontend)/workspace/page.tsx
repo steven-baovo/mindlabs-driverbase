@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import NoteEditorClient from '@/components/mindnote/NoteEditorClient'
 import MindmapOverview from '@/components/workspace/MindmapOverview'
+import WorkspaceHome from '@/components/workspace/WorkspaceHome'
 import ConnectNodeModal from '@/components/workspace/ConnectNodeModal'
 import { WorkspaceNode } from '@/lib/local-first/db'
 import { checkUrlEmbeddable } from '@/app/actions'
@@ -294,17 +295,9 @@ function WorkspaceContent() {
             </div>
           </div>
         ) : (
-          /* Render Mindmap View */
-          <MindmapOverview
+          /* Trang chủ Workspace: Priority tasks + Drive-style library */
+          <WorkspaceHome
             nodes={globalTreeNodes}
-            onRefetch={fetchProjectNodes}
-            onNodeCreated={(parentId) => {
-              setOpenNodes(prev => {
-                const next = new Set(prev)
-                next.add(parentId)
-                return next
-              })
-            }}
             onSelectNote={handleSelectNote}
             onSelectCanvas={handleSelectCanvas}
             onSelectLink={handleSelectLink}
