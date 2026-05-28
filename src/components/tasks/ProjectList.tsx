@@ -184,7 +184,14 @@ export default function ProjectList() {
 
                   {/* Col 3: Health */}
                   <div className="flex items-center gap-1.5 select-none">
-                    <span className={`w-1.5 h-1.5 rounded-full ${proj.health.bgClass === 'bg-emerald-500' ? 'bg-emerald-500' : proj.health.bgClass === 'bg-amber-500' ? 'bg-amber-500' : proj.health.bgClass === 'bg-red-500' ? 'bg-red-500' : 'border border-dashed border-zinc-400 w-2.5 h-2.5 shrink-0'}`} />
+                    {proj.health.label === 'No updates' ? (
+                      <div className="w-3.5 h-3.5 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 shrink-0" />
+                    ) : (
+                      <div className="relative w-3.5 h-3.5 flex items-center justify-center shrink-0">
+                        <span className={`absolute inset-0 rounded-full opacity-25 ${proj.health.bgClass}`} />
+                        <span className={`w-1.5 h-1.5 rounded-full ${proj.health.bgClass}`} />
+                      </div>
+                    )}
                     <span className={`text-[11px] font-semibold ${proj.health.textClass}`}>{proj.health.label}</span>
                   </div>
 

@@ -417,7 +417,14 @@ export default function ProjectDetails({ projectId }: { projectId: string }) {
                 <span>Health</span>
               </div>
               <div className="flex items-center gap-1.5 font-medium">
-                <span className={`w-1.5 h-1.5 rounded-full ${healthData.bgClass === 'bg-emerald-500' ? 'bg-emerald-500' : healthData.bgClass === 'bg-amber-500' ? 'bg-amber-500' : healthData.bgClass === 'bg-red-500' ? 'bg-red-500' : 'border border-dashed border-zinc-400 w-2 h-2'}`} />
+                {healthData.label === 'No updates' ? (
+                  <div className="w-3 h-3 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 shrink-0" />
+                ) : (
+                  <div className="relative w-3.5 h-3.5 flex items-center justify-center shrink-0">
+                    <span className={`absolute inset-0 rounded-full opacity-25 ${healthData.bgClass}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${healthData.bgClass}`} />
+                  </div>
+                )}
                 <span className={`text-[11px] font-semibold ${healthData.textClass}`}>{healthData.label}</span>
               </div>
             </div>
