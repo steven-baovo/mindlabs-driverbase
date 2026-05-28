@@ -6,7 +6,7 @@ import { articles } from './data'
 export default function DocsPage() {
   return (
     <main className="flex-1 flex min-w-0 bg-white p-6 md:p-12 overflow-y-auto">
-      <div className="flex-1 max-w-3xl space-y-12">
+      <div className="flex-1 max-w-[720px] space-y-12">
         <div className="space-y-10 animate-in fade-in duration-300">
           <header className="space-y-3">
             <span className="text-[13px] font-normal text-[#5e6ad2] uppercase tracking-widest">Tài liệu tham chiếu</span>

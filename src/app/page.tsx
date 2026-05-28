@@ -63,7 +63,7 @@ export default async function Home() {
     <div className="min-h-screen bg-white text-zinc-900 selection:bg-[#5e6ad2]/20 selection:text-[#5e6ad2] font-sans overflow-x-hidden relative">
       
       {/* Background Glows (Linear/Capacities-style soft ambient lighting) */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1440px] h-[600px] pointer-events-none -z-10 overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1200px] h-[600px] pointer-events-none -z-10 overflow-hidden">
         <div className="absolute top-[-200px] left-1/4 w-[600px] h-[600px] rounded-full bg-violet-600/5 blur-[150px]" />
         <div className="absolute top-[-150px] right-1/4 w-[500px] h-[500px] rounded-full bg-[#5e6ad2]/5 blur-[130px]" />
         <div className="absolute top-[250px] left-1/3 w-[400px] h-[400px] rounded-full bg-emerald-500/5 blur-[140px]" />
@@ -78,7 +78,7 @@ export default async function Home() {
       <Header />
 
       {/* Hero Section */}
-      <main className="pt-20 lg:pt-24 px-6 max-w-[1440px] mx-auto flex flex-col items-center text-center">
+      <main className="pt-20 lg:pt-24 px-6 max-w-[1200px] mx-auto flex flex-col items-center text-center">
         
         {/* Hero Headings */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight pb-4 leading-[1.1] text-zinc-950">
@@ -184,7 +184,7 @@ export default async function Home() {
       </main>
 
       {/* Bento Grid Features Section */}
-      <section id="features" className="py-24 lg:py-32 px-6 max-w-[1440px] mx-auto">
+      <section id="features" className="py-24 lg:py-32 px-6 max-w-[1200px] mx-auto">
         <header className="text-center max-w-xl mx-auto mb-16 space-y-4">
           <h2 className="text-xs uppercase tracking-widest text-[#5e6ad2] font-bold">Tính năng vượt trội</h2>
           <p className="text-3xl sm:text-4xl font-black tracking-tight text-zinc-950">
@@ -286,7 +286,7 @@ export default async function Home() {
       </section>
 
       {/* Philosophy Method Section */}
-      <section id="method" className="py-24 border-t border-zinc-200 px-6 max-w-[1440px] mx-auto bg-gradient-to-b from-white via-zinc-50 to-white">
+      <section id="method" className="py-24 border-t border-zinc-200 px-6 max-w-[1200px] mx-auto bg-gradient-to-b from-white via-zinc-50 to-white">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <h2 className="text-xs uppercase tracking-widest text-[#5e6ad2] font-bold">Triết lý thiết kế</h2>
@@ -329,7 +329,7 @@ export default async function Home() {
       </section>
 
       {/* Call To Action Section */}
-      <section id="about" className="py-24 text-center max-w-[1440px] mx-auto px-6">
+      <section id="about" className="py-24 text-center max-w-[1200px] mx-auto px-6">
         <div className="bg-[#5e6ad2]/5 border border-[#5e6ad2]/10 rounded-3xl p-10 lg:p-16 space-y-8 relative overflow-hidden">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-[#5e6ad2]/5 rounded-full blur-3xl pointer-events-none -z-10" />
           
@@ -354,7 +354,7 @@ export default async function Home() {
 
       {/* Footer Navigation (Capacities.io Premium Style) */}
       <footer className="border-t border-zinc-200 bg-white pt-16 pb-12 px-6">
-        <div className="max-w-[1440px] mx-auto">
+        <div className="max-w-[1200px] mx-auto">
           
           {/* Main Footer Content */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 pb-16">

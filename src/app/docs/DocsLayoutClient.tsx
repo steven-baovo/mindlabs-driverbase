@@ -160,7 +160,7 @@ export default function DocsLayoutClient({
 
       {/* 2. MAIN DOCS CONTAINER (Căn giữa tối đa 1440px) */}
       <div className="flex-1 flex w-full bg-white">
-        <div className="max-w-[1440px] mx-auto w-full flex relative">
+        <div className="max-w-[1200px] mx-auto w-full flex relative">
           
           {/* LEFT SIDEBAR (Desktop & Mobile) */}
           <aside className={`

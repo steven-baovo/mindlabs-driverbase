@@ -235,9 +235,9 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
       <Header />
 
       <div className="flex-1 flex w-full bg-background">
-        <div className="max-w-[1440px] mx-auto w-full flex relative px-6 gap-8 py-12">
+        <div className="max-w-[1200px] mx-auto w-full flex relative px-6 gap-8 py-12">
           
-          <main className="flex-1 min-w-0 max-w-3xl mx-auto w-full">
+          <main className="flex-1 min-w-0 max-w-[720px] mx-auto w-full">
             
             <article className="space-y-8 animate-in fade-in duration-300">
               

@@ -53,7 +53,7 @@ export default async function DocArticlePage({ params }: PageProps) {
     <main className="flex-1 flex min-w-0 bg-white p-6 md:p-12 overflow-y-auto">
       
       {/* Article content & footer */}
-      <div className="flex-1 max-w-3xl space-y-12">
+      <div className="flex-1 max-w-[720px] space-y-12">
         <article className="space-y-8 animate-in fade-in duration-300">
           
           {/* Breadcrumbs (Thân thiện SEO) */}

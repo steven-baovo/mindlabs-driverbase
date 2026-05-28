@@ -92,7 +92,7 @@ export default async function BlogPage() {
       <Header />
 
       <div className="flex-1 flex w-full bg-background">
-        <div className="max-w-[1440px] mx-auto w-full flex relative px-6">
+        <div className="max-w-[1200px] mx-auto w-full flex relative px-6">
           <main className="flex-1 py-16 max-w-5xl mx-auto w-full">
             
             <div className="space-y-12 animate-in fade-in duration-300">

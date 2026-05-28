@@ -17,7 +17,7 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full h-14 bg-white/85 backdrop-blur-md border-b border-zinc-200/80">
-      <div className="max-w-[1440px] mx-auto w-full h-full px-6 flex items-center justify-between gap-4">
+      <div className="max-w-[1200px] mx-auto w-full h-full px-6 flex items-center justify-between gap-4">
         
         {/* Left Section: Mobile Menu Trigger + Logo */}
         <div className="flex items-center space-x-3.5 shrink-0">
