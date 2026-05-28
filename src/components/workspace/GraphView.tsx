@@ -139,23 +139,7 @@ export default function GraphView({ nodes }: GraphViewProps) {
     }
   }, [nodes])
 
-  const hasCenteredRef = useRef(false)
 
-  // Reset flag căn giữa khi dữ liệu thay đổi
-  useEffect(() => {
-    hasCenteredRef.current = false
-    
-    // Fallback timer: Căn giữa sau 500ms phòng trường hợp engine D3 đã dừng từ trước
-    if (graphRef.current && graphData.nodes.length > 0) {
-      const timer = setTimeout(() => {
-        if (graphRef.current && !hasCenteredRef.current) {
-          graphRef.current.zoomToFit(0, 80)
-          hasCenteredRef.current = true
-        }
-      }, 500)
-      return () => clearTimeout(timer)
-    }
-  }, [graphData])
 
   return (
     <div ref={containerRef} className="w-full h-full bg-background relative">
@@ -173,13 +157,6 @@ export default function GraphView({ nodes }: GraphViewProps) {
           backgroundColor={isDark ? '#08080a' : '#ffffff'}
           maxZoom={1.8}
           minZoom={0.4}
-          warmupTicks={150}
-          onEngineStop={() => {
-            if (graphRef.current && !hasCenteredRef.current && graphData.nodes.length > 0) {
-              graphRef.current.zoomToFit(0, 80)
-              hasCenteredRef.current = true
-            }
-          }}
           
           // Tự vẽ Node và Chữ (Vẽ Canvas)
           nodeCanvasObject={(node: any, ctx, globalScale) => {
