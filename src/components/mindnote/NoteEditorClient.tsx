@@ -94,11 +94,13 @@ const NoteEditorClient = ({ noteId, onOpenConnectModal }: NoteEditorClientProps)
 
   const allAvailableFiles = useMemo(() => {
     if (!allNodes) return []
-    return allNodes.map(n => ({
-      id: n.id,
-      title: n.title,
-      type: n.type as 'note' | 'map'
-    }))
+    return allNodes
+      .filter(n => n.type === 'note' || n.type === 'map')
+      .map(n => ({
+        id: n.id,
+        title: n.title,
+        type: n.type as 'note' | 'map'
+      }))
   }, [allNodes])
 
   const [isLinksPanelOpen, setIsLinksPanelOpen] = useState(false)
