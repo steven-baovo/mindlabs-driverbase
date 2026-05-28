@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { History, Plus, Calendar, Activity, ChevronRight } from 'lucide-react';
 import { useLocalCycles, useLocalIssues } from '@/lib/local-first/useLocalTasks';
+import { getCycleIcon } from '@/components/tasks/types';
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '—';
@@ -75,7 +76,7 @@ export default function CycleList() {
         {/* Dòng 1: Tiêu đề chính */}
         <div className="flex items-center justify-between px-4 h-[44px] border-b border-border-main shrink-0">
           <div className="flex items-center gap-2 min-w-0">
-            <History className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+            {getCycleIcon("w-3.5 h-3.5 text-zinc-500 shrink-0")}
             <h1 className="text-standard tracking-tight font-medium text-standard-text truncate leading-none">Cycles</h1>
           </div>
         </div>
@@ -107,7 +108,7 @@ export default function CycleList() {
         <div className="max-w-4xl mx-auto px-6 pt-6 pb-8">
           {cyclesData.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center text-zinc-500 gap-4">
-              <History className="w-12 h-12 text-zinc-300 dark:text-zinc-700" />
+              {getCycleIcon("w-12 h-12 text-zinc-300 dark:text-zinc-700")}
               <p className="text-sm">Chưa có chu kỳ nào được tạo.</p>
             </div>
           ) : (
@@ -133,7 +134,7 @@ export default function CycleList() {
                         </div>
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 flex items-center justify-center border border-border-main relative z-10">
-                          <History className="w-4 h-4" />
+                          {getCycleIcon("w-4 h-4")}
                         </div>
                       )}
                     </div>

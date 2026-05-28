@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Plus, Folder, Layers, Keyboard, Command, X, CheckSquare, Settings, Box, History, ChevronDown } from 'lucide-react';
 import { useLocalProjects, useLocalCycles, useLocalIssues } from '@/lib/local-first/useLocalTasks';
-import { MockProject, MockCycle } from '@/components/tasks/types';
+import { MockProject, MockCycle, getCycleIcon } from '@/components/tasks/types';
 import { runAutoCycleEngine } from '@/lib/local-first/cycle-engine';
 import { SIDEBAR_STYLES } from '@/lib/sidebar-styles';
 
@@ -155,7 +155,7 @@ export default function TasksSection() {
                   className="p-0.5 rounded hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-400 hover:text-foreground transition-colors cursor-pointer"
                   title="Xem Cycles"
                 >
-                  <History className="w-3.5 h-3.5" />
+                  {getCycleIcon("w-3.5 h-3.5")}
                 </button>
                 <button
                   onClick={(e) => {

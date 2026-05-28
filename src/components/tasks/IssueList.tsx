@@ -10,7 +10,7 @@ import { useLocalIssues, useLocalProjects, useLocalCycles } from '@/lib/local-fi
 import { 
   MockIssue, IssueStatus, IssuePriority, 
   getStatusIcon, getStatusLabel, getPriorityIcon, getPriorityLabel, formatDueDate,
-  getIssueDisplayId
+  getIssueDisplayId, getCycleIcon
 } from './types';
 import { useQuickCreate } from '@/contexts/QuickCreateContext';
 
@@ -491,9 +491,7 @@ export default function IssueList({
                                 className="flex items-center gap-1.5 text-[12px] tracking-tight text-secondary/70 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/10 px-2 py-0.5 rounded-full hover:bg-hover-bg/85 transition-colors"
                                 title="Đổi chu kỳ"
                               >
-                                <div className="w-3.5 h-3.5 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center shrink-0">
-                                  <Play className="w-1.5 h-1.5 text-zinc-400 dark:text-zinc-500 fill-zinc-400 dark:fill-zinc-500 translate-x-[0.5px]" />
-                                </div>
+                                {getCycleIcon("w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500")}
                                 <span className="truncate font-medium">
                                   {(() => {
                                     const name = cycles.find(c => c.id === issue.cycleId)?.name || '';
@@ -506,11 +504,7 @@ export default function IssueList({
                                   <RowMenuOption
                                     label="Không thuộc chu kỳ"
                                     active={!issue.cycleId}
-                                    icon={
-                                      <div className="w-3.5 h-3.5 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center shrink-0 opacity-40">
-                                        <Play className="w-1.5 h-1.5 text-zinc-400 dark:text-zinc-500 fill-zinc-400 dark:fill-zinc-500 translate-x-[0.5px]" />
-                                      </div>
-                                    }
+                                    icon={getCycleIcon("w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 opacity-40")}
                                     onClick={() => handleUpdateIssueField(issue.id, 'cycle_id', null)}
                                   />
                                   {cycles.map(c => (
@@ -518,11 +512,7 @@ export default function IssueList({
                                       key={c.id}
                                       label={c.name}
                                       active={issue.cycleId === c.id}
-                                      icon={
-                                        <div className="w-3.5 h-3.5 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center shrink-0">
-                                          <Play className="w-1.5 h-1.5 text-zinc-400 dark:text-zinc-500 fill-zinc-400 dark:fill-zinc-500 translate-x-[0.5px]" />
-                                        </div>
-                                      }
+                                      icon={getCycleIcon("w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500")}
                                       onClick={() => handleUpdateIssueField(issue.id, 'cycle_id', c.id)}
                                     />
                                   ))}
@@ -547,11 +537,7 @@ export default function IssueList({
                                   <RowMenuOption
                                     label="Không thuộc chu kỳ"
                                     active={true}
-                                    icon={
-                                      <div className="w-3.5 h-3.5 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center shrink-0 opacity-40">
-                                        <Play className="w-1.5 h-1.5 text-zinc-400 dark:text-zinc-500 fill-zinc-400 dark:fill-zinc-500 translate-x-[0.5px]" />
-                                      </div>
-                                    }
+                                    icon={getCycleIcon("w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 opacity-40")}
                                     onClick={() => handleUpdateIssueField(issue.id, 'cycle_id', null)}
                                   />
                                   {cycles.map(c => (
@@ -559,11 +545,7 @@ export default function IssueList({
                                       key={c.id}
                                       label={c.name}
                                       active={false}
-                                      icon={
-                                        <div className="w-3.5 h-3.5 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center shrink-0">
-                                          <Play className="w-1.5 h-1.5 text-zinc-400 dark:text-zinc-500 fill-zinc-400 dark:fill-zinc-500 translate-x-[0.5px]" />
-                                        </div>
-                                      }
+                                      icon={getCycleIcon("w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500")}
                                       onClick={() => handleUpdateIssueField(issue.id, 'cycle_id', c.id)}
                                     />
                                   ))}

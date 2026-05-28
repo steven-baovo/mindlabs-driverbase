@@ -9,7 +9,7 @@ import {
 import { useLocalIssues, useLocalProjects, useLocalCycles } from '@/lib/local-first/useLocalTasks';
 import {
   IssueStatus, IssuePriority,
-  getStatusIcon, getStatusLabel, getPriorityIcon, getPriorityLabel, formatDueDate,
+  getStatusIcon, getStatusLabel, getPriorityIcon, getPriorityLabel, formatDueDate, getCycleIcon,
 } from '@/components/tasks/types';
 import { useQuickCreate } from '@/contexts/QuickCreateContext';
 
@@ -255,7 +255,7 @@ export default function QuickCreateModal() {
           <div className="relative">
             <button type="button" onClick={() => setActiveDropdown(activeDropdown === 'cycle' ? null : 'cycle')}
               className="flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900/50 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-md text-[11px] text-zinc-600 dark:text-zinc-300 font-semibold transition-colors shadow-subtle">
-              <History className="w-3.5 h-3.5 text-zinc-400" />
+              {getCycleIcon("w-3.5 h-3.5 text-zinc-400")}
               <span className="truncate max-w-[120px]">{cycleId ? (cycles.find(c => c.id === cycleId)?.name || 'Chu kỳ') : 'Chu kỳ'}</span>
               <ChevronDown className="w-3 h-3 text-zinc-400" />
             </button>

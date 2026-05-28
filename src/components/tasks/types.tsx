@@ -1,8 +1,16 @@
 import { 
   CheckCircle2, Circle, Clock, AlertCircle, ChevronsUp, ChevronUp, ChevronRight, 
   ChevronDown as ChevronDownIcon, Minus, CircleDot,
-  LayoutGrid, List
+  LayoutGrid, List, Play
 } from 'lucide-react';
+
+export const getCycleIcon = (className = "w-3.5 h-3.5") => {
+  return (
+    <div className={`${className} rounded-full border border-current flex items-center justify-center shrink-0`}>
+      <Play className="w-[50%] h-[50%] fill-current translate-x-[5%]" />
+    </div>
+  );
+};
 
 export type IssueStatus = 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled';
 export type IssuePriority = 'none' | 'low' | 'medium' | 'high' | 'urgent';

@@ -11,7 +11,7 @@ import { useLocalIssues, useLocalProjects, useLocalCycles } from '@/lib/local-fi
 import {
   MockIssue, IssueStatus, IssuePriority,
   getStatusIcon, getPriorityIcon, getStatusLabel, getPriorityLabel,
-  getIssueDisplayId
+  getIssueDisplayId, getCycleIcon
 } from '@/components/tasks/types';
 
 // ─── Popover ───────────────────────────────────────────────────────────────────
@@ -626,7 +626,7 @@ export default function IssueDetails({ issueId }: { issueId: string }) {
             {cyclesEnabled && cycles.length > 0 && (
               <div className="relative">
                 <PropRow
-                  icon={<Clock className="w-4 h-4" />}
+                  icon={getCycleIcon("w-4 h-4 text-zinc-400")}
                   label={cycleName ?? 'Add to cycle'}
                   onClick={() => setCycleOpen(v => !v)}
                 />
