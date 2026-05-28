@@ -88,19 +88,19 @@ export default function Header({
             </button>
           )}
           
-          <Link
-            href="/login"
-            className="px-4 py-1.5 bg-white hover:bg-zinc-50 text-zinc-700 text-[13px] font-normal rounded border border-zinc-200 hover:border-zinc-300 shadow-subtle flex items-center space-x-1.5 transition-all select-none"
-          >
-            <span>Đăng nhập</span>
-          </Link>
-
           <Link 
             href="/workspace" 
             className="px-4 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white text-[13px] font-normal rounded shadow-subtle flex items-center space-x-1.5 transition-all select-none"
           >
             <span>Vào Workspace</span>
             <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+
+          <Link
+            href="/login"
+            className="px-4 py-1.5 text-zinc-500 hover:text-zinc-900 text-[13px] font-normal transition-colors select-none"
+          >
+            <span>Đăng nhập</span>
           </Link>
         </div>
       </div>
