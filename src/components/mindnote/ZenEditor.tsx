@@ -23,7 +23,7 @@ import {
   List, ListOrdered, CheckSquare, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Type, Quote,
   Table as TableIcon, Image as ImageIcon, Minus, ChevronRight, Check,
   Link2, ExternalLink, Search, ListTodo, Scissors, Copy, ClipboardPaste, Replace,
-  AlignLeft, Plus, Paintbrush
+  AlignLeft, Plus, Paintbrush, Palette
 } from 'lucide-react'
 
 import { SearchNodeModal } from '@/components/ui/SearchNodeModal'
@@ -413,6 +413,24 @@ const ZenEditor = ({ noteId, initialContent, onChange, onCountChange, placeholde
             <ContextMenuItem label="Italic" icon={Italic} active={editor.isActive('italic')} onClick={() => executeCommand(() => editor.chain().focus().toggleItalic().run())} />
             <ContextMenuItem label="Underline" icon={UnderlineIcon} active={editor.isActive('underline')} onClick={() => executeCommand(() => editor.chain().focus().toggleUnderline().run())} />
             <ContextMenuItem label="Strikethrough" icon={Strikethrough} active={editor.isActive('strike')} onClick={() => executeCommand(() => editor.chain().focus().toggleStrike().run())} />
+          </ContextMenuSubMenu>
+
+          {/* TEXT COLOR SUBMENU */}
+          <ContextMenuSubMenu 
+            label="Text Color" 
+            icon={Palette}
+            isHovered={activeSubmenu === 'textColor'}
+            onMouseEnter={() => handleSubMenuEnter('textColor')}
+            onMouseLeave={handleSubMenuLeave}
+          >
+            <ContextMenuItem label="Mặc định" onClick={() => executeCommand(() => editor.chain().focus().unsetColor().run())} />
+            <ContextMenuItem label="Đỏ" onClick={() => executeCommand(() => editor.chain().focus().setColor('#ef4444').run())} />
+            <ContextMenuItem label="Xanh lá" onClick={() => executeCommand(() => editor.chain().focus().setColor('#22c55e').run())} />
+            <ContextMenuItem label="Xanh dương" onClick={() => executeCommand(() => editor.chain().focus().setColor('#3b82f6').run())} />
+            <ContextMenuItem label="Vàng" onClick={() => executeCommand(() => editor.chain().focus().setColor('#eab308').run())} />
+            <ContextMenuItem label="Tím" onClick={() => executeCommand(() => editor.chain().focus().setColor('#a855f7').run())} />
+            <ContextMenuItem label="Cam" onClick={() => executeCommand(() => editor.chain().focus().setColor('#f97316').run())} />
+            <ContextMenuItem label="Hồng" onClick={() => executeCommand(() => editor.chain().focus().setColor('#ec4899').run())} />
           </ContextMenuSubMenu>
 
           {/* PARAGRAPH SUBMENU */}
