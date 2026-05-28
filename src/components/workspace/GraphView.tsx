@@ -149,7 +149,7 @@ export default function GraphView({ nodes }: GraphViewProps) {
     if (graphRef.current && graphData.nodes.length > 0) {
       const timer = setTimeout(() => {
         if (graphRef.current && !hasCenteredRef.current) {
-          graphRef.current.zoomToFit(400, 80)
+          graphRef.current.zoomToFit(0, 80)
           hasCenteredRef.current = true
         }
       }, 500)
@@ -173,9 +173,10 @@ export default function GraphView({ nodes }: GraphViewProps) {
           backgroundColor={isDark ? '#08080a' : '#ffffff'}
           maxZoom={1.8}
           minZoom={0.4}
+          warmupTicks={150}
           onEngineStop={() => {
             if (graphRef.current && !hasCenteredRef.current && graphData.nodes.length > 0) {
-              graphRef.current.zoomToFit(400, 80)
+              graphRef.current.zoomToFit(0, 80)
               hasCenteredRef.current = true
             }
           }}
