@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, Suspense } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 // Selection state for the active file/view in the workspace
 interface WorkspaceSelection {
@@ -52,6 +53,23 @@ function parseSelectionFromUrl(): WorkspaceSelection {
   return defaultSelection
 }
 
+function WorkspaceSearchParamsSync({ onUpdate }: { onUpdate: () => void }) {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    onUpdate()
+
+    const handlePopState = () => {
+      onUpdate()
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [pathname, searchParams, onUpdate])
+
+  return null
+}
+
 const WorkspaceContext = createContext<WorkspaceContextType>({
   activeId: null,
   setActiveId: () => {},
@@ -73,18 +91,8 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [isSaving, setIsSaving] = useState(false)
   const [selection, setSelection] = useState<WorkspaceSelection>(defaultSelection)
 
-  // Initialize selection from URL on mount (handles page refresh / direct URL visit)
-  useEffect(() => {
+  const handleUpdateFromUrl = useCallback(() => {
     setSelection(parseSelectionFromUrl())
-  }, [])
-
-  // Handle browser back/forward navigation
-  useEffect(() => {
-    const handlePopState = () => {
-      setSelection(parseSelectionFromUrl())
-    }
-    window.addEventListener('popstate', handlePopState)
-    return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
   const selectNote = useCallback((noteId: string) => {
@@ -112,6 +120,9 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       activeId, setActiveId, title, setTitle, isSaving, setIsSaving,
       selection, selectNote, selectCanvas, selectLink, selectGraphView, clearSelection
     }}>
+      <Suspense fallback={null}>
+        <WorkspaceSearchParamsSync onUpdate={handleUpdateFromUrl} />
+      </Suspense>
       {children}
     </WorkspaceContext.Provider>
   )
