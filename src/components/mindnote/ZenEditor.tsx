@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 
-import { useEditor, EditorContent, NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react'
+import { useEditor, EditorContent, NodeViewWrapper, ReactNodeViewRenderer, mergeAttributes } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
 import Image from '@tiptap/extension-image'
@@ -23,7 +23,7 @@ import {
   List, ListOrdered, CheckSquare, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Type, Quote,
   Table as TableIcon, Image as ImageIcon, Minus, ChevronRight, Check,
   Link2, ExternalLink, Search, ListTodo, Scissors, Copy, ClipboardPaste, Replace,
-  AlignLeft, Plus, Paintbrush, Palette
+  AlignLeft, Plus, Paintbrush, Palette, Unlink
 } from 'lucide-react'
 
 import { SearchNodeModal } from '@/components/ui/SearchNodeModal'
@@ -194,10 +194,16 @@ const extensions = [
     placeholder: 'Bắt đầu viết...',
   }),
   MediaImage.configure(),
-  Link.configure({
-    openOnClick: false,
+  Link.extend({
+    renderHTML({ HTMLAttributes }) {
+      return ['a', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, { title: HTMLAttributes.href || '' }), 0]
+    },
+  }).configure({
+    openOnClick: true,
     HTMLAttributes: {
       class: 'text-primary underline underline-offset-4 cursor-pointer',
+      target: '_blank',
+      rel: 'noopener noreferrer nofollow',
     },
   }),
   Underline.configure(),
@@ -248,7 +254,7 @@ const ZenEditor = ({ noteId, initialContent, onChange, onCountChange, placeholde
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-lg max-w-none focus:outline-none min-h-[500px] pt-12 pb-[70vh]',
+        class: 'prose prose-lg max-w-none focus:outline-none min-h-[500px] pt-2 pb-[70vh]',
       },
       handleDOMEvents: {
         contextmenu: (view, event) => {
@@ -394,6 +400,9 @@ const ZenEditor = ({ noteId, initialContent, onChange, onCountChange, placeholde
           onContextMenu={(e) => e.preventDefault()}
         >
           <ContextMenuItem label="Add link" icon={Link2} onClick={handleBiDirectionalLink} />
+          {editor.isActive('link') && (
+            <ContextMenuItem label="Hủy link" icon={Unlink} onClick={() => executeCommand(() => editor.chain().focus().unsetLink().run())} />
+          )}
           
           <ContextMenuDivider />
           
@@ -423,14 +432,45 @@ const ZenEditor = ({ noteId, initialContent, onChange, onCountChange, placeholde
             onMouseEnter={() => handleSubMenuEnter('textColor')}
             onMouseLeave={handleSubMenuLeave}
           >
-            <ContextMenuItem label="Mặc định" onClick={() => executeCommand(() => editor.chain().focus().unsetColor().run())} />
-            <ContextMenuItem label="Đỏ" onClick={() => executeCommand(() => editor.chain().focus().setColor('#ef4444').run())} />
-            <ContextMenuItem label="Xanh lá" onClick={() => executeCommand(() => editor.chain().focus().setColor('#22c55e').run())} />
-            <ContextMenuItem label="Xanh dương" onClick={() => executeCommand(() => editor.chain().focus().setColor('#3b82f6').run())} />
-            <ContextMenuItem label="Vàng" onClick={() => executeCommand(() => editor.chain().focus().setColor('#eab308').run())} />
-            <ContextMenuItem label="Tím" onClick={() => executeCommand(() => editor.chain().focus().setColor('#a855f7').run())} />
-            <ContextMenuItem label="Cam" onClick={() => executeCommand(() => editor.chain().focus().setColor('#f97316').run())} />
-            <ContextMenuItem label="Hồng" onClick={() => executeCommand(() => editor.chain().focus().setColor('#ec4899').run())} />
+            <div className="grid grid-cols-5 gap-2 p-2.5 min-w-[160px] justify-items-center">
+              {[
+                { value: null, bg: 'linear-gradient(135deg, transparent 43%, #ef4444 43%, #ef4444 57%, transparent 57%)', title: 'Mặc định' },
+                { value: '#1e293b', bg: '#1e293b', title: 'Đen' },
+                { value: '#64748b', bg: '#64748b', title: 'Xám' },
+                { value: '#ef4444', bg: '#ef4444', title: 'Đỏ' },
+                { value: '#f97316', bg: '#f97316', title: 'Cam' },
+                { value: '#eab308', bg: '#eab308', title: 'Vàng' },
+                { value: '#22c55e', bg: '#22c55e', title: 'Xanh lá' },
+                { value: '#3b82f6', bg: '#3b82f6', title: 'Xanh dương' },
+                { value: '#a855f7', bg: '#a855f7', title: 'Tím' },
+                { value: '#ec4899', bg: '#ec4899', title: 'Hồng' }
+              ].map((c, idx) => {
+                const currentColor = editor.getAttributes('textStyle').color
+                const active = c.value === null ? !currentColor : currentColor === c.value
+                const dotColor = (c.value === '#eab308' || c.value === null) ? '#1e293b' : '#ffffff'
+                return (
+                  <button
+                    key={idx}
+                    title={c.title}
+                    onClick={() => executeCommand(() => {
+                      if (c.value) {
+                        editor.chain().focus().setColor(c.value).run()
+                      } else {
+                        editor.chain().focus().unsetColor().run()
+                      }
+                    })}
+                    className={`w-6 h-6 rounded-full border transition-all duration-150 relative flex items-center justify-center cursor-pointer hover:scale-110 ${
+                      active ? 'border-primary ring-2 ring-primary/20 scale-105' : 'border-border-main hover:border-foreground'
+                    }`}
+                    style={{ background: c.bg }}
+                  >
+                    {active && (
+                      <div className="w-1.5 h-1.5 rounded-full shadow-sm animate-in zoom-in duration-100" style={{ backgroundColor: dotColor }} />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
           </ContextMenuSubMenu>
 
           {/* PARAGRAPH SUBMENU */}
@@ -506,16 +546,45 @@ const ZenEditor = ({ noteId, initialContent, onChange, onCountChange, placeholde
                 onMouseEnter={() => handleSubMenuEnter('cellColor')}
                 onMouseLeave={handleSubMenuLeave}
               >
-                <ContextMenuItem label="Mặc định" onClick={() => executeCommand(() => editor.chain().focus().setCellAttribute('backgroundColor', null).run())} />
-                <ContextMenuItem label="Xám nhạt" onClick={() => executeCommand(() => editor.chain().focus().setCellAttribute('backgroundColor', '#f3f4f6').run())} />
-                <ContextMenuItem label="Đỏ nhạt" onClick={() => executeCommand(() => editor.chain().focus().setCellAttribute('backgroundColor', '#fee2e2').run())} />
-                <ContextMenuItem label="Xanh lá nhạt" onClick={() => executeCommand(() => editor.chain().focus().setCellAttribute('backgroundColor', '#dcfce7').run())} />
-                <ContextMenuItem label="Xanh dương nhạt" onClick={() => executeCommand(() => editor.chain().focus().setCellAttribute('backgroundColor', '#dbeafe').run())} />
-                <ContextMenuItem label="Vàng nhạt" onClick={() => executeCommand(() => editor.chain().focus().setCellAttribute('backgroundColor', '#fef9c3').run())} />
-                <ContextMenuItem label="Tím nhạt" onClick={() => executeCommand(() => editor.chain().focus().setCellAttribute('backgroundColor', '#f3e8ff').run())} />
+                <div className="grid grid-cols-5 gap-2 p-2.5 min-w-[160px] justify-items-center">
+                  {[
+                    { value: null, bg: 'linear-gradient(135deg, transparent 43%, #ef4444 43%, #ef4444 57%, transparent 57%)', title: 'Mặc định' },
+                    { value: '#f3f4f6', bg: '#f3f4f6', title: 'Xám nhạt' },
+                    { value: '#fee2e2', bg: '#fee2e2', title: 'Đỏ nhạt' },
+                    { value: '#ffedd5', bg: '#ffedd5', title: 'Cam nhạt' },
+                    { value: '#fef9c3', bg: '#fef9c3', title: 'Vàng nhạt' },
+                    { value: '#dcfce7', bg: '#dcfce7', title: 'Xanh lá nhạt' },
+                    { value: '#ccfbf1', bg: '#ccfbf1', title: 'Xanh ngọc nhạt' },
+                    { value: '#dbeafe', bg: '#dbeafe', title: 'Xanh dương nhạt' },
+                    { value: '#f3e8ff', bg: '#f3e8ff', title: 'Tím nhạt' },
+                    { value: '#fce7f3', bg: '#fce7f3', title: 'Hồng nhạt' }
+                  ].map((c, idx) => {
+                    const currentBg = editor.getAttributes('tableCell').backgroundColor || editor.getAttributes('tableHeader').backgroundColor
+                    const active = c.value === null ? !currentBg : currentBg === c.value
+                    const dotColor = '#1e293b'
+                    return (
+                      <button
+                        key={idx}
+                        title={c.title}
+                        onClick={() => executeCommand(() => {
+                          editor.chain().focus().setCellAttribute('backgroundColor', c.value).run()
+                        })}
+                        className={`w-6 h-6 rounded-full border transition-all duration-150 relative flex items-center justify-center cursor-pointer hover:scale-110 ${
+                          active ? 'border-primary ring-2 ring-primary/20 scale-105' : 'border-border-main hover:border-foreground'
+                        }`}
+                        style={{ background: c.bg }}
+                      >
+                        {active && (
+                          <div className="w-1.5 h-1.5 rounded-full shadow-sm animate-in zoom-in duration-100" style={{ backgroundColor: dotColor }} />
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
               </ContextMenuSubMenu>
             </>
           )}
+
 
           <ContextMenuDivider />
 

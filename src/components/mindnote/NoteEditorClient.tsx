@@ -229,7 +229,7 @@ const NoteEditorClient = ({ noteId, onOpenConnectModal }: NoteEditorClientProps)
                 }
               }}
               placeholder="Untitled Note"
-              className="w-full text-[2.5rem] font-black tracking-tighter text-foreground border-none outline-none mb-12 placeholder:text-black/5 resize-none overflow-hidden"
+              className="w-full text-3xl font-bold tracking-tight text-foreground border-none outline-none mb-4 placeholder:text-black/5 resize-none overflow-hidden"
               rows={1}
             />
 
