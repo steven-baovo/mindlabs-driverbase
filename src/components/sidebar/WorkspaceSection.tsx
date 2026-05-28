@@ -885,7 +885,6 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
           ${isDragOver && dropPosition === 'inside' ? 'bg-blue-50/70 border border-blue-500' : ''}
           text-standard
         `}
-        style={{ marginLeft: level > 0 ? `${level * 12}px` : '0' }}
         onClick={() => {
           if (isDraggingRef.current) return
           if (node.type === 'folder') {
@@ -990,18 +989,22 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
           </button>
         </div>
       </div>
-      {creatingParentId === node.id && (
-        <div className="ml-6 mb-2 px-1 flex items-center justify-start gap-1 border-b border-border-main/50 pb-2 text-[10px]">
-          <button onClick={() => handleCreateNodeDirect(node.id, 'note')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Note</button>
-          <button onClick={() => handleCreateNodeDirect(node.id, 'map')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Canvas</button>
-          <button onClick={() => handleCreateNodeDirect(node.id, 'link')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Link</button>
-          <button onClick={() => handleCreateNodeDirect(node.id, 'folder')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Folder</button>
-          <button onClick={() => setCreatingParentId(null)} className="p-1 bg-active-bg hover:bg-hover-bg rounded ml-auto text-secondary">Hủy</button>
+      {((isOpen && node.children.length > 0) || creatingParentId === node.id) && (
+        <div className="relative border-l border-zinc-200 dark:border-zinc-800 ml-[11px] pl-[10px] flex flex-col gap-0.5 mt-0.5">
+          {creatingParentId === node.id && (
+            <div className="mb-2 px-1 flex items-center justify-start gap-1 border-b border-border-main/50 pb-2 text-[10px]">
+              <button onClick={() => handleCreateNodeDirect(node.id, 'note')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Note</button>
+              <button onClick={() => handleCreateNodeDirect(node.id, 'map')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Canvas</button>
+              <button onClick={() => handleCreateNodeDirect(node.id, 'link')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Link</button>
+              <button onClick={() => handleCreateNodeDirect(node.id, 'folder')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Folder</button>
+              <button onClick={() => setCreatingParentId(null)} className="p-1 bg-active-bg hover:bg-hover-bg rounded ml-auto text-secondary">Hủy</button>
+            </div>
+          )}
+          {isOpen && node.children.map(child => (
+            <RenderNode key={child.id} node={child} level={level + 1} />
+          ))}
         </div>
       )}
-      {isOpen && node.children.map(child => (
-        <RenderNode key={child.id} node={child} level={level + 1} />
-      ))}
     </div>
   )
 })
