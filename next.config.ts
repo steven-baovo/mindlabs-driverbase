@@ -47,12 +47,6 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: "/blog/:path*",
-        destination: process.env.NODE_ENV === "development"
-          ? "http://localhost:3001/blog/:path*"
-          : "https://mindlabs-journal.vercel.app/blog/:path*",
-      },
-      {
         source: "/journal/:path*",
         destination: process.env.NODE_ENV === "development"
           ? "http://localhost:3001/journal/:path*"

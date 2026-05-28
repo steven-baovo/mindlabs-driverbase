@@ -1,199 +1,102 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Bell, ListTodo, FileText, Sparkles, Cloud, CloudCheck, Timer } from 'lucide-react'
+import Logo from '@/components/Logo'
+import { Menu, Search, ArrowRight } from 'lucide-react'
 
-import UserMenu from './UserMenu'
-import { useWorkspace } from '@/contexts/WorkspaceContext'
-import { useFocus } from '@/contexts/FocusContext'
-import { SyncStatusIndicator } from './SyncStatusIndicator'
+interface HeaderProps {
+  onSearchClick?: () => void
+  onMobileMenuToggle?: () => void
+  isMobileMenuOpen?: boolean
+}
 
-const DEEP_WORKSPACE = /^\/workspace/
-
-const NAV_ITEMS = [
-  { name: 'Tasks', href: '/tasks', icon: ListTodo },
-  { name: 'Workspace', href: '/workspace', icon: FileText },
-]
-
-export default function Header() {
-  const pathname = usePathname()
-  const { isSaving } = useWorkspace()
-  const focus = useFocus()
-  const [user, setUser] = useState<any>(null)
-  const [profile, setProfile] = useState<any>(null)
-  const [workspaceHref, setWorkspaceHref] = useState('/workspace')
-
-
-  const isDeepWorkspace = DEEP_WORKSPACE.test(pathname)
-
-
-  useEffect(() => {
-    async function getUser() {
-      try {
-        const res = await fetch('/api/auth/session')
-        const session = await res.json()
-        const currentUser = session?.user || null
-        setUser(currentUser)
-        if (currentUser) {
-          setProfile({
-            display_name: currentUser.name || 'User',
-            avatar_url: currentUser.image || null
-          })
-        }
-      } catch (err) {
-        console.error('Failed to fetch session', err)
-      }
-    }
-    getUser()
-  }, [])
-
+export default function Header({
+  onSearchClick,
+  onMobileMenuToggle,
+  isMobileMenuOpen
+}: HeaderProps) {
   return (
-    <motion.header
-      layout
-      initial={false}
-      animate={{
-        ...(isDeepWorkspace ? {
-          width: '300px',
-          left: 'calc(100% - 324px)',
-          x: 0,
-        } : {
-          width: '100%',
-          maxWidth: '1280px',
-          left: '50%',
-          x: '-50%',
-        }),
-        top: '24px',
-      }}
-      transition={{ 
-        layout: { type: 'spring', stiffness: 300, damping: 30 }
-      }}
-      className="fixed z-[100] px-6 pointer-events-none"
-    >
-      <div className="flex h-12 w-full items-center justify-between px-6 glass rounded-full -premium pointer-events-auto border border-black/75 ring-1 ring-white/50 relative group/header backdrop-blur-[64px] backdrop-saturate-[250%]">
-        {/* Atmospheric Glow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 opacity-0 group-hover/header:opacity-100 transition-opacity duration-1000 rounded-full" />
+    <header className="sticky top-0 z-50 w-full h-14 bg-white/85 backdrop-blur-md border-b border-zinc-200/80">
+      <div className="max-w-[1440px] mx-auto w-full h-full px-6 flex items-center justify-between gap-4">
         
-        {/* Logo Section */}
-        {!isDeepWorkspace && (
-          <motion.div 
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-6 relative z-10"
-          >
-            <Link href="/" className="flex items-center gap-2 group/logo">
-              <img 
-                src="/logo.svg" 
-                alt="Mindlabs Logo" 
-                className="w-5 h-5 rounded-full object-contain group-hover/logo:scale-110 transition-transform duration-300" 
-              />
-              <span className="text-[11px] font-black uppercase tracking-[0.3em] text-foreground">
-                Mindlabs
-              </span>
-            </Link>
-          </motion.div>
-        )}
-
-        {/* Center Nav */}
-        {!isDeepWorkspace && (
-          <nav className="hidden md:flex items-center gap-1 relative z-10">
-            {NAV_ITEMS.map((item) => {
-              const isWorkspace = item.name === 'Workspace'
-              const targetHref = isWorkspace ? workspaceHref : item.href
-              const isActive = isWorkspace ? pathname.startsWith('/workspace') : pathname === item.href
-
-              return (
-                <Link
-                  key={item.name}
-                  href={targetHref}
-                  className={`relative px-4 py-1.5 rounded-full text-[12px] font-bold transition-all duration-300 group/nav ${
-                    isActive
-                      ? 'text-foreground'
-                      : 'text-secondary hover:text-foreground'
-                  }`}
-                >
-                  {isActive && (
-                    <motion.div 
-                      layoutId="nav-pill"
-                      className="absolute inset-0 bg-foreground/5 rounded-full -z-10"
-                    />
-                  )}
-                  {item.name}
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary/40 rounded-full group-hover/nav:w-1 transition-all duration-300" />
-                </Link>
-              )
-            })}
-          </nav>
-        )}
-
-        {/* Right Section */}
-        <div className="flex items-center gap-3 ml-auto relative z-10">
-          {/* Focus Timer Global Indicator */}
-          <div className="hidden sm:flex items-center gap-2 mr-2">
-            <SyncStatusIndicator />
-            {focus.isActive && (
-              <Link 
-                href="/pomodoro"
-                className="flex items-center gap-2 bg-primary/5 text-primary hover:bg-primary hover:text-white px-3 py-1.5 rounded-full transition-all text-xs font-bold group/timer border border-primary/10"
-              >
-                <Timer className="w-3.5 h-3.5" />
-                <span className="w-10 text-center font-black tracking-widest">{focus.formatTime(focus.timeLeft)}</span>
-              </Link>
-            )}
-          </div>
-
-          {!isDeepWorkspace && (
-            <div className="hidden sm:flex items-center bg-black/5 rounded-full px-4 py-1 border border-black/5 focus-within:border-primary/20 transition-all w-44 group/search">
-              <Search strokeWidth={2.5} className="w-3 h-3 text-secondary/80 group-focus-within/search:text-primary transition-colors mr-2 shrink-0" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="bg-transparent border-none outline-none text-[10px] text-foreground placeholder-secondary/70 w-full font-bold uppercase tracking-widest"
-              />
-            </div>
+        {/* Left Section: Mobile Menu Trigger + Logo */}
+        <div className="flex items-center space-x-3.5 shrink-0">
+          {onMobileMenuToggle && (
+            <button 
+              onClick={onMobileMenuToggle}
+              className="lg:hidden p-1.5 rounded hover:bg-zinc-100 text-zinc-600 cursor-pointer flex items-center justify-center focus:outline-none"
+              aria-label="Mở thanh điều hướng"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
           )}
+          
+          <Link href="/" className="flex items-center space-x-2.5 group">
+            <Logo size={28} className="group-hover:scale-[1.05]" />
+            <span className="font-extrabold text-[24px] tracking-tight text-zinc-900 select-none">
+              Leanity
+            </span>
+          </Link>
+        </div>
 
-          {isDeepWorkspace && (
-            <div className="flex items-center gap-1 mr-2 bg-black/5 rounded-full p-0.5">
-              {[
-                { href: '/workspace', icon: FileText, title: 'Workspace' }
-              ].map((link, i) => (
+        {/* Central Section: ALWAYS show Navigation Menu */}
+        <div className="flex-1 flex justify-center max-w-2xl">
+          <nav className="hidden md:flex items-center space-x-8 text-[13px] font-semibold text-zinc-500">
+            <a href="/#features" className="hover:text-zinc-950 transition-colors duration-200">Product</a>
+            
+            {/* Resources Dropdown Menu */}
+            <div className="relative group py-4">
+              <button className="flex items-center space-x-1 hover:text-zinc-950 transition-colors duration-200 cursor-pointer focus:outline-none">
+                <span>Resources</span>
+                <svg className="w-3 h-3 opacity-60 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {/* Dropdown Box with animation */}
+              <div className="absolute top-[80%] left-1/2 -translate-x-1/2 mt-1.5 w-44 bg-white border border-zinc-200/80 rounded-md shadow-subtle opacity-0 translate-y-1.5 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 ease-out z-50 p-1 space-y-0.5">
                 <Link 
-                  key={i}
-                  href={link.href} 
-                  className="p-1.5 rounded-full hover:bg-white/90 text-secondary hover:text-primary transition-all active:scale-90"
-                  title={link.title}
+                  href="/blog" 
+                  className="flex items-center px-3 py-2 text-zinc-500 hover:text-zinc-950 hover:bg-zinc-50 rounded transition-colors duration-150"
                 >
-                  <link.icon strokeWidth={2.5} className="w-3.5 h-3.5" />
+                  <span className="font-medium text-[12px]">Blog</span>
                 </Link>
-              ))}
+                <Link 
+                  href="/docs" 
+                  className="flex items-center px-3 py-2 text-zinc-500 hover:text-zinc-950 hover:bg-zinc-50 rounded transition-colors duration-150"
+                >
+                  <span className="font-medium text-[12px]">Docs</span>
+                </Link>
+              </div>
             </div>
-          )}
 
-          {user ? (
-            <div className="flex items-center gap-3">
-              {!isDeepWorkspace && (
-                <button className="p-1.5 text-secondary hover:text-foreground transition-colors relative group/bell">
-                  <Bell strokeWidth={2.5} className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                  <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full border-2 border-white" />
-                </button>
-              )}
-              <UserMenu user={user} profile={profile} />
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <Link href="/login" className="text-[11px] font-black text-secondary hover:text-foreground uppercase tracking-widest transition-colors px-2">
-                Log in
-              </Link>
-              <Link href="/register" className="bg-foreground text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-80 transition-all active:scale-95">
-                Get Started
-              </Link>
-            </div>
+            <a href="/#about" className="hover:text-zinc-950 transition-colors duration-200">About</a>
+          </nav>
+        </div>
+
+        {/* Right Section: Search Icon + Workspace CTA */}
+        <div className="shrink-0 flex items-center space-x-3.5">
+
+          {/* Elegant Search Button (Only shown on Docs layout next to Workspace button) */}
+          {onSearchClick && (
+            <button
+              onClick={onSearchClick}
+              className="w-8 h-8 rounded border border-zinc-200 bg-white hover:bg-zinc-50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 transition-colors shadow-subtle cursor-pointer focus:outline-none"
+              title="Tìm kiếm tài liệu (Ctrl + K)"
+            >
+              <Search className="w-4 h-4" />
+            </button>
           )}
+          
+          <Link 
+            href="/workspace" 
+            className="px-4 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white text-[13px] font-normal rounded shadow-subtle flex items-center space-x-1.5 transition-all select-none"
+          >
+            <span>Vào Workspace</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
       </div>
-    </motion.header>
+    </header>
   )
 }
