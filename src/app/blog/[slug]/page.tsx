@@ -24,6 +24,7 @@ interface SanityPost {
   publishedAt: string
   readTime?: string
   category?: string
+  categoryId?: string
   author?: {
     name: string
   }
@@ -180,6 +181,7 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
       publishedAt,
       readTime,
       "category": category->title,
+      "categoryId": category->_id,
       author->{name},
       mainImage,
       tags,
@@ -190,6 +192,19 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
   if (!post) {
     notFound()
   }
+
+  // Fetch related posts in the same category (or newest if no category)
+  const categoryFilter = post.categoryId ? '&& category._ref == $categoryId' : ''
+  const relatedPosts: SanityPost[] = await client.fetch(`
+    *[_type == "post" && _id != $currentId ${categoryFilter}] | order(publishedAt desc)[0...3] {
+      _id,
+      title,
+      "slug": slug.current,
+      publishedAt,
+      "category": category->title,
+      mainImage
+    }
+  `, { categoryId: post.categoryId || '', currentId: post._id })
 
   // Fetch adjacent posts for bottom navigation links
   const allPosts = await client.fetch(`*[_type == "post"] | order(publishedAt desc) { "slug": slug.current, title }`)
@@ -316,6 +331,53 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
                     </span>
                   ))}
                 </div>
+              )}
+
+              {/* Related Posts Section */}
+              {relatedPosts && relatedPosts.length > 0 && (
+                <section className="pt-10 border-t border-zinc-150 dark:border-zinc-800 space-y-6">
+                  <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center space-x-2">
+                    <span className="w-1.5 h-3 rounded-full bg-primary" />
+                    <span>Bài viết liên quan</span>
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {relatedPosts.map((related) => {
+                      const relatedImageUrl = urlFor(related.mainImage)
+                      return (
+                        <Link
+                          key={related._id}
+                          href={`/blog/${related.slug}`}
+                          className="group flex flex-col space-y-3 bg-white dark:bg-zinc-900/10 border border-zinc-150 dark:border-zinc-850 hover:border-zinc-250 dark:hover:border-zinc-750 p-4 rounded transition-all duration-200"
+                        >
+                          {relatedImageUrl && (
+                            <div className="relative aspect-video w-full overflow-hidden rounded border border-zinc-100/50 dark:border-zinc-800/50">
+                              <Image
+                                src={relatedImageUrl}
+                                alt={related.title}
+                                fill
+                                sizes="(max-w-768px) 100vw, 30vw"
+                                className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                              />
+                            </div>
+                          )}
+                          <div className="space-y-1.5 flex-1 flex flex-col justify-between">
+                            <div className="space-y-1">
+                              <span className="text-[10px] font-semibold text-primary uppercase tracking-wider block">
+                                {related.category || 'Tin tức'}
+                              </span>
+                              <h4 className="text-[12px] font-bold text-zinc-850 dark:text-zinc-100 group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                                {related.title}
+                              </h4>
+                            </div>
+                            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 block pt-1.5">
+                              {formatDate(related.publishedAt)}
+                            </span>
+                          </div>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </section>
               )}
 
               <BlogFeedback postId={post.slug} postTitle={post.title} />
