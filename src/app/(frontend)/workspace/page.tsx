@@ -335,15 +335,7 @@ function LinkEmbedPreview({ nodeId, nodes }: { nodeId: string, nodes: WorkspaceN
   const [isEmbeddable, setIsEmbeddable] = useState<boolean | null>(null)
   const [forceEmbed, setForceEmbed] = useState(false)
 
-  if (!node) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center text-secondary/40 text-xs gap-2">
-        <span>Không tìm thấy thông tin liên kết này</span>
-      </div>
-    )
-  }
-
-  let formattedUrl = node.url || ''
+  let formattedUrl = node?.url || ''
   if (formattedUrl && !formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://') && !formattedUrl.startsWith('/')) {
     formattedUrl = `https://${formattedUrl}`
   }
@@ -389,6 +381,14 @@ function LinkEmbedPreview({ nodeId, nodes }: { nodeId: string, nodes: WorkspaceN
       return formattedUrl
     }
   }, [formattedUrl])
+
+  if (!node) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center text-secondary/40 text-xs gap-2">
+        <span>Không tìm thấy thông tin liên kết này</span>
+      </div>
+    )
+  }
 
   return (
     <div className="flex-1 flex flex-col h-full bg-background">

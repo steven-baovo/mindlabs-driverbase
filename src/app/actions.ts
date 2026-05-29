@@ -2,7 +2,16 @@
 
 export async function checkUrlEmbeddable(url: string): Promise<{ embeddable: boolean }> {
   try {
-    const res = await fetch(url, { method: 'HEAD' })
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 4000)
+
+    const res = await fetch(url, { 
+      method: 'HEAD',
+      signal: controller.signal
+    })
+
+    clearTimeout(timeoutId)
+
     const xFrameOptions = res.headers.get('x-frame-options')
     const csp = res.headers.get('content-security-policy')
     
