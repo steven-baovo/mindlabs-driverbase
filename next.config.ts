@@ -52,12 +52,6 @@ const nextConfig: NextConfig = {
           ? "http://localhost:3001/journal/:path*"
           : "https://mindlabs-journal.vercel.app/journal/:path*",
       },
-      {
-        source: "/studio/:path*",
-        destination: process.env.NODE_ENV === "development"
-          ? "http://localhost:3001/studio/:path*"
-          : "https://mindlabs-journal.vercel.app/studio/:path*",
-      },
     ];
   },
 };

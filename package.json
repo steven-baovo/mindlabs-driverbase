@@ -51,6 +51,7 @@
     "react-force-graph-2d": "^1.29.1",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
+    "sanity": "^5.28.0",
     "uuid": "^14.0.0"
   },
   "devDependencies": {
