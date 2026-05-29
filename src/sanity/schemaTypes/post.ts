@@ -44,7 +44,8 @@ export const post = defineType({
     defineField({
       name: 'category',
       title: 'Danh mục',
-      type: 'string',
+      type: 'reference',
+      to: [{ type: 'category' }],
     }),
     defineField({
       name: 'author',

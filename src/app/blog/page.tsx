@@ -48,7 +48,7 @@ export default async function BlogPage() {
       summary,
       publishedAt,
       readTime,
-      category,
+      "category": category->title,
       author->{name},
       mainImage
     } | order(publishedAt desc)

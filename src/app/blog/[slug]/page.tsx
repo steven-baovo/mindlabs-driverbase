@@ -178,7 +178,7 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
       summary,
       publishedAt,
       readTime,
-      category,
+      "category": category->title,
       author->{name},
       mainImage,
       tags,
