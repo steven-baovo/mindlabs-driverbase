@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Header from '@/components/Header'
 import { client, urlFor } from '@/lib/sanity'
 import { BookOpen, Calendar, Clock, ArrowRight, Sparkles, Cpu } from 'lucide-react'
+export const revalidate = 60
 
 interface SanityPost {
   _id: string

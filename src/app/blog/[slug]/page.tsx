@@ -7,6 +7,7 @@ import { PortableText } from '@portabletext/react'
 import Header from '@/components/Header'
 import BlogFeedback from './BlogFeedback'
 import { ChevronRight, ArrowLeft, Calendar, Clock, Sparkles, Cpu, BookOpen } from 'lucide-react'
+export const revalidate = 60
 
 interface PageProps {
   params: Promise<{
