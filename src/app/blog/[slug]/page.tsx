@@ -335,48 +335,26 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
 
               {/* Related Posts Section */}
               {relatedPosts && relatedPosts.length > 0 && (
-                <section className="pt-10 border-t border-zinc-150 dark:border-zinc-800 space-y-6">
-                  <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 flex items-center space-x-2">
-                    <span className="w-1.5 h-3 rounded-full bg-primary" />
+                <section className="pt-10 border-t border-zinc-200/60 dark:border-zinc-800/60 space-y-4">
+                  <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-50 uppercase tracking-widest flex items-center space-x-2">
+                    <span className="w-1 h-3 rounded-full bg-[#5e6ad2]" />
                     <span>Bài viết liên quan</span>
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {relatedPosts.map((related) => {
-                      const relatedImageUrl = urlFor(related.mainImage)
-                      return (
+                  <ul className="divide-y divide-zinc-200/50 dark:divide-zinc-800/50 border border-zinc-200/60 dark:border-zinc-800/60 rounded-md overflow-hidden bg-white dark:bg-zinc-900/10">
+                    {relatedPosts.map((related) => (
+                      <li key={related._id}>
                         <Link
-                          key={related._id}
                           href={`/blog/${related.slug}`}
-                          className="group flex flex-col space-y-3 bg-white dark:bg-zinc-900/10 border border-zinc-150 dark:border-zinc-850 hover:border-zinc-250 dark:hover:border-zinc-750 p-4 rounded transition-all duration-200"
+                          className="flex items-center justify-between px-4 py-3 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 text-[13px] font-normal text-zinc-600 dark:text-zinc-400 hover:text-[#5e6ad2] dark:hover:text-[#5e6ad2] transition-colors group"
                         >
-                          {relatedImageUrl && (
-                            <div className="relative aspect-video w-full overflow-hidden rounded border border-zinc-100/50 dark:border-zinc-800/50">
-                              <Image
-                                src={relatedImageUrl}
-                                alt={related.title}
-                                fill
-                                sizes="(max-w-768px) 100vw, 30vw"
-                                className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
-                              />
-                            </div>
-                          )}
-                          <div className="space-y-1.5 flex-1 flex flex-col justify-between">
-                            <div className="space-y-1">
-                              <span className="text-[10px] font-semibold text-primary uppercase tracking-wider block">
-                                {related.category || 'Tin tức'}
-                              </span>
-                              <h4 className="text-[12px] font-bold text-zinc-850 dark:text-zinc-100 group-hover:text-primary transition-colors line-clamp-2 leading-snug">
-                                {related.title}
-                              </h4>
-                            </div>
-                            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 block pt-1.5">
-                              {formatDate(related.publishedAt)}
-                            </span>
-                          </div>
+                          <span className="truncate pr-4 leading-normal">{related.title}</span>
+                          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 shrink-0 font-normal">
+                            {formatDate(related.publishedAt)}
+                          </span>
                         </Link>
-                      )
-                    })}
-                  </div>
+                      </li>
+                    ))}
+                  </ul>
                 </section>
               )}
 
