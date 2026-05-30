@@ -61,6 +61,8 @@ async function recoverOrphanedItems(): Promise<number> {
     await checkAndAdd(db.issues, 'issues');
     await checkAndAdd(db.focus_sessions, 'focus_sessions');
     await checkAndAdd(db.focus_settings, 'focus_settings');
+    await checkAndAdd(db.objectives, 'objectives');
+    await checkAndAdd(db.key_results, 'key_results');
 
     if (outboxItemsToAdd.length > 0) {
       console.log(`[Sync Engine] Recovered ${recoveredCount} orphaned item(s) into outbox.`)
@@ -259,7 +261,7 @@ async function syncMediaFiles(): Promise<void> {
 
 async function pullRemoteChanges(remoteData: any) {
   // remoteData: { workspace_nodes: { id1: {...}, id2: {...} }, mind_notes: {...} }
-  const tables = ['mind_notes', 'mindmaps', 'workspace_nodes', 'projects', 'cycles', 'issues', 'focus_sessions', 'focus_settings'];
+  const tables = ['mind_notes', 'mindmaps', 'workspace_nodes', 'projects', 'cycles', 'issues', 'focus_sessions', 'focus_settings', 'objectives', 'key_results'];
 
   for (const tableName of tables) {
     const tableRemoteData = remoteData[tableName];
