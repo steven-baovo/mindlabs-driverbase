@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useAppRouter } from '@/contexts/AppRouterContext';
+import { useClientNavigate } from '@/hooks/useClientNavigate';
 import { Timer, BarChart2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppSidebarFrame from '@/components/sidebar/AppSidebarFrame';
@@ -11,12 +11,13 @@ import WorkspaceSection from './WorkspaceSection';
 import SidebarHeader from './SidebarHeader';
 
 export default function MainSidebar() {
-  const pathname = usePathname();
+  const { route } = useAppRouter();
+  const { navigate } = useClientNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const isPomodoroActive = pathname ? pathname.startsWith('/pomodoro') : false;
-  const isProductivityActive = pathname ? pathname.startsWith('/productivity') : false;
+  const isPomodoroActive = route.type === 'pomodoro';
+  const isProductivityActive = route.type === 'productivity';
   const isAnyActive = isPomodoroActive || isProductivityActive;
 
   const handleMouseEnter = () => {
@@ -86,10 +87,10 @@ export default function MainSidebar() {
                 {actionItems.map((item, idx) => {
                   const Icon = item.icon;
                   return (
-                    <Link
+                    <button
                       key={idx}
-                      href={item.href}
-                      className={`group relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-subtle hover:shadow-floating hover:scale-105 active:scale-95 ${
+                      onClick={() => navigate(item.href)}
+                      className={`group relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-subtle hover:shadow-floating hover:scale-105 active:scale-95 cursor-pointer ${
                         item.active
                           ? 'bg-primary text-white border border-transparent'
                           : 'bg-white dark:bg-zinc-900 border border-border-main hover:border-border-strong text-secondary hover:text-foreground'
@@ -100,7 +101,7 @@ export default function MainSidebar() {
                         {item.title}
                       </span>
                       <Icon className="w-5 h-5" strokeWidth={1.5} />
-                    </Link>
+                    </button>
                   );
                 })}
               </motion.div>

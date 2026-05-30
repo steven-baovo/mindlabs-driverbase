@@ -4,7 +4,7 @@ import React, { useMemo, useState, useEffect, useRef } from 'react'
 import ForceGraph2D from 'react-force-graph-2d'
 import { WorkspaceNode } from '@/lib/node-utils'
 import { Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useClientNavigate } from '@/hooks/useClientNavigate'
 
 const STANDARD_FONT_SIZE = 13
 
@@ -38,7 +38,7 @@ interface GraphViewProps {
 }
 
 export default function GraphView({ nodes, loading }: GraphViewProps) {
-  const router = useRouter()
+  const { navigate } = useClientNavigate()
   const prevNodesRef = useRef<any[]>([])
   const [hoveredNode, setHoveredNode] = useState<any>(null)
   const [hoverProgress, setHoverProgress] = useState(0)
@@ -270,11 +270,11 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
           }}
           onNodeClick={node => {
             if (node.type === 'note' && node.note_id) {
-              router.push(`/workspace?note=${node.note_id}`)
+              navigate(`/note/${node.note_id}`)
             } else if (node.type === 'map' && node.map_id) {
-              router.push(`/workspace?canvas=${node.map_id}`)
+              navigate(`/canvas/${node.map_id}`)
             } else if (node.type === 'link') {
-              router.push(`/workspace?link=${node.id}`)
+              navigate(`/link/${node.id}`)
             }
           }}
           d3VelocityDecay={0.4}

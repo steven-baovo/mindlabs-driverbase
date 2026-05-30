@@ -2,7 +2,18 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 
 // Routes that require authentication (frontend app routes)
-const PROTECTED_ROUTES = ['/workspace', '/tasks', '/pomodoro', '/productivity']
+const PROTECTED_ROUTES = [
+  '/workspace', '/tasks', '/pomodoro', '/productivity', '/okrs',
+  '/task',      // /task/[id]
+  '/project',   // /project/[id]
+  '/projects',  // projects list
+  '/cycle',     // /cycle/[id]
+  '/cycles',    // cycles list
+  '/note',      // /note/[id]
+  '/canvas',    // /canvas/[id]
+  '/link',      // /link/[id]
+  '/graph',     // graph view
+]
 
 // Public-only routes (redirect to workspace if already logged in)
 const PUBLIC_ONLY_ROUTES = ['/']

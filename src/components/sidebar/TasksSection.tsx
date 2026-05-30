@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useTasksRouter } from '@/contexts/TasksRouterContext';
+import { useAppRouter } from '@/contexts/AppRouterContext';
+import { useClientNavigate } from '@/hooks/useClientNavigate';
 import { usePathname } from 'next/navigation';
 import { Plus, Folder, Layers, Keyboard, Command, X, CheckSquare, Settings, Box, History, ChevronDown } from 'lucide-react';
 import { useLocalProjects, useLocalCycles, useLocalIssues } from '@/lib/local-first/useLocalTasks';
@@ -11,7 +12,8 @@ import { SIDEBAR_STYLES } from '@/lib/sidebar-styles';
 
 export default function TasksSection() {
   const pathname = usePathname();
-  const { state, goToMyTasks, goToProjectsView, goToCyclesView, goToProject } = useTasksRouter();
+  const { route } = useAppRouter();
+  const { navigate } = useClientNavigate();
   const { projects: dbProjects } = useLocalProjects();
   const { cycles: dbCycles } = useLocalCycles();
   const { issues: dbIssues } = useLocalIssues();
@@ -107,14 +109,8 @@ export default function TasksSection() {
     return c.endDate < nowStr;
   }).sort((a, b) => b.startDate.localeCompare(a.startDate));
 
-  const isMyTasksActive = isClient && 
-    pathname === '/tasks' &&
-    !state.projectId && 
-    !state.cycleId && 
-    !state.issueId && 
-    state.view !== 'projects';
-
-  const isProjectsHeaderActive = isClient && pathname === '/tasks' && state.view === 'projects';
+  const isMyTasksActive = isClient && route.type === 'tasks';
+  const isProjectsHeaderActive = isClient && route.type === 'projects';
 
   return (
     <>
@@ -124,7 +120,7 @@ export default function TasksSection() {
           <div
             onClick={(e) => {
               e.preventDefault();
-              goToMyTasks();
+              navigate('/tasks');
             }}
             className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${isMyTasksActive ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
           >
@@ -142,7 +138,7 @@ export default function TasksSection() {
             <div
               onClick={(e) => {
                 e.preventDefault();
-                goToProjectsView();
+                navigate('/projects');
               }}
               className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${isProjectsHeaderActive ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
             >
@@ -155,7 +151,7 @@ export default function TasksSection() {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    goToCyclesView();
+                    navigate('/cycles');
                   }}
                   className="p-0.5 rounded hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-400 hover:text-foreground transition-colors cursor-pointer"
                   title="Xem Cycles"
@@ -181,14 +177,14 @@ export default function TasksSection() {
               {projects.map(project => {
                 const count = (dbIssues || []).filter(i => i.project_id === project.id).length;
                 const progress = projectProgress[project.id] || 0;
-                const isActive = isClient && state.projectId === project.id;
+                const isActive = isClient && route.type === 'project' && route.id === project.id;
                 
                 return (
                   <div
                     key={project.id}
                     onClick={(e) => {
                       e.preventDefault();
-                      goToProject(project.id);
+                      navigate(`/project/${project.id}`);
                     }}
                     className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${isActive ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
                   >

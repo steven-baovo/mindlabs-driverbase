@@ -5,8 +5,8 @@ import { useState, useEffect, Suspense } from 'react'
 import { WorkspaceProvider } from "@/contexts/WorkspaceContext"
 import { FocusProvider } from "@/contexts/FocusContext"
 import { TasksProvider } from "@/lib/local-first/TasksProvider"
-import { TasksRouterProvider } from "@/contexts/TasksRouterContext"
 import { QuickCreateProvider } from "@/contexts/QuickCreateContext"
+import { AppRouterProvider } from "@/contexts/AppRouterContext"
 import MobileNavigationWrapper from "@/components/MobileNavigationWrapper"
 import ContentWrapper from "@/components/ContentWrapper"
 import SyncInitializer from "@/components/SyncInitializer"
@@ -53,33 +53,33 @@ export default function FrontendLayout({
   }, [])
 
   return (
+    <AppRouterProvider>
     <FocusProvider>
       <TasksProvider>
-        <TasksRouterProvider>
-          <QuickCreateProvider>
-            <WorkspaceProvider>
-            {user && <SyncInitializer />}
-            {/* Global shortcuts */}
-            <GlobalKeyboardListener />
-            <QuickCreateModal />
-            <div className="flex flex-col lg:flex-row h-screen bg-[#f2f2f2] dark:bg-background overflow-hidden p-[5px] gap-[5px]">
-              {/* Mobile Navigation */}
-              <MobileNavigationWrapper user={user} />
+        <QuickCreateProvider>
+          <WorkspaceProvider>
+          {user && <SyncInitializer />}
+          {/* Global shortcuts */}
+          <GlobalKeyboardListener />
+          <QuickCreateModal />
+          <div className="flex flex-col lg:flex-row h-screen bg-[#f2f2f2] dark:bg-background overflow-hidden p-[5px] gap-[5px]">
+            {/* Mobile Navigation */}
+            <MobileNavigationWrapper user={user} />
 
-              {/* Desktop Sidebar */}
-              <div className="hidden lg:block h-full">
-                <Suspense fallback={<div className="w-[240px] h-full bg-[#f8fafc] animate-pulse" />}>
-                  <MainSidebar />
-                </Suspense>
-              </div>
-
-              {/* Main Content Island */}
-              <ContentWrapper>{children}</ContentWrapper>
+            {/* Desktop Sidebar */}
+            <div className="hidden lg:block h-full">
+              <Suspense fallback={<div className="w-[240px] h-full bg-[#f8fafc] animate-pulse" />}>
+                <MainSidebar />
+              </Suspense>
             </div>
-            </WorkspaceProvider>
-          </QuickCreateProvider>
-        </TasksRouterProvider>
+
+            {/* Main Content Island */}
+            <ContentWrapper>{children}</ContentWrapper>
+          </div>
+          </WorkspaceProvider>
+        </QuickCreateProvider>
       </TasksProvider>
     </FocusProvider>
+    </AppRouterProvider>
   )
 }

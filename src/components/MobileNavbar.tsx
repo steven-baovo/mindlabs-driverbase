@@ -8,9 +8,9 @@ import { motion } from 'framer-motion'
 import { useFocus } from '@/contexts/FocusContext'
 
 const NAV_ITEMS = [
-  { icon: ListTodo, label: 'Tasks', href: '/tasks' },
-  { icon: FileText, label: 'Workspace', href: '/workspace' },
-  { icon: Timer, label: 'Focus', href: '/pomodoro' },
+  { icon: ListTodo, label: 'Tasks', href: '/tasks', prefixes: ['/tasks', '/task/', '/project/', '/projects', '/cycle/', '/cycles'] },
+  { icon: FileText, label: 'Workspace', href: '/workspace', prefixes: ['/workspace', '/note/', '/canvas/', '/link/', '/graph'] },
+  { icon: Timer, label: 'Focus', href: '/pomodoro', prefixes: ['/pomodoro'] },
 ]
 
 interface MobileNavbarProps {
@@ -33,7 +33,7 @@ export default function MobileNavbar({ onMenuClick }: MobileNavbarProps) {
         {NAV_ITEMS.map((item) => {
           const isWorkspace = item.label === 'Workspace'
           const targetHref = isWorkspace ? workspaceHref : item.href
-          const isActive = targetHref === '/' ? pathname === '/' : pathname?.startsWith(targetHref)
+        const isActive = item.prefixes.some(prefix => pathname?.startsWith(prefix))
           const Icon = item.icon
           const isFocus = item.label === 'Focus'
 

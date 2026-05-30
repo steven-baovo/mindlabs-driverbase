@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import Link from 'next/link';
-import { useTasksRouter } from '@/contexts/TasksRouterContext';
+import { useClientNavigate } from '@/hooks/useClientNavigate';
 import { Box, Plus, Calendar, Activity, ChevronRight, Folder, User } from 'lucide-react';
 import { useLocalProjects, useLocalIssues } from '@/lib/local-first/useLocalTasks';
 import { getProjectStatusIcon, getProjectStatusLabel, getPriorityIcon } from '@/types/models';
@@ -32,7 +32,7 @@ const formatTargetDate = (dateStr: string) => {
 };
 
 export default function ProjectList() {
-  const { goToProject } = useTasksRouter();
+  const { navigate } = useClientNavigate();
   const { projects: dbProjects, addProject } = useLocalProjects();
   const { issues: dbIssues } = useLocalIssues();
 
@@ -44,7 +44,7 @@ export default function ProjectList() {
       status: 'planned',
       priority: 'none'
     });
-    if (newId) goToProject(newId);
+    if (newId) navigate(`/project/${newId}`);
   };
 
   const projectsData = useMemo(() => {

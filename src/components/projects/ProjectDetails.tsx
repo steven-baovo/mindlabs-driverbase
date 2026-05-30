@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useMemo } from 'react';
-import { useTasksRouter } from '@/contexts/TasksRouterContext';
+import { useClientNavigate } from '@/hooks/useClientNavigate';
 import { Trash2, Check, Calendar, ChevronLeft, ChevronRight, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { useLocalProjects, useLocalIssues } from '@/lib/local-first/useLocalTasks';
@@ -265,7 +265,7 @@ function PropRow({ icon, label, onClick }: { icon: React.ReactNode; label: strin
 
 // ─── Main Component ─────────────────────────────────────────────────────────────────
 export default function ProjectDetails({ projectId }: { projectId: string }) {
-  const { goToMyTasks } = useTasksRouter();
+  const { navigate } = useClientNavigate();
   const { projects: dbProjects, updateProject, deleteProject } = useLocalProjects();
   const { issues: dbIssues } = useLocalIssues();
   const [localName, setLocalName] = useState('');
@@ -335,7 +335,7 @@ export default function ProjectDetails({ projectId }: { projectId: string }) {
 
   const handleDelete = () => {
     if (window.confirm('Xóa dự án này? Tất cả nhiệm vụ sẽ bị mất.')) {
-      deleteProject(projectId); goToMyTasks();
+      deleteProject(projectId); navigate('/tasks');
     }
   };
 

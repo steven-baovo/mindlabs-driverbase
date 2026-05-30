@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useMemo, useState, useContext } from 'react'
-import { useRouter } from 'next/navigation'
+import { useClientNavigate } from '@/hooks/useClientNavigate'
 import { TasksContext } from '@/lib/local-first/TasksProvider'
 import { LocalIssue } from '@/lib/local-first/db'
 import { buildTree, TreeNode, WorkspaceNode, getNodeIconData } from '@/lib/node-utils'
@@ -150,12 +150,12 @@ function DueDateBadge({ dueDateStr }: { dueDateStr: string | null | undefined })
 }
 
 function TaskItem({ issue, quadrant }: { issue: LocalIssue; quadrant: Quadrant }) {
-  const router = useRouter()
+  const { navigate } = useClientNavigate()
   const meta = QUADRANT_META[quadrant]
 
   return (
     <div
-      onClick={() => router.push('/tasks')}
+      onClick={() => navigate('/tasks')}
       className={`group flex items-center gap-2.5 px-3 py-2 rounded-lg border ${meta.border} ${meta.bg} hover:brightness-95 dark:hover:brightness-110 transition-all duration-150 cursor-pointer`}
     >
       {/* Quadrant dot */}
@@ -182,7 +182,7 @@ function TaskItem({ issue, quadrant }: { issue: LocalIssue; quadrant: Quadrant }
 
 function PriorityPanel() {
   const { issues } = useContext(TasksContext)
-  const router = useRouter()
+  const { navigate } = useClientNavigate()
 
   const sortedTasks = useMemo(() => {
     if (!issues) return []
@@ -226,7 +226,7 @@ function PriorityPanel() {
       ))}
       {sortedTasks.length > VISIBLE_COUNT && (
         <button
-          onClick={() => router.push('/tasks')}
+          onClick={() => navigate('/tasks')}
           className="text-[11px] text-secondary hover:text-primary font-medium py-1.5 text-center transition-colors cursor-pointer"
         >
           Xem thêm {sortedTasks.length - VISIBLE_COUNT} task khác →

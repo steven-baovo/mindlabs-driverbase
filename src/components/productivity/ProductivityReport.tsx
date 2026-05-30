@@ -13,9 +13,10 @@ import {
   Briefcase,
   ChevronLeft
 } from 'lucide-react'
-import Link from 'next/link'
+import { useClientNavigate } from '@/hooks/useClientNavigate'
 
-export default function ProductivityReportPage() {
+export default function ProductivityReport() {
+  const { navigate } = useClientNavigate()
   // Query dữ liệu từ offline database
   const sessions = useLiveQuery(() => db.focus_sessions.toArray()) || []
   const issues = useLiveQuery(() => db.issues.toArray()) || []
@@ -141,13 +142,13 @@ export default function ProductivityReportPage() {
       {/* Header */}
       <div className="w-full flex items-center justify-between mb-6 shrink-0">
         <div className="flex items-center gap-3">
-          <Link 
-            href="/workspace" 
-            className="w-8 h-8 rounded-full border border-border-main flex items-center justify-center text-secondary hover:text-foreground hover:bg-hover-bg hover:scale-105 active:scale-95 transition-all"
+          <button
+            onClick={() => navigate('/workspace')}
+            className="w-8 h-8 rounded-full border border-border-main flex items-center justify-center text-secondary hover:text-foreground hover:bg-hover-bg hover:scale-105 active:scale-95 transition-all cursor-pointer"
             title="Quay lại"
           >
             <ChevronLeft className="w-4 h-4" />
-          </Link>
+          </button>
           <div>
             <h1 className="text-base sm:text-lg font-black text-foreground tracking-tight uppercase">Báo cáo Năng suất</h1>
             <p className="text-[11px] text-secondary tracking-tight">Tổng hợp kết quả tập trung và nhiệm vụ của bạn</p>

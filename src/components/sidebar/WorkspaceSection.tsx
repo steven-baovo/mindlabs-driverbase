@@ -1,7 +1,9 @@
 'use client'
 
 import React, { useState, useEffect, useMemo, useRef } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
+import { useClientNavigate } from '@/hooks/useClientNavigate'
+import { useAppRouter } from '@/contexts/AppRouterContext'
 import { useWorkspace } from '@/contexts/WorkspaceContext'
 import {
   ChevronRight,
@@ -27,17 +29,19 @@ import LinkNodeModal from '@/components/workspace/LinkNodeModal'
 import { DropdownCard, DropdownItem, DropdownSeparator } from '@/components/ui/DropdownCard'
 
 export default function WorkspaceSection() {
-  const router = useRouter()
   const pathname = usePathname()
+  const { navigate } = useClientNavigate()
+  const { route } = useAppRouter()
 
   const { nodes, updateNode, deleteNode, createNode, liveNodesReady } = useLocalWorkspace()
   const { updateNote: updateMindNote } = useLocalNotes()
   const { updateCanvas: updateMindmap } = useLocalCanvas()
-  const { selection, selectNote: ctxSelectNote, selectCanvas: ctxSelectCanvas, selectLink: ctxSelectLink, selectGraphView: ctxSelectGraphView, clearSelection } = useWorkspace()
+  const { selectNote: ctxSelectNote, selectCanvas: ctxSelectCanvas, selectLink: ctxSelectLink, selectGraphView: ctxSelectGraphView, clearSelection } = useWorkspace()
 
-  const activeNoteId = selection.noteId
-  const activeCanvasId = selection.canvasId
-  const activeLinkId = selection.linkId
+  // Active state từ URL (route) thay vì WorkspaceContext.selection
+  const activeNoteId = route.type === 'note' ? route.id : null
+  const activeCanvasId = route.type === 'canvas' ? route.id : null
+  const activeLinkId = route.type === 'link' ? route.id : null
 
   const loading = !liveNodesReady
 
@@ -183,27 +187,15 @@ export default function WorkspaceSection() {
 
   const handleSelectNote = (noteId: string) => {
     ctxSelectNote(noteId)
-    if (pathname === '/workspace') {
-      window.history.replaceState(null, '', `/workspace?note=${noteId}`)
-    } else {
-      router.push(`/workspace?note=${noteId}`)
-    }
+    navigate(`/note/${noteId}`)
   }
   const handleSelectCanvas = (mapId: string) => {
     ctxSelectCanvas(mapId)
-    if (pathname === '/workspace') {
-      window.history.replaceState(null, '', `/workspace?canvas=${mapId}`)
-    } else {
-      router.push(`/workspace?canvas=${mapId}`)
-    }
+    navigate(`/canvas/${mapId}`)
   }
   const handleSelectLink = (linkId: string) => {
     ctxSelectLink(linkId)
-    if (pathname === '/workspace') {
-      window.history.replaceState(null, '', `/workspace?link=${linkId}`)
-    } else {
-      router.push(`/workspace?link=${linkId}`)
-    }
+    navigate(`/link/${linkId}`)
   }
 
   const handleLinkModalSubmit = async (title: string, url: string) => {
@@ -282,11 +274,7 @@ export default function WorkspaceSection() {
 
   const handleClearSelection = () => {
     clearSelection()
-    if (pathname === '/workspace') {
-      window.history.replaceState(null, '', '/workspace')
-    } else {
-      router.push('/workspace')
-    }
+    navigate('/workspace')
   }
 
   const checkAndClearSelection = (deletedNodeId: string) => {
@@ -459,11 +447,7 @@ export default function WorkspaceSection() {
         <div 
           onClick={() => {
             ctxSelectGraphView()
-            if (pathname === '/workspace') {
-              window.history.replaceState(null, '', '/workspace?view=graph')
-            } else {
-              router.push('/workspace?view=graph')
-            }
+            navigate('/graph')
           }}
           className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md select-none shrink-0 relative group/lib-header cursor-pointer transition-colors ${createMenuOpen ? 'bg-hover-bg' : 'hover:bg-hover-bg'}`}
         >
