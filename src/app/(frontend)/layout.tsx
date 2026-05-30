@@ -12,7 +12,7 @@ import ContentWrapper from "@/components/ContentWrapper"
 import SyncInitializer from "@/components/SyncInitializer"
 import MainSidebar from "@/components/sidebar/MainSidebar"
 import GlobalKeyboardListener from "@/components/GlobalKeyboardListener"
-import QuickCreateModal from "@/components/tasks/QuickCreateModal"
+import QuickCreateModal from "@/components/shared/QuickCreateModal"
 
 export default function FrontendLayout({
   children,

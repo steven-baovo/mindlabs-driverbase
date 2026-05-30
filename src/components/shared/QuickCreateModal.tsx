@@ -10,7 +10,7 @@ import { useLocalIssues, useLocalProjects, useLocalCycles } from '@/lib/local-fi
 import {
   IssueStatus, IssuePriority,
   getStatusIcon, getStatusLabel, getPriorityIcon, getPriorityLabel, formatDueDate, getCycleIcon,
-} from '@/components/tasks/types';
+} from '@/types/models';
 import { useQuickCreate } from '@/contexts/QuickCreateContext';
 
 export default function QuickCreateModal() {

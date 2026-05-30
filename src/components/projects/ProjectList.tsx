@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useTasksRouter } from '@/contexts/TasksRouterContext';
 import { Box, Plus, Calendar, Activity, ChevronRight, Folder, User } from 'lucide-react';
 import { useLocalProjects, useLocalIssues } from '@/lib/local-first/useLocalTasks';
-import { getProjectStatusIcon, getProjectStatusLabel, getPriorityIcon } from '@/components/tasks/types';
+import { getProjectStatusIcon, getProjectStatusLabel, getPriorityIcon } from '@/types/models';
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '—';

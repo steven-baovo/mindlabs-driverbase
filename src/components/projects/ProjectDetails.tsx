@@ -5,8 +5,8 @@ import { useTasksRouter } from '@/contexts/TasksRouterContext';
 import { Trash2, Check, Calendar, ChevronLeft, ChevronRight, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { useLocalProjects, useLocalIssues } from '@/lib/local-first/useLocalTasks';
-import IssueList from '@/components/tasks/IssueList';
-import { MockProject, getProjectStatusIcon, getProjectStatusLabel, getPriorityIcon, getPriorityLabel } from '@/components/tasks/types';
+import IssueList from '@/components/issues/IssueList';
+import { MockProject, getProjectStatusIcon, getProjectStatusLabel, getPriorityIcon, getPriorityLabel } from '@/types/models';
 
 // ─── Popover ───────────────────────────────────────────────────────────────────
 function Popover({ open, onClose, children }: { open: boolean; onClose: () => void; children: React.ReactNode }) {

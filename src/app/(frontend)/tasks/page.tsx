@@ -2,12 +2,12 @@
 
 import React, { Suspense } from 'react';
 import { useTasksRouter } from '@/contexts/TasksRouterContext';
-import IssueList from '@/components/tasks/IssueList';
-import IssueDetails from '@/components/tasks/IssueDetails';
-import ProjectDetails from '@/components/tasks/ProjectDetails';
-import CycleDetails from '@/components/tasks/CycleDetails';
-import CycleList from '@/components/tasks/CycleList';
-import ProjectList from '@/components/tasks/ProjectList';
+import IssueList from '@/components/issues/IssueList';
+import IssueDetails from '@/components/issues/IssueDetails';
+import ProjectDetails from '@/components/projects/ProjectDetails';
+import CycleDetails from '@/components/cycles/CycleDetails';
+import CycleList from '@/components/cycles/CycleList';
+import ProjectList from '@/components/projects/ProjectList';
 
 function TasksContent() {
   const { state } = useTasksRouter();

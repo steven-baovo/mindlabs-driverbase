@@ -11,7 +11,7 @@ import {
   MockIssue, IssueStatus, IssuePriority, 
   getStatusIcon, getStatusLabel, getPriorityIcon, getPriorityLabel, formatDueDate,
   getIssueDisplayId, getCycleIcon
-} from './types';
+} from '@/types/models';
 import { useQuickCreate } from '@/contexts/QuickCreateContext';
 
 // ─── Popover & MenuOption cho dòng Task ─────────────────────────────────────────

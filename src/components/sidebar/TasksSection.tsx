@@ -5,7 +5,7 @@ import { useTasksRouter } from '@/contexts/TasksRouterContext';
 import { usePathname } from 'next/navigation';
 import { Plus, Folder, Layers, Keyboard, Command, X, CheckSquare, Settings, Box, History, ChevronDown } from 'lucide-react';
 import { useLocalProjects, useLocalCycles, useLocalIssues } from '@/lib/local-first/useLocalTasks';
-import { MockProject, MockCycle, getCycleIcon } from '@/components/tasks/types';
+import { MockProject, MockCycle, getCycleIcon } from '@/types/models';
 import { runAutoCycleEngine } from '@/lib/local-first/cycle-engine';
 import { SIDEBAR_STYLES } from '@/lib/sidebar-styles';
 

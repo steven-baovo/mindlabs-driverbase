@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useTasksRouter } from '@/contexts/TasksRouterContext';
 import { History, Plus, Calendar, Activity, ChevronRight } from 'lucide-react';
 import { useLocalCycles, useLocalIssues } from '@/lib/local-first/useLocalTasks';
-import { getCycleIcon } from '@/components/tasks/types';
+import { getCycleIcon } from '@/types/models';
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '—';

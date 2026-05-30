@@ -12,7 +12,7 @@ import {
   MockIssue, IssueStatus, IssuePriority,
   getStatusIcon, getPriorityIcon, getStatusLabel, getPriorityLabel,
   getIssueDisplayId, getCycleIcon
-} from '@/components/tasks/types';
+} from '@/types/models';
 
 // ─── Popover ───────────────────────────────────────────────────────────────────
 function Popover({ open, onClose, children }: { open: boolean; onClose: () => void; children: React.ReactNode }) {

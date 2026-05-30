@@ -5,8 +5,8 @@ import { useTasksRouter } from '@/contexts/TasksRouterContext';
 import { Trash2, ChevronLeft, ChevronRight, Check, Calendar, Activity, X } from 'lucide-react';
 import Link from 'next/link';
 import { useLocalCycles, useLocalIssues } from '@/lib/local-first/useLocalTasks';
-import IssueList from '@/components/tasks/IssueList';
-import { MockCycle } from '@/components/tasks/types';
+import IssueList from '@/components/issues/IssueList';
+import { MockCycle } from '@/types/models';
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '—';

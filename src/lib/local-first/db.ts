@@ -53,6 +53,34 @@ export interface LocalProject {
   start_date?: string
   target_date?: string
   icon?: string
+  key_result_id?: string | null
+  created_at: string
+  updated_at: string
+  is_synced: number
+  is_deleted: number
+}
+
+export interface LocalObjective {
+  id: string
+  user_id: string
+  title: string
+  start_date?: string
+  end_date?: string
+  created_at: string
+  updated_at: string
+  is_synced: number
+  is_deleted: number
+}
+
+export interface LocalKeyResult {
+  id: string
+  user_id: string
+  objective_id: string
+  title: string
+  initial_value: number
+  target_value: number
+  current_value: number
+  metric_name?: string
   created_at: string
   updated_at: string
   is_synced: number
@@ -124,7 +152,7 @@ export interface LocalFocusSetting {
 export interface LocalOutboxItem {
   id?: number
   action: 'create' | 'update' | 'delete'
-  table_name: 'workspace_nodes' | 'mind_notes' | 'mindmaps' | 'projects' | 'cycles' | 'issues' | 'focus_sessions' | 'focus_settings'
+  table_name: 'workspace_nodes' | 'mind_notes' | 'mindmaps' | 'projects' | 'cycles' | 'issues' | 'focus_sessions' | 'focus_settings' | 'objectives' | 'key_results'
   record_id: string
   created_at: string
   status?: 'pending' | 'failed'
@@ -159,6 +187,8 @@ class MindlabsOfflineDatabase extends Dexie {
   outbox!: Table<LocalOutboxItem>
   media_cache!: Table<LocalMediaCacheItem>
   media_outbox!: Table<LocalMediaOutboxItem>
+  objectives!: Table<LocalObjective>
+  key_results!: Table<LocalKeyResult>
 
   constructor() {
     super('MindlabsOfflineDatabase')
@@ -235,6 +265,23 @@ class MindlabsOfflineDatabase extends Dexie {
       outbox: '++id, table_name, record_id, created_at, [record_id+table_name]',
       media_cache: 'id, is_synced, is_deleted',
       media_outbox: '++id, record_id, action, created_at'
+    })
+
+    // v9: Thêm OKRs module
+    this.version(9).stores({
+      workspace_nodes: 'id, parent_id, order, type, note_id, map_id, is_synced, is_deleted',
+      mind_notes: 'id, is_synced, is_deleted',
+      mindmaps: 'id, is_synced, is_deleted',
+      projects: 'id, user_id, key_result_id, status, is_synced, is_deleted',
+      cycles: 'id, user_id, is_active, is_synced, is_deleted',
+      issues: 'id, user_id, project_id, cycle_id, status, priority, is_synced, is_deleted',
+      focus_sessions: 'id, user_id, task_id, session_type, is_synced',
+      focus_settings: 'id, user_id, is_synced',
+      outbox: '++id, table_name, record_id, created_at, [record_id+table_name]',
+      media_cache: 'id, is_synced, is_deleted',
+      media_outbox: '++id, record_id, action, created_at',
+      objectives: 'id, user_id, is_synced, is_deleted',
+      key_results: 'id, user_id, objective_id, is_synced, is_deleted'
     })
   }
 }
