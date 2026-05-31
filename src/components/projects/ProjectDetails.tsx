@@ -324,7 +324,12 @@ export default function ProjectDetails({ projectId }: { projectId: string }) {
   if (!project) return (
     <div className="p-8 flex flex-col items-center justify-center flex-1 h-full gap-4 text-zinc-500 bg-background">
       <p className="text-sm">Dự án không tồn tại hoặc đã bị xóa.</p>
-      <Link href="/tasks" className="text-xs font-semibold text-zinc-900 hover:underline">Quay lại</Link>
+      <button 
+        onClick={(e) => { e.preventDefault(); navigate('/tasks'); }} 
+        className="text-xs font-semibold text-zinc-900 hover:underline cursor-pointer border border-transparent bg-transparent"
+      >
+        Quay lại
+      </button>
     </div>
   );
 
@@ -359,16 +364,24 @@ export default function ProjectDetails({ projectId }: { projectId: string }) {
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 h-[44px] border-b border-border-main shrink-0 select-none">
         <div className="flex items-center gap-2">
-          <Link href="/tasks?view=projects" className="p-1 rounded-md text-zinc-400 hover:bg-hover-bg hover:text-foreground transition-colors">
+          <button 
+            onClick={(e) => { e.preventDefault(); navigate('/projects'); }} 
+            className="p-1 rounded-md text-zinc-400 hover:bg-hover-bg hover:text-foreground transition-colors cursor-pointer border border-transparent bg-transparent"
+          >
             <ChevronLeft className="w-4 h-4" />
-          </Link>
+          </button>
           <div className="flex items-center gap-1 text-standard text-zinc-400 leading-none">
-            <Link href="/tasks?view=projects" className="hover:text-standard-text transition-colors leading-none">Project</Link>
+            <button 
+              onClick={(e) => { e.preventDefault(); navigate('/projects'); }} 
+              className="hover:text-standard-text transition-colors leading-none cursor-pointer border border-transparent bg-transparent"
+            >
+              Project
+            </button>
             <span className="mx-1 leading-none">/</span>
             <span className="text-standard-text font-semibold leading-none">{project.name}</span>
           </div>
         </div>
-        <button onClick={handleDelete} className="p-1.5 rounded-md text-zinc-400 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer" title="Xóa dự án">
+        <button onClick={handleDelete} className="p-1.5 rounded-md text-zinc-400 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer border border-transparent bg-transparent" title="Xóa dự án">
           <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>

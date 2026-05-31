@@ -481,21 +481,33 @@ export default function IssueDetails({ issueId }: { issueId: string }) {
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 h-[44px] border-b border-border-main shrink-0 select-none">
         <div className="flex items-center gap-2">
-          <Link 
-            href={issue.projectId ? `/tasks?project=${issue.projectId}` : "/tasks"} 
-            className="p-1 rounded-md text-zinc-400 hover:bg-hover-bg hover:text-foreground transition-colors"
+          <button 
+            onClick={(e) => { 
+              e.preventDefault(); 
+              if (typeof window !== 'undefined' && window.history.length > 1) {
+                window.history.back(); 
+              } else {
+                navigate('/tasks');
+              }
+            }} 
+            className="p-1 rounded-md text-zinc-400 hover:bg-hover-bg hover:text-foreground transition-colors border border-transparent bg-transparent cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" />
-          </Link>
+          </button>
           <div className="flex items-center gap-1 text-standard text-zinc-400 leading-none">
             {issue.projectId ? (
-              <Link href={`/tasks?project=${issue.projectId}`} className="hover:text-standard-text transition-colors leading-none">{projectName || 'Dự án không tồn tại'}</Link>
+              <button 
+                onClick={(e) => { e.preventDefault(); navigate(`/project/${issue.projectId}`); }} 
+                className="hover:text-standard-text transition-colors leading-none cursor-pointer border border-transparent bg-transparent p-0 font-normal"
+              >
+                {projectName || 'Dự án không tồn tại'}
+              </button>
             ) : <span className="leading-none">Nhiệm vụ</span>}
             <span className="mx-1 leading-none">/</span>
             <span className="text-standard-text font-semibold leading-none">{issue.displayId}</span>
           </div>
         </div>
-        <button onClick={handleDelete} className="p-1.5 rounded-md text-zinc-400 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer" title="Xóa">
+        <button onClick={handleDelete} className="p-1.5 rounded-md text-zinc-400 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer border border-transparent bg-transparent" title="Xóa">
           <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>

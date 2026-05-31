@@ -275,7 +275,7 @@ function CalendarPicker({ value, onChange, onClose }: {
 
 // ─── Main Component ─────────────────────────────────────────────────────────────────
 export default function CycleDetails({ cycleId }: { cycleId: string }) {
-  const { navigate } = useClientNavigate();
+  const { navigate, replace } = useClientNavigate();
   const { cycles: dbCycles, updateCycle, deleteCycle } = useLocalCycles();
   const { issues: dbIssues } = useLocalIssues();
   const [cyclesEnabled, setCyclesEnabled] = useState(true);
@@ -290,10 +290,10 @@ export default function CycleDetails({ cycleId }: { cycleId: string }) {
       const enabled = localStorage.getItem('cycles_enabled') !== 'false';
       setCyclesEnabled(enabled);
       if (!enabled) {
-        router.replace('/tasks');
+        replace('/tasks');
       }
     }
-  }, [router]);
+  }, []);
 
   const cycle = useMemo(() => {
     if (!dbCycles) return null;
@@ -319,7 +319,12 @@ export default function CycleDetails({ cycleId }: { cycleId: string }) {
   if (!cycle) return (
     <div className="p-8 flex flex-col items-center justify-center flex-1 h-full gap-4 text-zinc-500 bg-background">
       <p className="text-xs font-semibold uppercase tracking-wider">Chu kỳ không tồn tại hoặc đã bị xóa.</p>
-      <Link href="/tasks" className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 hover:underline">Quay lại danh sách</Link>
+      <button 
+        onClick={(e) => { e.preventDefault(); navigate('/tasks'); }} 
+        className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 hover:underline cursor-pointer border border-transparent bg-transparent"
+      >
+        Quay lại danh sách
+      </button>
     </div>
   );
 
@@ -363,12 +368,15 @@ export default function CycleDetails({ cycleId }: { cycleId: string }) {
         <div className="p-6 pb-3 border-b border-border-main bg-background shrink-0 flex flex-col gap-3">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-xs font-semibold text-zinc-500">
-            <Link href="/tasks" className="flex items-center gap-1 hover:text-foreground transition-colors">
+            <button 
+              onClick={(e) => { e.preventDefault(); navigate('/cycles'); }} 
+              className="flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer border border-transparent bg-transparent"
+            >
               <ChevronLeft className="w-3.5 h-3.5" />
-              <span>Nhiệm vụ</span>
-            </Link>
+              <span>Cycle</span>
+            </button>
             <span>/</span>
-            <span className="text-foreground">Chu kỳ</span>
+            <span className="text-foreground">{cycle.name}</span>
           </div>
 
           <div className="flex items-center gap-3">

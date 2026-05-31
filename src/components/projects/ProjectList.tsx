@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { useClientNavigate } from '@/hooks/useClientNavigate';
-import { Box, Plus, Calendar, Activity, ChevronRight, Folder, User } from 'lucide-react';
+import { Box, Plus, Calendar, Activity, ChevronRight, Folder, User, Target } from 'lucide-react';
 import { useLocalProjects, useLocalIssues } from '@/lib/local-first/useLocalTasks';
 import { getProjectStatusIcon, getProjectStatusLabel, getPriorityIcon } from '@/types/models';
 
@@ -115,12 +115,30 @@ export default function ProjectList() {
 
         {/* Dòng 2: Thanh công cụ dưới đường viền */}
         <div className="flex items-center justify-between gap-4 flex-wrap p-4">
-          {/* Nhóm bên trái: Lọc */}
-          <div className="flex items-center gap-2 text-xs flex-1">
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-hover-bg rounded-md text-xs font-semibold text-foreground border border-transparent select-none cursor-pointer">
-              <span>Tất cả dự án</span>
+          {/* Nhóm bên trái: Điều hướng phân đoạn (Segmented Tabs) */}
+            <div className="flex items-center gap-1 bg-white dark:bg-zinc-900 border border-border-main p-1 rounded-lg text-xs select-none">
+              <button
+                onClick={() => navigate('/okrs')}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-foreground dark:hover:text-foreground rounded-md text-[11px] font-medium transition-all cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/40 border border-transparent"
+              >
+                <Target className="w-3.5 h-3.5" />
+                <span>OKRs</span>
+              </button>
+              <button
+                onClick={() => navigate('/projects')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-foreground rounded-md text-[11px] font-semibold transition-all cursor-pointer border border-transparent"
+              >
+                <Box className="w-3.5 h-3.5" />
+                <span>Project</span>
+              </button>
+              <button
+                onClick={() => navigate('/cycles')}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-foreground dark:hover:text-foreground rounded-md text-[11px] font-medium transition-all cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/40 border border-transparent"
+              >
+                <Activity className="w-3.5 h-3.5" />
+                <span>Cycle</span>
+              </button>
             </div>
-          </div>
 
           {/* Nhóm bên phải: Nút Tạo dự án */}
           <div className="flex items-center gap-3 shrink-0">
@@ -160,9 +178,12 @@ export default function ProjectList() {
           ) : (
             projectsData.map(proj => {
               return (
-                <Link
+                <div
                   key={proj.id}
-                  href={`/tasks?project=${proj.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(`/project/${proj.id}`);
+                  }}
                   className="group grid grid-cols-[36px_1fr_120px_80px_120px_60px_100px] items-center gap-4 py-2.5 px-4 bg-transparent hover:bg-hover-bg/30 transition-colors cursor-pointer text-xs"
                 >
                   {/* Col 1: Icon & Checkbox */}
@@ -245,7 +266,7 @@ export default function ProjectList() {
                     </div>
                     <span className="text-[11px] font-semibold w-8 text-right">{proj.progress}%</span>
                   </div>
-                </Link>
+                </div>
               );
             })
           )}

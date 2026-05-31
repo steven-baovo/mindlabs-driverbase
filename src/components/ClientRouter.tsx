@@ -201,6 +201,20 @@ function RouterContent() {
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 export default function ClientRouter() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <div className="flex-1 h-full flex items-center justify-center bg-background">
+        <Loader2 className="w-6 h-6 text-primary animate-spin" />
+      </div>
+    )
+  }
+
   return (
     <Suspense fallback={
       <div className="flex-1 h-full flex items-center justify-center bg-background">

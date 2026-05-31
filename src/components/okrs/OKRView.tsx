@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useClientNavigate } from '@/hooks/useClientNavigate';
 import { useLocalObjectives, useLocalKeyResults } from '@/lib/local-first/useLocalOKRs';
 import { useLocalProjects, useLocalIssues } from '@/lib/local-first/useLocalTasks';
 import { Plus, Target, Target as TargetIcon, ChevronDown, ChevronRight, BarChart2, Briefcase, Activity, CheckCircle2, Pencil, Trash2, X, Box } from 'lucide-react';
@@ -44,7 +45,9 @@ function ObjectiveNode({ obj, krs, projects, onAddKR, onUpdateObj, onDeleteObj, 
         >
           {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         </button>
-        <div className="w-5 h-5 flex items-center justify-center rounded border border-border-main bg-zinc-100 dark:bg-zinc-800 text-[11px] font-bold text-zinc-600 dark:text-zinc-300 shrink-0 mt-0.5">O</div>
+        <div className="w-5 h-5 flex items-center justify-center rounded border border-border-main bg-zinc-100 dark:bg-zinc-800 shrink-0 mt-0.5">
+          <Target className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
+        </div>
         
         <div className="flex-1 min-w-0 flex items-start gap-3">
           <div className="flex-1 min-w-0 animate-fade-in">
@@ -160,6 +163,7 @@ function ObjectiveNode({ obj, krs, projects, onAddKR, onUpdateObj, onDeleteObj, 
 }
 
 function KeyResultNode({ kr, projects, allProjects, onLinkProject, onDeleteKR, isFirst, isLast, projectProgress }: any) {
+  const { navigate } = useClientNavigate();
   const [expanded, setExpanded] = useState(true);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isEditingActions, setIsEditingActions] = useState(false);
@@ -400,7 +404,11 @@ function KeyResultNode({ kr, projects, allProjects, onLinkProject, onDeleteKR, i
             projects.map((p: any, idx: number) => {
               const isLastProj = idx === projects.length - 1;
               return (
-                <div key={p.id} className="relative flex items-center gap-2 text-xs py-3 pr-12 pl-2 hover:bg-hover-bg rounded-md group/proj cursor-pointer">
+                <div 
+                  key={p.id} 
+                  onClick={() => navigate(`/project/${p.id}`)}
+                  className="relative flex items-center gap-2 text-xs py-3 pr-12 pl-2 hover:bg-hover-bg rounded-md group/proj cursor-pointer"
+                >
                   <div className={`absolute -left-[62px] top-[-10px] border-l border-border-strong ${isLastProj && !isLinking ? 'h-[30px]' : 'bottom-0'}`} />
                   <div className="absolute -left-[62px] top-[20px] w-[20px] border-t border-border-strong" />
                 
@@ -412,15 +420,25 @@ function KeyResultNode({ kr, projects, allProjects, onLinkProject, onDeleteKR, i
                   </span>
                 </div>
 
-                {/* Progress Column aligning with KR progress column */}
-                <div className="w-28 shrink-0 flex items-center justify-end gap-2">
-                  <div className="w-16 h-1.5 bg-active-bg rounded-full overflow-hidden shrink-0" title={`Tiến độ: ${projectProgress[p.id] || 0}%`}>
-                    <div 
-                      className="h-full bg-blue-500 rounded-full transition-all duration-500"
-                      style={{ width: `${projectProgress[p.id] || 0}%` }}
-                    />
+                {/* Progress Column - Styled as a Progress Circle on the right edge */}
+                <div className="flex items-center gap-2 ml-auto shrink-0 select-none pr-1">
+                  <div className="relative w-4 h-4 flex items-center justify-center shrink-0" title={`Tiến độ: ${projectProgress[p.id] || 0}%`}>
+                    <svg className="w-full h-full transform -rotate-90">
+                      <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" className="text-zinc-100 dark:text-zinc-800" strokeWidth="1.5" />
+                      <circle 
+                        cx="8" 
+                        cy="8" 
+                        r="6" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        className="text-blue-500" 
+                        strokeDasharray="37.7" 
+                        strokeDashoffset={37.7 - (37.7 * (projectProgress[p.id] || 0)) / 100} 
+                        strokeWidth="1.5" 
+                      />
+                    </svg>
                   </div>
-                  <span className="text-xs font-mono text-secondary shrink-0 text-right w-8">
+                  <span className="text-xs font-mono font-medium text-secondary shrink-0 text-right w-10">
                     {projectProgress[p.id] || 0}%
                   </span>
                 </div>
@@ -473,6 +491,7 @@ function KeyResultNode({ kr, projects, allProjects, onLinkProject, onDeleteKR, i
 }
 
 export default function OKRView() {
+  const { navigate } = useClientNavigate();
   const { objectives, addObjective, updateObjective, deleteObjective } = useLocalObjectives();
   const { key_results, addKeyResult, deleteKeyResult } = useLocalKeyResults();
   const { projects, updateProject } = useLocalProjects();
@@ -556,22 +575,57 @@ export default function OKRView() {
 
   return (
     <div className="flex-1 flex flex-col h-full bg-background overflow-hidden">
-      <div className="p-6 pb-4 border-b border-border-main shrink-0 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-            <Target className="w-6 h-6 text-primary" />
-            Chiến lược (OKRs)
-          </h1>
-          <p className="text-xs text-secondary mt-1">Định hướng mục tiêu và liên kết trực tiếp với thực thi (Projects).</p>
+      {/* Header */}
+      <header className="flex flex-col bg-background shrink-0 select-none">
+        {/* Dòng 1: Tiêu đề chính */}
+        <div className="flex items-center justify-between px-4 h-[44px] border-b border-border-main shrink-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <Target className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+            <h1 className="text-standard tracking-tight font-medium text-standard-text truncate leading-none">OKRs</h1>
+          </div>
         </div>
-        
-        <button 
-          onClick={handleAddObjective}
-          className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-3 py-1.5 rounded-md text-sm font-semibold transition-colors shadow-sm"
-        >
-          <Plus className="w-4 h-4" /> Mục tiêu mới (O)
-        </button>
-      </div>
+
+        {/* Dòng 2: Thanh công cụ dưới đường viền */}
+        <div className="flex items-center justify-between gap-4 flex-wrap p-4">
+          {/* Nhóm bên trái: Điều hướng phân đoạn (Segmented Tabs) */}
+          <div className="flex items-center gap-2 text-xs flex-1">
+            <div className="flex items-center gap-1 bg-white dark:bg-zinc-900 border border-border-main p-1 rounded-lg text-xs select-none">
+              <button
+                onClick={() => navigate('/okrs')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-foreground rounded-md text-[11px] font-semibold transition-all cursor-pointer border border-transparent"
+              >
+                <Target className="w-3.5 h-3.5" />
+                <span>OKRs</span>
+              </button>
+              <button
+                onClick={() => navigate('/projects')}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-foreground dark:hover:text-foreground rounded-md text-[11px] font-medium transition-all cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/40 border border-transparent"
+              >
+                <Box className="w-3.5 h-3.5" />
+                <span>Project</span>
+              </button>
+              <button
+                onClick={() => navigate('/cycles')}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-foreground dark:hover:text-foreground rounded-md text-[11px] font-medium transition-all cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/40 border border-transparent"
+              >
+                <Activity className="w-3.5 h-3.5" />
+                <span>Cycle</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Nhóm bên phải: Nút Tạo Mục tiêu */}
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={handleAddObjective}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-[11px] font-semibold rounded-md shadow-subtle transition-colors cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Objective</span>
+            </button>
+          </div>
+        </div>
+      </header>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
         <div className="max-w-4xl mx-auto">
