@@ -207,9 +207,21 @@ const NoteEditorClient = ({ noteId, onOpenConnectModal }: NoteEditorClientProps)
       </header>
 
       {/* Phần nội dung cuộn */}
-      <div className="flex-1 overflow-y-auto pt-10 pb-32">
-        <main className="px-4 lg:px-24 min-w-0">
-          <div className="max-w-3xl mx-auto">
+      <div 
+        className="flex-1 overflow-y-auto pt-10 pb-[50vh]"
+        onClick={(e) => {
+          // Focus editor nếu click vào vùng trống dưới cùng
+          if (e.target === e.currentTarget || (e.target as HTMLElement).tagName === 'MAIN' || (e.target as HTMLElement).classList.contains('max-w-3xl')) {
+            const editorElement = document.querySelector('.ProseMirror') as HTMLElement
+            editorElement?.focus()
+            
+            // Tùy chọn: Đưa con trỏ xuống cuối document
+            // editor.commands.focus('end') cần access vào editor instance, ở đây focus tạm vào element là đủ
+          }
+        }}
+      >
+        <main className="px-4 lg:px-24 min-w-0 h-full">
+          <div className="max-w-3xl mx-auto h-full">
 
             {/* Title */}
             <textarea

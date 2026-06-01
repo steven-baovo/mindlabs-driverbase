@@ -49,6 +49,18 @@ const ContextMenuItem = ({ label, icon: Icon, onClick, active }: { label: string
 const ContextMenuDivider = () => <div className="h-px bg-border-main my-1" />
 
 const ContextMenuSubMenu = ({ label, icon: Icon, children, isHovered, onMouseEnter, onMouseLeave }: any) => {
+  const submenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (isHovered && submenuRef.current) {
+      const rect = submenuRef.current.getBoundingClientRect()
+      if (rect.bottom > window.innerHeight) {
+        const overflow = rect.bottom - window.innerHeight + 16
+        submenuRef.current.style.transform = `translateY(-${overflow}px)`
+      }
+    }
+  }, [isHovered])
+
   return (
     <div 
       className="relative flex items-center justify-between px-3 py-1.5 hover:bg-hover-bg cursor-pointer text-secondary hover:text-foreground transition-colors text-[13px]"
@@ -61,7 +73,10 @@ const ContextMenuSubMenu = ({ label, icon: Icon, children, isHovered, onMouseEnt
       </div>
       <ChevronRight className="w-4 h-4 opacity-50" strokeWidth={1.5} />
       {isHovered && (
-        <div className="absolute left-full top-0 ml-1 bg-surface/95 backdrop-blur-md border border-border-main rounded-xl shadow-overlay py-1.5 min-w-[200px] animate-in fade-in zoom-in-95 duration-200 z-[110]">
+        <div 
+          ref={submenuRef}
+          className="absolute left-full top-0 ml-1 bg-surface/95 backdrop-blur-md border border-border-main rounded-xl shadow-overlay py-1.5 min-w-[200px] animate-in fade-in zoom-in-95 duration-200 z-[110]"
+        >
           {children}
         </div>
       )}
@@ -223,7 +238,7 @@ const extensions = [
       return ['a', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, { title: HTMLAttributes.href || '' }), 0]
     },
   }).configure({
-    openOnClick: true,
+    openOnClick: false,
     HTMLAttributes: {
       class: 'text-primary underline underline-offset-4 cursor-pointer',
       target: '_blank',
@@ -244,6 +259,32 @@ const extensions = [
 
 const ZenEditor = ({ noteId, initialContent, onChange, onCountChange, placeholder = 'Bắt đầu viết...' }: ZenEditorProps) => {
   const [menuPos, setMenuPos] = useState<{ x: number; y: number } | null>(null)
+  const [adjustedMenuPos, setAdjustedMenuPos] = useState<{ x: number; y: number } | null>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setAdjustedMenuPos(menuPos)
+  }, [menuPos])
+
+  useEffect(() => {
+    if (menuPos && adjustedMenuPos && menuRef.current) {
+      const rect = menuRef.current.getBoundingClientRect()
+      let newY = adjustedMenuPos.y
+      let newX = adjustedMenuPos.x
+      
+      if (rect.bottom > window.innerHeight) {
+        newY = Math.max(16, window.innerHeight - rect.height - 16)
+      }
+      if (rect.right > window.innerWidth) {
+        newX = Math.max(16, window.innerWidth - rect.width - 16)
+      }
+      
+      if (newY !== adjustedMenuPos.y || newX !== adjustedMenuPos.x) {
+        setAdjustedMenuPos({ x: newX, y: newY })
+      }
+    }
+  }, [menuPos, adjustedMenuPos])
+
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null)
   const [isSearchNodeOpen, setIsSearchNodeOpen] = useState(false)
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -278,7 +319,7 @@ const ZenEditor = ({ noteId, initialContent, onChange, onCountChange, placeholde
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-lg max-w-none focus:outline-none min-h-[500px] pt-2 pb-[70vh]',
+        class: 'prose prose-lg max-w-none focus:outline-none min-h-[500px] pt-2 pb-24',
       },
       handleDOMEvents: {
         contextmenu: (view, event) => {
@@ -289,6 +330,19 @@ const ZenEditor = ({ noteId, initialContent, onChange, onCountChange, placeholde
         },
         mousedown: () => {
           if (menuPos) setMenuPos(null)
+          return false
+        },
+        click: (view, event) => {
+          if (event.ctrlKey || event.metaKey) {
+            const target = event.target as HTMLElement
+            const link = target.closest('a')
+            if (link && link.href) {
+              window.open(link.href, link.target || '_blank')
+              event.preventDefault()
+              event.stopPropagation()
+              return true
+            }
+          }
           return false
         }
       }
@@ -413,12 +467,13 @@ const ZenEditor = ({ noteId, initialContent, onChange, onCountChange, placeholde
   return (
     <div className="relative w-full">
       {/* Custom Context Menu - Obsidian Style with Leanity Aesthetics */}
-      {menuPos && (
+      {adjustedMenuPos && menuPos && (
         <div 
+          ref={menuRef}
           className="fixed z-[100] bg-surface/95 backdrop-blur-md border border-border-main rounded-xl shadow-overlay py-1.5 min-w-[240px] animate-in fade-in zoom-in-95 duration-150 select-none"
           style={{ 
-            top: Math.min(menuPos.y, typeof window !== 'undefined' ? window.innerHeight - 400 : menuPos.y), 
-            left: Math.min(menuPos.x, typeof window !== 'undefined' ? window.innerWidth - 260 : menuPos.x) 
+            top: adjustedMenuPos.y, 
+            left: adjustedMenuPos.x 
           }}
           onClick={(e) => e.stopPropagation()}
           onContextMenu={(e) => e.preventDefault()}
